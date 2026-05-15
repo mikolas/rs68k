@@ -2529,11 +2529,11 @@ def emit_bus_end(ci):
     if is_interrupt_vector_lookup:
         lines.append("self.end_interrupt_vector_lookup();")
 
-    # Address error check AFTER bus access (preserves register state from preceding code)
+    # Address error check AFTER bus access
     if not ci[3] and ci[2] != 2:
         fault = "S_DOUBLE_FAULT" if ci[8] else "S_ADDRESS_ERROR"
         lines.append("if self.aob & 1 != 0 {")
-        lines.append("    self.icount += 4;")  # refund the bus access that didn't happen
+        lines.append("    self.icount += 4;")
         lines.append("    self.inst_state = %s;" % fault)
         lines.append("    return;")
         lines.append("}")
