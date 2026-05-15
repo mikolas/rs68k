@@ -230,10 +230,61 @@ interface is called once per bus access — the emulator can interleave DMA betw
 |--------|--------|------|---------|
 | Master clock | Emulator | 28.375 MHz | Derives all other clocks |
 | CPU clock (CLK) | ÷4 from master | 7.09 MHz | Drives CPU `tick()` calls |
+| E clock | CPU output, ÷10 from CLK | 709 kHz | Peripheral sync (CIA) |
 | CCK | ÷8 from master | 3.55 MHz | Color clock, DMA scheduling |
 | CDAC | ÷4 from master | 7.09 MHz | Chip RAM access timing |
 | Horizontal sync | Every 227.5 CCK | 15.6 kHz | Scanline boundary |
 | Vertical sync | Every 262/312 lines | 59.94/50 Hz | Frame boundary |
+
+### E Clock (Enable)
+
+The 68000 generates the E clock internally by dividing CLK by 10. It's a free-running
+output with a 6-high/4-low duty cycle:
+
+```
+CLK: _/‾\_/‾\_/‾\_/‾\_/‾\_/‾\_/‾\_/‾\_/‾\_/‾\_/‾\_/‾\_/‾\_/‾\_/‾\_/‾\_/‾\_/‾\_/‾\_/‾\
+E:   ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾\________________________________________/‾‾‾‾‾‾‾‾‾‾‾‾
+     |<------------ 6 clocks high ----------->|<---- 4 clocks low ---->|
+     |<----------------------- 10 clocks = 1 E cycle ----------------->|
+```
+
+**Purpose:** Synchronizes 6800-family peripherals (CIAs on the Amiga). When VPA is
+asserted during an interrupt acknowledge, the CPU synchronizes the bus cycle to E clock
+edges, adding wait states until aligned. This is why CIA access takes ~12-16 cycles
+instead of the normal 4.
+
+**Implementation:** The CPU must track E clock phase internally (a counter mod 10).
+When VPA is asserted (CIA access or autovectored interrupt), the bus cycle is stretched
+to align with E clock edges.
+
+```rust
+pub struct M68000 {
+    // ... existing fields ...
+    
+    /// E clock counter (0-9), increments each CPU clock
+    pub e_clock: u8,
+}
+
+impl M68000 {
+    /// Returns true if E clock output is high (first 6 of 10 clocks)
+    pub fn e_high(&self) -> bool {
+        self.e_clock < 6
+    }
+    
+    /// Advance E clock by N CPU clocks
+    pub fn advance_e_clock(&mut self, clocks: u32) {
+        self.e_clock = ((self.e_clock as u32 + clocks) % 10) as u8;
+    }
+}
+```
+
+The `Bus68k` response includes VPA. When VPA is asserted, the adapter inserts wait
+states until E clock alignment is achieved (the CPU waits for the falling edge of E,
+then completes the cycle on the next rising edge). This adds 0-9 extra clocks depending
+on current E phase.
+
+In MAME, this is handled by `vpa_sync()` and `vpa_after()` which calculate the
+synchronization delay. Our implementation matches this behavior.
 
 The emulator does NOT pass clock signals to the CPU. Instead, it calls `cpu.tick()` at the
 appropriate rate. The CPU is purely passive — it executes when called and returns how many
