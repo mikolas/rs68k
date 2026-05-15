@@ -215,4 +215,20 @@ impl M68000 {
     pub fn fc(&self) -> u8 {
         ((self.base_ssw | if self.sr & SR_S != 0 { SSW_S } else { 0 }) & 7) as u8
     }
+
+    /// Start interrupt vector lookup — called at beginning of interrupt ack
+    pub fn start_interrupt_vector_lookup(&mut self) {
+        let level = self.next_state >> 24;
+        // Clear NMI if level 7
+        if level == 7 {
+            self.nmi_pending = false;
+            self.update_interrupt();
+        }
+    }
+
+    /// End interrupt vector lookup — called after reading vector from bus
+    pub fn end_interrupt_vector_lookup(&mut self) {
+        self.int_vector = ((self.edb & 0xff) as u32) << 2;
+        self.int_next_state = 0;
+    }
 }
