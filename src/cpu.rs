@@ -47,6 +47,9 @@ pub struct M68000 {
     // Decode table (64K entries)
     pub decode_table: Vec<u16>,
 
+    // Pin-level interface state
+    pub pin_state: crate::pins::PinState,
+
     // Cycle accumulator for current instruction
     pub icount: i32,
 }
@@ -64,6 +67,7 @@ impl M68000 {
             virq_state: 0, nmi_pending: false, int_level: 0, int_next_state: 0,
             inst_state: S_RESET, next_state: 0,
             decode_table: Vec::new(),
+            pin_state: crate::pins::PinState::default(),
             icount: 0,
         };
         cpu.init_decode_table();
