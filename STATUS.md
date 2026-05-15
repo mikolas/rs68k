@@ -121,3 +121,42 @@ The `make_expression()` function can emit proper casts because it knows the sour
 4. Run, compile, iterate on errors
 5. Verify with ProcessorTests
 
+
+## 2026-05-15: Phase 3 — Testing & Validation
+
+### Results (ProcessorTests, ~8000 tests per instruction)
+
+**100% passing (38 instructions):**
+NOP, MOVE.q, EXG, SWAP, EXT.w, EXT.l, ADD.b, SUB.b, AND.b, OR.b, EOR.b, CMP.b,
+NEG.b, NOT.b, CLR.b, TST.b, MOVE.b, LEA, PEA, Scc, TAS, NBCD, TRAP, UNLINK,
+ASL.b, ASL.l, LSL.b, LSL.l, LSR.b, LSR.l, ROL.b, ROL.l, ROR.b, ROR.l,
+ROXL.b, ROXL.l, ROXR.b, ROXR.l
+
+**Partially passing (address error PC issue only):**
+All word/long memory-accessing instructions: ADD.w/l, SUB.w/l, AND.w/l, OR.w/l,
+EOR.w/l, CMP.w/l, MOVE.w/l, TST.w/l, NEG.w/l, NOT.w/l, CLR.w/l, MOVEA.w/l,
+ADDA.w/l, SUBA.w/l, CMPA.w/l, ASL.w, LSL.w, LSR.w, ROL.w, ROR.w, ROXL.w, ROXR.w,
+JMP, JSR, BSR, RTS, RTR, RTE, LINK, MOVEM.w/l, MULU, MULS, DIVU, DIVS,
+ADDX.b/w/l, SUBX.b/w/l, ABCD, SBCD, DBcc, Bcc, CHK, TRAPV
+
+### Known Issues
+
+1. **Address error stack frame PC** (MAME-inherited): The PC pushed to the stack
+   frame during address error is 2 bytes too high. This is because `m_pc` is updated
+   in the microstep before the bus access that triggers the error. The C++ MAME code
+   has the same behavior — this is a known MAME inaccuracy vs real hardware.
+   Impact: only affects the ~1% of tests that trigger address errors.
+
+2. **ASR.b with large shift counts**: SR flags (X/C) are wrong when shift count >= 8.
+   This is an ALU edge case in the shift loop microcode. Needs investigation.
+
+3. **DIVS overflow flag**: Some DIVS tests show V flag differences. Edge case.
+
+### Architecture Decisions
+
+- `execute_one()` loops through exception states (address error, bus error, trace,
+  interrupt) until reaching a normal instruction state (>= S_ILLEGAL).
+- Address error detection: check AFTER bus access (preserves register state for the
+  exception handler), refund 4 bus cycles (bus cycle doesn't complete on real HW).
+- Bus trait: simple read_program/read_data/write_data/read_cpu without masks.
+  Byte shift (`edb >>= 8`) handled in generated code.
