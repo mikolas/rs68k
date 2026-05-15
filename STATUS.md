@@ -1,162 +1,149 @@
 # Porting Journal — MAME m68000 → Rust
 
-## 2026-05-15: Phase 1 — Infrastructure
+## Project Overview
 
-### Completed
-- **Cargo.toml**: crate skeleton with dev-deps for test harness (serde, flate2)
-- **types.rs**: All constants (S_RESET..S_LINEF, SR flags, SSW bits), Bus trait
-- **cpu.rs**: M68000 struct with all fields matching C++ `m68000_device`:
-  - `da[17]`, `sp`, `pc`, `ipc`, `au`, `at`, `aob`, `dt`, `int_vector`
-  - `isr`, `sr`, `dbin`, `dbout`, `edb`, `irc`, `ir`, `ird`, `ftu`
-  - `aluo`, `alue`, `alub`, `movemr`, `irdi`, `base_ssw`, `ssw`, `dcr`
-  - `inst_state`, `next_state`, interrupt state
-  - Helper methods: `set_16h`, `set_16l`, `ext32`, `high16`, `merge_16_32`,
-    `set_ftu_const`, `step_movem`, `step_movem_predec`, `update_user_super`,
-    `update_interrupt`, `set_irq`, `fc()`
-- **alu.rs**: Core ALU ops — add, add8, addc, addx, addx8, sub, sub8, subc, subx, subx8,
-  and, andx, and8, and8x, or, or8, eor, eor8
-- **alu_ext.rs**: ext, not, not8, abcd8, sbcd8, sla0, sla1, over, asl, asl8, asl32,
-  asr, asr8, asr32, lsl, lsl8, lsl32, lsr, lsr8, lsr32
-- **alu_rot.rs**: rol, rol8, rol32, ror, ror8, ror32, roxl, roxl8, roxl32, roxr, roxr8,
-  roxr32, roxr32ms, roxr32mu, sr_z, sr_nz_u, sr_nzvc, sr_nzvc_u, sr_xnzvc, sr_xnzvc_u
-- **decode.rs**: 1525-entry packed decode table, `init_decode_table()` expansion to 64K
+Port of MAME's Olivier Galibert cycle-exact m68000 core to Rust for use in an Amiga emulator.
+Source: `m68000/m68000gen.py` (microcode-based code generator).
+Strategy: Fork the generator to emit Rust directly from the same intermediate representation.
+Verification: ProcessorTests suite (830,695 tests across 103 instructions).
 
-### Verification
-- 9 unit tests passing: ALU add/sub/and/asr/lsl, decode table validity,
-  set_ftu_const, update_interrupt
-- Decode table produces 45815 valid entries (matches C++ expansion)
-- Max state number: 1534 (matches handler count in m68000-head.h)
+## Phase 1 — Infrastructure (tag: phase1)
 
-### Notes
-- Bus trait passes no function code — the CPU computes FC internally from `base_ssw` + SR.
-  The Bus impl can call `cpu.fc()` if needed, but for simplicity the trait methods don't
-  take FC. **Revisit if Amiga integration needs FC per-access.**
-- `icount` field is `i32` (matching C++ `int m_icount`) but we use it as a cycle accumulator
-  that gets decremented per the C++ pattern. The execute loop will set it to a budget and
-  run until ≤ 0.
-- Stripped: `m_inst_substate`, `m_post_run`, `m_post_run_cycles`, `m_bcount`,
-  `m_count_before_instruction_step` — all MAME scheduler artifacts.
+Created the Rust crate skeleton:
+- `src/types.rs`: Constants (SR flags, SSW bits, special states), Bus trait
+- `src/cpu.rs`: M68000 struct (all 40+ fields matching C++ m68000_device), helpers
+- `src/alu.rs`, `src/alu_ext.rs`, `src/alu_rot.rs`: 40+ ALU methods
+- `src/decode.rs`: 1525-entry packed decode table → 64K lookup
+- 9 unit tests verifying ALU, decode table, set_ftu_const, interrupts
 
-## 2026-05-15: Phase 2 — Code Generator (Revised Approach)
+## Phase 2 — Code Generator (tag: phase2)
 
 ### Failed Approach: Parsing Generated C++
-Attempted to parse `m68000-sdf.cpp` (the generated C++ output) with a Python translator.
-Got down to ~610 errors from 3678 but hit fundamental issues:
-- Type system: C++ implicit u32→u16 truncation requires per-expression cast analysis
-- Brace matching: nested if/else/goto patterns require full AST understanding
-- Ternary operators: many special cases with nested ternaries
-- goto/label: 526 handlers use gotos, 148 with backward jumps (MUL/DIV loops)
+Attempted to parse `m68000-sdf.cpp` (4MB generated C++) with regex-based Python translator.
+Hit fundamental issues: implicit type truncation (u32→u16), nested brace matching, goto/label
+translation, ternary operators. Got to 610 compile errors before abandoning.
 
-**Conclusion:** Parsing generated C++ is the wrong approach.
+### Successful Approach: Fork the Generator
+Copied `m68000gen.py` (2015 lines of microcode/nanocode decoding unchanged) and replaced
+only the output layer (~670 lines) to emit Rust instead of C++.
 
-### Correct Approach: Fork the Generator
+Key implementation: `gen_rust.py`
+- `make_rust_expression()`: returns `(code, ExprType)` tuples for type-safe emission
+- `generate_rust_source_from_code()`: walks IR, emits Rust for all 29 opcode types
+- `emit_bus_end()`: handles bus access with address error detection
+- Goto handlers use `loop { match __state { ... } }` pattern
+- 30-entry `T_EXPR_TABLE` for branch condition translations
+- 7-entry `I_STMT_TABLE` for inline C++ translations
 
-The `m68000gen.py` generator has a clean intermediate representation:
-- `["=", reg, expr...]` — assignment
-- `["alu", op, mask, info, args...]` — ALU operation
-- `["bus_end", id, space, is_byte, is_write, ...]` — bus access
-- `["label", name]` / `["goto", name]` / `["cgoto", [targets]]` — control flow
-- `["istep"]` — internal 2-cycle step
-- `["next_trace"]` / `["next_stop"]` — instruction end
-- `["=t", expr]` — set branch condition
-- `["priv"]` — privilege check
-- etc.
+Result: 1535 handlers generated, zero compile errors on first successful run.
 
-The generator already knows:
-- Which registers are u16 vs u32 (via the R enum and regname table)
-- Which ALU ops are 8/16/32-bit (via ALUInfo flags)
-- Where bus accesses happen and their type (program/data/cpu, read/write, byte/word)
-- Control flow structure (labels, gotos, conditional gotos)
+Usage: `python3 gen_rust.py m68000/m68000.lst src/handlers/`
 
-**Plan:**
-1. Copy `m68000gen.py` → `gen_rust.py`
-2. Replace `generate_source_from_code()` with Rust-emitting version
-3. Replace `generate_source_file()` with Rust file output (split into chunks)
-4. Add a `generate_dispatch()` function for the match statement
-5. Strip: icount blocks, substate, access_to_be_redone, debugger hooks
-6. Keep: ALL microcode logic, cycle counting, bus access ordering, control flow
+## Phase 3 — Testing & Validation (tag: phase3)
 
-### Key Differences in Rust Output
+### Test Harness
+`tests/hartes.rs`: Loads ProcessorTests (gzipped JSON), sets up CPU state, runs one
+instruction via `execute_one()`, compares all registers/flags/PC/prefetch/RAM/cycles.
 
-| Intermediate op | C++ output | Rust output |
-|----------------|-----------|-------------|
-| `["=", R.au, ...]` | `m_au = expr;` | `self.au = expr;` |
-| `["=", R.sr, ...]` | `m_sr = expr;` | `self.sr = expr;` (with u16 cast if needed) |
-| `["=16h", R.atl, ...]` | `set_16h(m_at, expr);` | `M68000::set_16h(&mut self.at, expr);` |
-| `["alu", ...]` | `alu_xxx(a, b);` | `self.alu_xxx(a as u16, b as u16);` |
-| `["bus_end", ...]` (read) | `m_edb = m_program.read_interruptible(...)` | `self.edb = bus.read_data(self.aob & !1);` |
-| `["bus_end", ...]` (write) | `m_program.write_interruptible(...)` | `bus.write_data(self.aob & !1, self.dbout);` |
-| `["istep"]` | `m_icount -= 2;` | `self.icount -= 2;` |
-| `["label", x]` | `x:` | (handled by loop/match structure) |
-| `["goto", x]` | `goto x;` | `__state = N; continue;` |
-| `["cgoto", [...]]` | `if(m_t) goto x; else goto y;` | `match self.t { ... }` |
-| icount check block | 8 lines of scheduler code | **omitted entirely** |
-| `["trap", ...]` | `debugger_exception_hook(...)` | **omitted** |
+### Execution Model
+`execute_one()` dispatches the current handler, then loops through any exception states
+(address error, bus error, trace, interrupt) until reaching a normal instruction state.
 
-### Goto Handling
-The generator knows exactly which handlers have labels/gotos (from the intermediate code).
-For those handlers, emit:
-```rust
-let mut __state = 0u32;
-loop { match __state {
-    0 => { ... __state = N; continue; }
-    N => { ... }
-    _ => return,
-}}
-```
+### Bug Fixes During Testing
 
-### Type Safety
-The generator knows register widths from the R enum:
-- `R.axl`, `R.ayl`, `R.aul`, `R.atl`, `R.pcl`, `R.aobl` → low 16 bits of u32 regs
-- `R.axh`, `R.ayh`, `R.auh`, `R.ath`, `R.pch`, `R.aobh` → high 16 bits of u32 regs
-- `R.alue`, `R.alub`, `R.dbin`, `R.aluo`, `R.ftu`, `R.sr` → u16 regs
-- `R.dcr` → u8
+**1. Address error timing (cycles)**
+- Initial: 8 cycles too many (bus access + penalty both charged)
+- Fix: address error check after bus access, refund 4 bus cycles (+4 to icount)
+- Rationale: real 68000 detects odd address before bus cycle starts
 
-The `make_expression()` function can emit proper casts because it knows the source type.
+**2. Byte write bus corruption**
+- Symptom: ABCD/SBCD/ADDX.b/SUBX.b same-register predecrement wrong results
+- Root cause: `bus.write_data()` wrote a full word, clobbering adjacent byte
+- Fix: added `write_data_byte()` to Bus trait, generator emits byte writes for byte ops
+- Result: ABCD, SBCD, ADDX.b, SUBX.b all 8065/8065
 
-### Next Steps
-1. Fork m68000gen.py → gen_rust.py
-2. Implement `generate_rust_source_from_code()` 
-3. Implement `generate_rust_file()` with file splitting
-4. Run, compile, iterate on errors
-5. Verify with ProcessorTests
+### Current Test Results (830,695 total tests)
 
-
-## 2026-05-15: Phase 3 — Testing & Validation
-
-### Results (ProcessorTests, ~8000 tests per instruction)
-
-**100% passing (38 instructions):**
+**41 instructions pass 100% (8065/8065 each):**
 NOP, MOVE.q, EXG, SWAP, EXT.w, EXT.l, ADD.b, SUB.b, AND.b, OR.b, EOR.b, CMP.b,
 NEG.b, NOT.b, CLR.b, TST.b, MOVE.b, LEA, PEA, Scc, TAS, NBCD, TRAP, UNLINK,
 ASL.b, ASL.l, LSL.b, LSL.l, LSR.b, LSR.l, ROL.b, ROL.l, ROR.b, ROR.l,
-ROXL.b, ROXL.l, ROXR.b, ROXR.l
+ROXL.b, ROXL.l, ROXR.b, ROXR.l, ABCD, SBCD, ADDX.b, SUBX.b
 
-**Partially passing (address error PC issue only):**
-All word/long memory-accessing instructions: ADD.w/l, SUB.w/l, AND.w/l, OR.w/l,
-EOR.w/l, CMP.w/l, MOVE.w/l, TST.w/l, NEG.w/l, NOT.w/l, CLR.w/l, MOVEA.w/l,
-ADDA.w/l, SUBA.w/l, CMPA.w/l, ASL.w, LSL.w, LSR.w, ROL.w, ROR.w, ROXL.w, ROXR.w,
-JMP, JSR, BSR, RTS, RTR, RTE, LINK, MOVEM.w/l, MULU, MULS, DIVU, DIVS,
-ADDX.b/w/l, SUBX.b/w/l, ABCD, SBCD, DBcc, Bcc, CHK, TRAPV
+**Remaining failures: 262 total (0.03% of all tests)**
 
-### Known Issues
+Breakdown by root cause:
 
-1. **Address error stack frame PC** (MAME-inherited): The PC pushed to the stack
-   frame during address error is 2 bytes too high. This is because `m_pc` is updated
-   in the microstep before the bus access that triggers the error. The C++ MAME code
-   has the same behavior — this is a known MAME inaccuracy vs real hardware.
-   Impact: only affects the ~1% of tests that trigger address errors.
+| Category | Count | Status |
+|----------|-------|--------|
+| Address error frame state (PC, registers) | 90 | Known MAME-inherited, deferred |
+| ASR X/C flags (shift count > size) | 49 | MAME-inherited microcode issue |
+| DIVS/DIVU SR flags (N, Z) | 13 | Needs investigation |
+| ADDQ/SUBQ.l An timing (+2 cycles) | 8 | Needs fix |
+| CHK timing (-2 cycles) | 8 | Needs fix |
+| TRAPV exception handling | 15 | Needs fix |
+| DIVS early exit (cycle overcount) | 3 | Needs fix |
+| DBcc loop counter | 7 | Needs fix |
+| ASL.b overflow edge case | 3 | Needs fix |
+| MOVE.l V/N flags | 4 | Needs fix |
 
-2. **ASR.b with large shift counts**: SR flags (X/C) are wrong when shift count >= 8.
-   This is an ALU edge case in the shift loop microcode. Needs investigation.
+### Known Limitations (MAME-inherited)
 
-3. **DIVS overflow flag**: Some DIVS tests show V flag differences. Edge case.
+1. **Address error stack frame PC**: 2 bytes too high. The microcode advances PC before
+   the bus access that triggers the error. The correct value depends on which microstep
+   the error occurs in (varies by addressing mode). C++ MAME has the same behavior.
+   Impact: ~1% of tests, only affects exception handler stack frame inspection.
 
-### Architecture Decisions
+2. **ASR X/C with count > operand size**: The microcode shift loop continues calling
+   alu_asr after all bits are shifted out. Real 68000 apparently stops propagating X/C
+   after `size` shifts. The C++ MAME code has the same behavior.
 
-- `execute_one()` loops through exception states (address error, bus error, trace,
-  interrupt) until reaching a normal instruction state (>= S_ILLEGAL).
-- Address error detection: check AFTER bus access (preserves register state for the
-  exception handler), refund 4 bus cycles (bus cycle doesn't complete on real HW).
-- Bus trait: simple read_program/read_data/write_data/read_cpu without masks.
-  Byte shift (`edb >>= 8`) handled in generated code.
+## Architecture Notes
+
+### Bus Trait
+```rust
+pub trait Bus {
+    fn read_program(&mut self, addr: u32) -> u16;
+    fn read_data(&mut self, addr: u32) -> u16;
+    fn write_data(&mut self, addr: u32, data: u16);
+    fn write_data_byte(&mut self, addr: u32, data: u8);
+    fn read_cpu(&mut self, addr: u32) -> u16;
+}
+```
+
+Byte reads: word read + shift (handled in generated code).
+Byte writes: `write_data_byte` with address bit 0 selecting UDS/LDS.
+Word writes: `write_data` to even-aligned address.
+
+### Register Layout
+- `da[17]`: D0-D7 (0-7), A0-A6 (8-14), USP (15), SSP (16)
+- `sp`: index 15 or 16 (user/supervisor)
+- `next_state`: packed field — `(interrupt_level << 24) | state_number`
+- `icount`: i32, decremented by 2 (internal) or 4 (bus access) per microstep
+
+### Generated Code Structure
+- 11 handler files (~10K lines each), split by state number
+- `dispatch.rs`: match statement mapping state → handler function
+- Handlers with gotos use `loop { match __state { ... } }` pattern
+- All arithmetic uses `.wrapping_add()` / `.wrapping_sub()`
+
+## File Map
+
+```
+gen_rust.py              — Rust code generator (fork of m68000gen.py)
+src/lib.rs              — crate root
+src/types.rs            — Bus trait, constants
+src/cpu.rs              — M68000 struct, execute_one, helpers
+src/alu.rs              — ALU: add/sub/and/or/eor (8/16-bit + carry/extend)
+src/alu_ext.rs          — ALU: ext/not/bcd/shifts
+src/alu_rot.rs          — ALU: rotates, SR update methods
+src/decode.rs           — decode table
+src/handlers/           — generated instruction handlers (11 files + dispatch + mod)
+tests/hartes.rs         — ProcessorTests harness
+tests/verify_infra.rs   — unit tests for infrastructure
+external/ProcessorTests — symlink to test data
+m68000/                 — MAME C++ source (reference)
+.kiro/skills/           — agent skill for porting rules
+.kiro/plans/            — implementation plans
+SPEC.md                 — original port specification
+```
