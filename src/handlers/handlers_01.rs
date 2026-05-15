@@ -13,7 +13,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -40,7 +40,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -62,7 +62,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -94,7 +94,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -116,7 +116,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -150,7 +150,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -172,7 +172,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -184,7 +184,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -212,7 +212,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -237,7 +237,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -256,7 +256,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -271,7 +271,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -303,7 +303,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -327,7 +327,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -343,7 +343,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -369,7 +369,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -390,7 +390,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -403,7 +403,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -418,7 +418,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -444,7 +444,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -465,7 +465,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -477,7 +477,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -505,7 +505,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -529,7 +529,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -548,7 +548,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -563,7 +563,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -595,7 +595,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -623,7 +623,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -644,7 +644,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -693,7 +693,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -718,7 +718,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -750,7 +750,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -780,7 +780,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -812,7 +812,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -844,7 +844,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -876,7 +876,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -888,7 +888,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -914,7 +914,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -949,7 +949,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -968,7 +968,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -983,7 +983,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -1013,7 +1013,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -1047,7 +1047,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -1063,7 +1063,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -1087,7 +1087,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -1118,7 +1118,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -1131,7 +1131,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -1146,7 +1146,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -1170,7 +1170,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -1205,7 +1205,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -1226,7 +1226,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -1279,7 +1279,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -1306,7 +1306,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -1338,7 +1338,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -1370,7 +1370,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -1402,7 +1402,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -1436,7 +1436,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -1468,7 +1468,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -1480,7 +1480,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -1508,7 +1508,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -1543,7 +1543,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -1562,7 +1562,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -1577,7 +1577,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -1609,7 +1609,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -1643,7 +1643,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -1659,7 +1659,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -1685,7 +1685,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -1716,7 +1716,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -1729,7 +1729,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -1744,7 +1744,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -1770,7 +1770,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -1805,7 +1805,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -1826,7 +1826,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -1875,7 +1875,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -1900,7 +1900,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -1932,7 +1932,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -1962,7 +1962,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -1994,7 +1994,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -2026,7 +2026,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -2058,7 +2058,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -2070,7 +2070,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -2096,7 +2096,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -2131,7 +2131,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -2150,7 +2150,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -2165,7 +2165,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -2195,7 +2195,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -2229,7 +2229,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -2245,7 +2245,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -2269,7 +2269,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -2300,7 +2300,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -2313,7 +2313,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -2328,7 +2328,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -2352,7 +2352,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -2384,7 +2384,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -2403,7 +2403,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -2425,7 +2425,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -2450,7 +2450,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -2481,7 +2481,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -2511,7 +2511,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -2542,7 +2542,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -2574,7 +2574,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -2605,7 +2605,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -2617,7 +2617,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -2643,7 +2643,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -2677,7 +2677,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -2696,7 +2696,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -2711,7 +2711,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -2741,7 +2741,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -2774,7 +2774,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -2790,7 +2790,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -2814,7 +2814,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -2844,7 +2844,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -2857,7 +2857,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -2872,7 +2872,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -2896,7 +2896,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -2926,7 +2926,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -2952,7 +2952,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -2968,7 +2968,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -2990,7 +2990,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -3009,7 +3009,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -3031,7 +3031,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -3045,7 +3045,7 @@ impl M68000 {
         self.edb = bus.read_data(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -3060,7 +3060,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -3075,7 +3075,7 @@ impl M68000 {
         bus.write_data(self.aob & !1u32, self.dbout);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -3095,7 +3095,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -3114,7 +3114,7 @@ impl M68000 {
         self.edb = bus.read_data(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -3129,7 +3129,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -3144,7 +3144,7 @@ impl M68000 {
         bus.write_data(self.aob & !1u32, self.dbout);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -3164,7 +3164,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -3185,7 +3185,7 @@ impl M68000 {
         self.edb = bus.read_data(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -3200,7 +3200,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -3215,7 +3215,7 @@ impl M68000 {
         bus.write_data(self.aob & !1u32, self.dbout);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -3235,7 +3235,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -3247,7 +3247,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -3262,7 +3262,7 @@ impl M68000 {
         self.edb = bus.read_data(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -3277,7 +3277,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -3292,7 +3292,7 @@ impl M68000 {
         bus.write_data(self.aob & !1u32, self.dbout);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -3315,7 +3315,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -3334,7 +3334,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -3349,7 +3349,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -3368,7 +3368,7 @@ impl M68000 {
             self.edb = bus.read_data(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -3383,7 +3383,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -3398,7 +3398,7 @@ impl M68000 {
             bus.write_data(self.aob & !1u32, self.dbout);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -3420,7 +3420,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -3436,7 +3436,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -3449,7 +3449,7 @@ impl M68000 {
         self.edb = bus.read_data(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -3464,7 +3464,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -3479,7 +3479,7 @@ impl M68000 {
         bus.write_data(self.aob & !1u32, self.dbout);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -3498,7 +3498,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -3511,7 +3511,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -3526,7 +3526,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -3539,7 +3539,7 @@ impl M68000 {
         self.edb = bus.read_data(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -3554,7 +3554,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -3569,7 +3569,7 @@ impl M68000 {
         bus.write_data(self.aob & !1u32, self.dbout);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -3589,7 +3589,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -3617,7 +3617,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -3633,7 +3633,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -3654,7 +3654,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -3667,7 +3667,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -3683,7 +3683,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -3712,7 +3712,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -3725,7 +3725,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -3738,7 +3738,7 @@ impl M68000 {
         self.edb = bus.read_data(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -3752,7 +3752,7 @@ impl M68000 {
         self.edb = bus.read_data(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -3767,7 +3767,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -3782,7 +3782,7 @@ impl M68000 {
         bus.write_data(self.aob & !1u32, self.dbout);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -3795,7 +3795,7 @@ impl M68000 {
         bus.write_data(self.aob & !1u32, self.dbout);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -3814,7 +3814,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -3827,7 +3827,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -3840,7 +3840,7 @@ impl M68000 {
         self.edb = bus.read_data(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -3856,7 +3856,7 @@ impl M68000 {
         self.edb = bus.read_data(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -3871,7 +3871,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -3886,7 +3886,7 @@ impl M68000 {
         bus.write_data(self.aob & !1u32, self.dbout);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -3899,7 +3899,7 @@ impl M68000 {
         bus.write_data(self.aob & !1u32, self.dbout);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -3918,7 +3918,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -3931,7 +3931,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -3947,7 +3947,7 @@ impl M68000 {
         self.edb = bus.read_data(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -3961,7 +3961,7 @@ impl M68000 {
         self.edb = bus.read_data(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -3976,7 +3976,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -3991,7 +3991,7 @@ impl M68000 {
         bus.write_data(self.aob & !1u32, self.dbout);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -4004,7 +4004,7 @@ impl M68000 {
         bus.write_data(self.aob & !1u32, self.dbout);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -4023,7 +4023,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -4036,7 +4036,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -4048,7 +4048,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -4061,7 +4061,7 @@ impl M68000 {
         self.edb = bus.read_data(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -4075,7 +4075,7 @@ impl M68000 {
         self.edb = bus.read_data(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -4090,7 +4090,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -4105,7 +4105,7 @@ impl M68000 {
         bus.write_data(self.aob & !1u32, self.dbout);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -4118,7 +4118,7 @@ impl M68000 {
         bus.write_data(self.aob & !1u32, self.dbout);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -4140,7 +4140,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -4153,7 +4153,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -4172,7 +4172,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -4187,7 +4187,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -4204,7 +4204,7 @@ impl M68000 {
             self.edb = bus.read_data(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -4218,7 +4218,7 @@ impl M68000 {
             self.edb = bus.read_data(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -4233,7 +4233,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -4248,7 +4248,7 @@ impl M68000 {
             bus.write_data(self.aob & !1u32, self.dbout);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -4261,7 +4261,7 @@ impl M68000 {
             bus.write_data(self.aob & !1u32, self.dbout);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -4282,7 +4282,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -4295,7 +4295,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -4311,7 +4311,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -4324,7 +4324,7 @@ impl M68000 {
         self.edb = bus.read_data(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -4338,7 +4338,7 @@ impl M68000 {
         self.edb = bus.read_data(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -4353,7 +4353,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -4368,7 +4368,7 @@ impl M68000 {
         bus.write_data(self.aob & !1u32, self.dbout);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -4381,7 +4381,7 @@ impl M68000 {
         bus.write_data(self.aob & !1u32, self.dbout);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -4399,7 +4399,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -4412,7 +4412,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -4425,7 +4425,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -4440,7 +4440,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -4453,7 +4453,7 @@ impl M68000 {
         self.edb = bus.read_data(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -4467,7 +4467,7 @@ impl M68000 {
         self.edb = bus.read_data(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -4482,7 +4482,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -4497,7 +4497,7 @@ impl M68000 {
         bus.write_data(self.aob & !1u32, self.dbout);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -4510,7 +4510,7 @@ impl M68000 {
         bus.write_data(self.aob & !1u32, self.dbout);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -4530,7 +4530,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -4548,7 +4548,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -4570,7 +4570,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -4597,7 +4597,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -4619,7 +4619,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -4650,7 +4650,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -4672,7 +4672,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -4705,7 +4705,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -4727,7 +4727,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -4739,7 +4739,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -4767,7 +4767,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -4792,7 +4792,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -4811,7 +4811,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -4826,7 +4826,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -4858,7 +4858,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -4882,7 +4882,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -4897,7 +4897,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -4923,7 +4923,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -4944,7 +4944,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -4957,7 +4957,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -4971,7 +4971,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -4997,7 +4997,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -5019,7 +5019,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -5037,7 +5037,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -5059,7 +5059,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -5073,7 +5073,7 @@ impl M68000 {
         self.edb = bus.read_data(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -5090,7 +5090,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -5112,7 +5112,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -5130,7 +5130,7 @@ impl M68000 {
         self.edb = bus.read_data(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -5147,7 +5147,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -5169,7 +5169,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -5189,7 +5189,7 @@ impl M68000 {
         self.edb = bus.read_data(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -5206,7 +5206,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -5228,7 +5228,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -5240,7 +5240,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -5255,7 +5255,7 @@ impl M68000 {
         self.edb = bus.read_data(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -5272,7 +5272,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -5297,7 +5297,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -5316,7 +5316,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -5331,7 +5331,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -5350,7 +5350,7 @@ impl M68000 {
             self.edb = bus.read_data(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -5367,7 +5367,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -5391,7 +5391,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -5406,7 +5406,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -5419,7 +5419,7 @@ impl M68000 {
         self.edb = bus.read_data(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -5436,7 +5436,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -5457,7 +5457,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -5470,7 +5470,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -5484,7 +5484,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -5497,7 +5497,7 @@ impl M68000 {
         self.edb = bus.read_data(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -5514,7 +5514,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -5535,7 +5535,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -5548,7 +5548,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -5565,7 +5565,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -5590,7 +5590,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -5603,7 +5603,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -5616,7 +5616,7 @@ impl M68000 {
         self.edb = bus.read_data(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -5630,7 +5630,7 @@ impl M68000 {
         self.edb = bus.read_data(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -5649,7 +5649,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -5670,7 +5670,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -5683,7 +5683,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -5696,7 +5696,7 @@ impl M68000 {
         self.edb = bus.read_data(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -5712,7 +5712,7 @@ impl M68000 {
         self.edb = bus.read_data(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -5731,7 +5731,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -5752,7 +5752,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -5765,7 +5765,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -5781,7 +5781,7 @@ impl M68000 {
         self.edb = bus.read_data(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -5795,7 +5795,7 @@ impl M68000 {
         self.edb = bus.read_data(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -5814,7 +5814,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -5835,7 +5835,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -5848,7 +5848,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -5860,7 +5860,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -5873,7 +5873,7 @@ impl M68000 {
         self.edb = bus.read_data(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -5887,7 +5887,7 @@ impl M68000 {
         self.edb = bus.read_data(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -5906,7 +5906,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -5930,7 +5930,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -5943,7 +5943,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -5962,7 +5962,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -5977,7 +5977,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -5994,7 +5994,7 @@ impl M68000 {
             self.edb = bus.read_data(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -6008,7 +6008,7 @@ impl M68000 {
             self.edb = bus.read_data(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -6027,7 +6027,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -6050,7 +6050,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -6063,7 +6063,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -6078,7 +6078,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -6091,7 +6091,7 @@ impl M68000 {
         self.edb = bus.read_data(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -6105,7 +6105,7 @@ impl M68000 {
         self.edb = bus.read_data(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -6124,7 +6124,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -6144,7 +6144,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -6157,7 +6157,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -6170,7 +6170,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -6184,7 +6184,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -6197,7 +6197,7 @@ impl M68000 {
         self.edb = bus.read_data(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -6211,7 +6211,7 @@ impl M68000 {
         self.edb = bus.read_data(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -6230,7 +6230,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -6260,7 +6260,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -6297,7 +6297,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -6338,7 +6338,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -6381,7 +6381,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -6402,7 +6402,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -6431,7 +6431,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -6462,7 +6462,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -6477,7 +6477,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -6510,7 +6510,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -6536,7 +6536,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -6563,7 +6563,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -6584,7 +6584,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -6598,7 +6598,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -6625,7 +6625,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -6645,7 +6645,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -6674,7 +6674,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -6704,7 +6704,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -6719,7 +6719,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -6752,7 +6752,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -6778,7 +6778,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -6799,7 +6799,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -6834,7 +6834,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -6877,7 +6877,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -6924,7 +6924,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -6973,7 +6973,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -6994,7 +6994,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -7029,7 +7029,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -7060,7 +7060,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -7075,7 +7075,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -7114,7 +7114,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -7140,7 +7140,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -7173,7 +7173,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -7194,7 +7194,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -7208,7 +7208,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -7241,7 +7241,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -7261,7 +7261,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -7296,7 +7296,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -7326,7 +7326,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -7341,7 +7341,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -7380,7 +7380,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -7406,7 +7406,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -7432,7 +7432,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -7467,7 +7467,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -7511,7 +7511,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -7559,7 +7559,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -7609,7 +7609,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -7630,7 +7630,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -7666,7 +7666,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -7697,7 +7697,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -7712,7 +7712,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -7752,7 +7752,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -7778,7 +7778,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -7812,7 +7812,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -7833,7 +7833,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -7847,7 +7847,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -7881,7 +7881,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -7901,7 +7901,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -7937,7 +7937,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -7967,7 +7967,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -7982,7 +7982,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -8022,7 +8022,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -8048,7 +8048,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -8074,7 +8074,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -8099,7 +8099,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -8143,7 +8143,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -8191,7 +8191,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -8241,7 +8241,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -8272,7 +8272,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -8298,7 +8298,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -8339,7 +8339,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -8354,7 +8354,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -8384,7 +8384,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -8420,7 +8420,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -8444,7 +8444,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -8475,7 +8475,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -8489,7 +8489,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -8513,7 +8513,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -8543,7 +8543,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -8569,7 +8569,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -8609,7 +8609,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -8624,7 +8624,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -8654,7 +8654,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -8690,7 +8690,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -8706,7 +8706,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -8738,7 +8738,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -8763,7 +8763,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -8796,7 +8796,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -8822,7 +8822,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -8859,7 +8859,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -8885,7 +8885,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -8924,7 +8924,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -8950,7 +8950,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -8971,7 +8971,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -8996,7 +8996,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -9022,7 +9022,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -9053,7 +9053,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -9068,7 +9068,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -9097,7 +9097,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -9123,7 +9123,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -9149,7 +9149,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -9172,7 +9172,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -9198,7 +9198,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -9219,7 +9219,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -9233,7 +9233,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -9256,7 +9256,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -9282,7 +9282,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -9302,7 +9302,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -9327,7 +9327,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -9353,7 +9353,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -9383,7 +9383,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -9398,7 +9398,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -9427,7 +9427,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -9453,7 +9453,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -9479,7 +9479,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -9492,7 +9492,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -9517,7 +9517,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -9549,7 +9549,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -9564,7 +9564,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -9594,7 +9594,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -9640,7 +9640,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -9655,7 +9655,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -9684,7 +9684,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -9734,7 +9734,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -9749,7 +9749,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -9778,7 +9778,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -9830,7 +9830,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -9845,7 +9845,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -9874,7 +9874,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -9901,7 +9901,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -9933,7 +9933,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -9948,7 +9948,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -9977,7 +9977,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -10011,7 +10011,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -10026,7 +10026,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -10062,7 +10062,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -10077,7 +10077,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -10106,7 +10106,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -10135,7 +10135,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -10165,7 +10165,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -10180,7 +10180,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -10209,7 +10209,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -10236,7 +10236,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -10250,7 +10250,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -10280,7 +10280,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -10295,7 +10295,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -10324,7 +10324,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -10350,7 +10350,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -10382,7 +10382,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -10397,7 +10397,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -10426,7 +10426,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -10459,7 +10459,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -10474,7 +10474,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -10510,7 +10510,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -10525,7 +10525,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -10554,7 +10554,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -10583,7 +10583,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -10603,7 +10603,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -10618,7 +10618,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -10648,7 +10648,7 @@ impl M68000 {
             self.edb = bus.read_program(self.aob & !1u32);
             self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount += 4;
+                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
@@ -10675,7 +10675,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
@@ -10701,7 +10701,7 @@ impl M68000 {
         self.edb = bus.read_program(self.aob & !1u32);
         self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount += 4;
+            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }

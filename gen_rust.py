@@ -2539,7 +2539,7 @@ def emit_bus_end(ci):
     if not ci[3] and ci[2] != 2:
         fault = "S_DOUBLE_FAULT" if ci[8] else "S_ADDRESS_ERROR"
         lines.append("if self.aob & 1 != 0 {")
-        lines.append("    self.icount += 4;")
+        lines.append("    self.icount -= 4;")
         lines.append("    self.inst_state = %s;" % fault)
         lines.append("    return;")
         lines.append("}")
