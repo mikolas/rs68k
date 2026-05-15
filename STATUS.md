@@ -84,16 +84,17 @@ Two execution variants, both verified:
    Functionally correct, cycle-count accurate. Equivalent to MAME's `sdf` (direct full).
    127/127 instructions, 317,500 tests pass.
 
-2. **Pin-level partial handlers** (`dispatch_partial`): suspends at each bus access.
-   Handler sets up address/data/direction and returns. External system performs the bus
-   cycle and fills `edb`. Equivalent to MAME's `sdp` but without inline bus calls —
-   designed for true parallel clocking. 127/127 instructions verified against full handlers.
+2. **Pin-level partial handlers** (`dispatch_partial` / `clock()`): suspends at each bus
+   access. Handler sets up address/data/direction and returns. External system performs
+   the bus cycle and fills `edb`. The `clock()` method provides a complete pin-level
+   interface with S0-S7 bus state machine, E clock, VPA sync, bus arbitration, and all
+   control signals. 127/127 instructions verified against full handlers.
 
 ### What Remains
 
-- Wire `clock()` / `run_core_step()` in `pins.rs` to call `dispatch_partial()` and
-  drive the S0-S7 bus state machine. This is integration work — the partial handlers
-  themselves are complete and verified.
+Nothing critical. The core is complete for integration. Optional future work:
+- Debugging facilities (see `DEBUG.md`)
+- Suppress unused `bus` parameter warning in partial handlers
 
 **42 instructions pass 100% (8065/8065 each):**
 NOP, MOVE.q, EXG, SWAP, EXT.w, EXT.l, ADD.b, SUB.b, AND.b, OR.b, EOR.b, CMP.b,
@@ -262,7 +263,17 @@ The partial handler models the 68000's bus behavior at the level that matters:
 This enables true parallel clocking where CPU, Agnus, Paula, and Denise all advance
 on every clock edge, with bus arbitration handled externally.
 
-### What Remains
+### clock() Implementation (tag: clock-interface-v1)
 
-- Wire `clock()` / `run_core_step()` in `pins.rs` to call `dispatch_partial()` and drive the S0-S7 bus state machine
-- This is integration work — the partial handlers are complete and verified
+The `clock()` method in `pins.rs` is fully implemented:
+- `run_core_step()` calls `dispatch_partial()`, detects bus requests from handler
+- Bus state machine drives S0→S2→S4→S6 with real pin signals (addr, FC, AS, UDS, LDS, R/W)
+- Handles DTACK (normal acknowledge), VPA/E-clock sync (6800 peripherals), BERR (bus error)
+- Bus arbitration (BR/BG/BGACK), halt, reset
+- Verified: `clock()` produces identical results to `execute_one()` for all tested instructions
+
+### Current State
+
+The port is **complete**. Both execution modes are implemented, tested, and ready for integration:
+1. `execute_one()` — fast path, one instruction per call
+2. `clock()` — pin-level, one CLK period per call, real bus signals

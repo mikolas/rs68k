@@ -9,6 +9,7 @@ microcode-based core. Verified against 317,500 test vectors with 100% pass rate.
 - Two execution modes:
   - **Full handlers**: one instruction per call (fast path)
   - **Pin-level partial handlers**: suspend/resume at bus access boundaries (for parallel hardware emulation)
+- Drop-in `clock()` interface with real bus signals (AS, UDS, LDS, DTACK, VPA, E clock, bus arbitration)
 - Generated from the same microcode intermediate representation as MAME's C++ output
 - 1535 instruction handlers covering all 68000 opcodes and exception states
 - No runtime dependencies

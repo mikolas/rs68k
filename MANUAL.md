@@ -248,3 +248,62 @@ cargo test --test partial partial_sst_all -- --nocapture  # full partial verific
 - The `Bus` trait parameter in partial handlers is unused but kept for type compatibility
 - Cross-substate gotos in partial handlers use unique substate IDs to avoid re-executing address error checks
 - Internal cycles (`icount -= 2`) execute in a burst; only bus accesses are suspend points
+
+## Mode 3: Pin-Level clock() Interface
+
+For drop-in 68000 replacement with real bus signals. One call per CLK period.
+
+```rust
+use rs68k::cpu::M68000;
+use rs68k::pins::{Inputs68k, Pins68k};
+
+let mut cpu = M68000::new();
+// ... set up initial state (reset vector fetch) ...
+
+loop {
+    let pins = cpu.pins();
+
+    // Build inputs based on current pin state
+    let mut inputs = Inputs68k::default();
+
+    // Address decode: provide data for reads
+    if !pins.as_n && pins.rw {
+        inputs.data_in = memory_read(pins.addr);
+        inputs.dtack_n = false; // acknowledge
+    }
+
+    // Capture writes
+    if !pins.as_n && !pins.rw {
+        memory_write(pins.addr, pins.data_out);
+        inputs.dtack_n = false;
+    }
+
+    // Slow device: delay DTACK for wait states
+    if is_slow_device(pins.addr) && !pins.as_n {
+        inputs.dtack_n = !device_ready();
+    }
+
+    // 6800 peripheral (CIA): assert VPA instead of DTACK
+    if is_cia_address(pins.addr) && !pins.as_n {
+        inputs.dtack_n = true;  // no DTACK
+        inputs.vpa_n = false;   // use E-clock sync
+    }
+
+    // Interrupts
+    inputs.ipl0_n = !(irq_level & 1 != 0);
+    inputs.ipl1_n = !(irq_level & 2 != 0);
+    inputs.ipl2_n = !(irq_level & 4 != 0);
+
+    cpu.clock(&inputs);
+}
+```
+
+The `clock()` method handles all internal complexity:
+- S0-S7 bus state machine (4 CLK per bus cycle minimum)
+- Wait state insertion (stays in S4 until DTACK)
+- E clock generation (free-running CLK÷10)
+- VPA/VMA handshake for 6800 peripherals
+- Bus arbitration (BR/BG/BGACK)
+- Halt and reset
+
+See `BUS_INTERFACE.md` for the complete pin specification.
