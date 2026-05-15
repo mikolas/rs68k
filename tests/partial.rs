@@ -437,3 +437,52 @@ fn parse_sst_test(data: &[u8], mut ptr: usize) -> (M68000, Vec<(u32, u8)>, usize
 #[test] fn partial_sst_lea() { run_sst_partial_vs_full("LEA"); }
 #[test] fn partial_sst_exg() { run_sst_partial_vs_full("EXG"); }
 #[test] fn partial_sst_swap() { run_sst_partial_vs_full("SWAP"); }
+
+#[test]
+fn partial_sst_all() {
+    let files = [
+        "ABCD", "ADD.b", "ADD.w", "ADD.l", "ADDA.w", "ADDA.l",
+        "ADDX.b", "ADDX.w", "ADDX.l", "AND.b", "AND.w", "AND.l",
+        "ANDItoCCR", "ANDItoSR", "ASL.b", "ASL.l", "ASL.w",
+        "ASR.b", "ASR.l", "ASR.w", "Bcc", "BCHG", "BCLR", "BSET",
+        "BSR", "BTST", "CHK", "CLR.b", "CLR.w", "CLR.l",
+        "CMP.b", "CMP.w", "CMP.l", "CMPA.w", "CMPA.l",
+        "DBcc", "DIVS", "DIVU", "EOR.b", "EOR.w", "EOR.l",
+        "EORItoCCR", "EORItoSR", "EXG", "EXT.l", "EXT.w",
+        "ILLEGAL_LineA", "ILLEGAL_LineF",
+        "JMP", "JSR", "LEA", "LINK", "LSL.b", "LSL.l", "LSL.w",
+        "LSR.b", "LSR.l", "LSR.w", "MOVE.b", "MOVE.w", "MOVE.l",
+        "MOVE.q", "MOVEA.w", "MOVEA.l", "MOVEfromSR",
+        "MOVEfromUSP", "MOVEtoCCR", "MOVEtoSR", "MOVEtoUSP",
+        "MOVEM.w", "MOVEM.l", "MOVEP.w", "MOVEP.l",
+        "MULS", "MULU", "NBCD", "NEG.b", "NEG.w", "NEG.l",
+        "NEGX.b", "NEGX.w", "NEGX.l", "NOP", "NOT.b", "NOT.w", "NOT.l",
+        "OR.b", "OR.w", "OR.l", "ORItoCCR", "ORItoSR",
+        "PEA", "RESET", "ROL.b", "ROL.l", "ROL.w",
+        "ROR.b", "ROR.l", "ROR.w", "ROXL.b", "ROXL.l", "ROXL.w",
+        "ROXR.b", "ROXR.l", "ROXR.w", "RTE", "RTR", "RTS",
+        "SBCD", "Scc", "STOP", "SUB.b", "SUB.w", "SUB.l",
+        "SUBA.w", "SUBA.l", "SUBX.b", "SUBX.w", "SUBX.l",
+        "SWAP", "TAS", "TRAP", "TRAPV", "TST.b", "TST.w", "TST.l",
+        "UNLINK",
+    ];
+    let mut total_pass = 0usize;
+    let mut total_fail = 0usize;
+    let mut failed_files = Vec::new();
+    for f in &files {
+        let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+            run_sst_partial_vs_full(f);
+        }));
+        if result.is_ok() {
+            total_pass += 1;
+        } else {
+            total_fail += 1;
+            failed_files.push(*f);
+        }
+    }
+    eprintln!("\n=== PARTIAL SST SUMMARY: {}/{} files passed ===", total_pass, total_pass + total_fail);
+    if !failed_files.is_empty() {
+        eprintln!("Failed: {:?}", failed_files);
+        panic!("{} files failed", total_fail);
+    }
+}
