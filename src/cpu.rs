@@ -42,6 +42,7 @@ pub struct M68000 {
 
     // State machine
     pub inst_state: u16,
+    pub inst_substate: u16,
     pub next_state: u32,
 
     // Decode table (64K entries)
@@ -65,7 +66,7 @@ impl M68000 {
             movemr: 0, irdi: 0, base_ssw: 0, ssw: 0,
             dcr: 0,
             virq_state: 0, nmi_pending: false, int_level: 0, int_next_state: 0,
-            inst_state: S_RESET, next_state: 0,
+            inst_state: S_RESET, inst_substate: 0, next_state: 0,
             decode_table: Vec::new(),
             pin_state: crate::pins::PinState::default(),
             icount: 0,

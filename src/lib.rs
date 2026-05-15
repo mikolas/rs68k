@@ -6,3 +6,4 @@ pub mod alu_rot;
 pub mod decode;
 pub mod pins;
 pub mod handlers;
+pub mod handlers_partial;

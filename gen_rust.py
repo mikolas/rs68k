@@ -2321,6 +2321,401 @@ def generate_rust_source_from_code(code):
     return source
 
 
+def generate_rust_partial_source_from_code(code):
+    """Generate Rust source lines for a partial handler (suspends at each bus access).
+    
+    Substates are defined by bus_end positions. Labels/gotos within a substate use
+    an inner loop/match __state pattern. Cross-substate gotos get unique substate IDs
+    that enter the target segment at the label's inner state (skipping addr error check).
+    """
+
+    def aluname(op, mask, info):
+        n = "alu_" + alu_opnames[op]
+        if info & ALUInfo.is_long and op in (ALU.asl, ALU.asr, ALU.lsl, ALU.lsr, ALU.rol, ALU.ror, ALU.roxl, ALU.roxr):
+            n += '32'
+            if info & ALUInfo.is_mul:
+                n += 'ms' if info & ALUInfo.mul_signed else 'mu'
+        elif info & ALUInfo.is_byte and op != ALU.ext:
+            n += '8'
+        if op == ALU.and_ and info & ALUInfo.is_rox_and:
+            n += 'x'
+        f = None
+        if mask != 0:
+            f = ''
+            if mask & 0x10: f += 'x'
+            if mask & 0x08: f += 'n'
+            if mask & 0x04: f += 'z'
+            if mask & 0x02: f += 'v'
+            if mask & 0x01: f += 'c'
+            if info & (ALUInfo.finish | ALUInfo.arx):
+                f += '_u'
+        return n, f
+
+    def alu_param_type(fn_name):
+        if fn_name.endswith('32'):
+            return ExprType.U32 if fn_name == 'alu_roxr32' else ExprType.U16
+        if '8' in fn_name:
+            return ExprType.U16 if fn_name == 'alu_and8' else ExprType.U8
+        return ExprType.U16
+
+    def target_type(reg):
+        if reg <= R.moveml: return ExprType.U32
+        elif reg <= R.movemh: return ExprType.U32
+        elif reg == R.dcr: return ExprType.U8
+        else: return ExprType.U16
+
+    # Flatten all CIs
+    flat = []
+    for cib in code:
+        for ci in cib:
+            flat.append(ci)
+
+    # Find bus_end positions
+    bus_end_positions = []
+    for i, ci in enumerate(flat):
+        if ci[0] == "bus_end":
+            bus_end_positions.append((i, ci[1], ci))
+
+    # Build segments split at bus_end boundaries
+    segments = []  # (substate_id, resume_bus_end_ci, [cis])
+    prev_end_idx = 0
+    prev_bus_ci = None
+    for pos, bid, bus_ci in bus_end_positions:
+        seg_cis = flat[prev_end_idx:pos+1]
+        substate = 0 if prev_bus_ci is None else (prev_bus_ci[1] + 1)
+        segments.append((substate, prev_bus_ci, seg_cis))
+        prev_bus_ci = bus_ci
+        prev_end_idx = pos + 1
+    # Final segment
+    if prev_end_idx <= len(flat):
+        seg_cis = flat[prev_end_idx:]
+        substate = prev_bus_ci[1] + 1 if prev_bus_ci else 0
+        segments.append((substate, prev_bus_ci, seg_cis))
+
+    # Build label→(substate, inner_id) mapping
+    label_info = {}  # label_name -> (substate, inner_id)
+    for substate, _, seg_cis in segments:
+        inner_id = 1
+        for ci in seg_cis:
+            if ci[0] == "label":
+                label_info[ci[1]] = (substate, inner_id)
+                inner_id += 1
+
+    # Find cross-substate goto targets and assign unique substate IDs
+    max_normal_ss = max((s for s, _, _ in segments), default=0)
+    next_cross_ss = max_normal_ss + 2
+    # cross_goto_ss: (target_substate, target_inner_id) -> assigned_substate_id
+    cross_goto_ss = {}
+    for substate, _, seg_cis in segments:
+        for ci in seg_cis:
+            targets = []
+            if ci[0] == "goto":
+                targets = [ci[1]]
+            elif ci[0] == "cgoto":
+                targets = ci[1]
+            for t in targets:
+                if t in label_info:
+                    t_ss, t_inner = label_info[t]
+                    if t_ss != substate and (t_ss, t_inner) not in cross_goto_ss:
+                        cross_goto_ss[(t_ss, t_inner)] = next_cross_ss
+                        next_cross_ss += 2
+
+    # Resolve a goto target to a substate value
+    def resolve_goto(target_label, current_substate):
+        """Returns (is_inner, value) - either inner state id or substate id."""
+        if target_label not in label_info:
+            return ("outer", 0)
+        t_ss, t_inner = label_info[target_label]
+        if t_ss == current_substate:
+            return ("inner", t_inner)
+        else:
+            # Cross-substate: use the assigned cross_goto_ss
+            cross_ss = cross_goto_ss.get((t_ss, t_inner), t_ss)
+            return ("outer", cross_ss)
+
+    # Helper to emit one segment arm
+    def emit_segment(substate_val, resume_ci, seg_cis, start_inner, emit_addr_check, current_seg_ss):
+        source.append("        %d => {" % substate_val)
+
+        # Address error check (only for normal resume, not cross-substate entry)
+        if emit_addr_check and resume_ci is not None:
+            lines = emit_bus_end_resume(resume_ci)
+            for l in lines:
+                source.append("            " + l)
+
+        # Check if segment has labels
+        seg_labels = [ci[1] for ci in seg_cis if ci[0] == "label"]
+        needs_inner = len(seg_labels) > 0
+
+        if needs_inner:
+            # Build inner label_ids
+            inner_label_ids = {}
+            iid = 1
+            for name in seg_labels:
+                inner_label_ids[name] = iid
+                iid += 1
+
+            source.append("            let mut __state: u32 = %d;" % start_inner)
+            source.append("            loop { match __state {")
+
+            # Split into inner blocks
+            inner_blocks = []
+            cur_id = 0
+            cur_block = []
+            for ci in seg_cis:
+                if ci[0] == "label":
+                    if cur_block:
+                        inner_blocks.append((cur_id, cur_block))
+                        cur_block = []
+                    cur_id = inner_label_ids[ci[1]]
+                elif ci[0] == "bus_end":
+                    cur_block.append(("__bus", ci))
+                elif ci[0] == "goto":
+                    kind, val = resolve_goto(ci[1], current_seg_ss)
+                    cur_block.append(("__goto", kind, val))
+                elif ci[0] == "cgoto":
+                    resolved = [resolve_goto(t, current_seg_ss) for t in ci[1]]
+                    cur_block.append(("__cgoto", resolved))
+                elif ci[0] in ("next_trace", "next_stop"):
+                    cur_block.append(("__end", ci))
+                elif ci[0] == "halt":
+                    cur_block.append(("__halt", None))
+                else:
+                    cur_block.append(("__ci", ci))
+            if cur_block:
+                inner_blocks.append((cur_id, cur_block))
+
+            for blk_id, blk_items in inner_blocks:
+                source.append("            %d => {" % blk_id)
+                emit_block_items(blk_items, "                ")
+                source.append("            }")
+
+            source.append("            _ => { return; }")
+            source.append("            }}")
+            source.append("            continue;")
+
+        else:
+            # No labels — emit linearly
+            for ci in seg_cis:
+                if ci[0] == "bus_end":
+                    lines = emit_bus_end_partial(ci)
+                    for l in lines:
+                        source.append("            " + l)
+                elif ci[0] == "goto":
+                    kind, val = resolve_goto(ci[1], current_seg_ss)
+                    if kind == "inner":
+                        source.append("            // unexpected inner goto in no-label segment")
+                    else:
+                        source.append("            self.inst_substate = %d; continue;" % val)
+                elif ci[0] == "cgoto":
+                    resolved = [resolve_goto(t, current_seg_ss) for t in ci[1]]
+                    emit_cgoto_outer(resolved, "            ")
+                elif ci[0] in ("next_trace", "next_stop"):
+                    source.append("            self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };")
+                    if ci[0] == "next_trace":
+                        source.append("            if self.sr & SR_T != 0 { self.next_state = S_TRACE as u32; }")
+                    source.append("            self.inst_substate = 0;")
+                    source.append("            return;")
+                elif ci[0] == "halt":
+                    source.append("            self.icount = 0; self.inst_substate = 0; return;")
+                elif ci[0] == "label":
+                    pass
+                else:
+                    lines = emit_ci(ci, {}, aluname, alu_param_type, target_type)
+                    for l in lines:
+                        source.append("            " + l)
+
+        source.append("        }")
+
+    def emit_block_items(items, indent):
+        for item in items:
+            tag = item[0]
+            if tag == "__ci":
+                lines = emit_ci(item[1], {}, aluname, alu_param_type, target_type)
+                for l in lines:
+                    source.append(indent + l)
+            elif tag == "__bus":
+                lines = emit_bus_end_partial(item[1])
+                for l in lines:
+                    source.append(indent + l)
+            elif tag == "__goto":
+                kind, val = item[1], item[2]
+                if kind == "inner":
+                    source.append(indent + "__state = %d; continue;" % val)
+                else:
+                    source.append(indent + "self.inst_substate = %d; break;" % val)
+            elif tag == "__cgoto":
+                resolved = item[1]
+                emit_cgoto_mixed(resolved, indent)
+            elif tag == "__end":
+                ci = item[1]
+                source.append(indent + "self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };")
+                if ci[0] == "next_trace":
+                    source.append(indent + "if self.sr & SR_T != 0 { self.next_state = S_TRACE as u32; }")
+                source.append(indent + "self.inst_substate = 0;")
+                source.append(indent + "return;")
+            elif tag == "__halt":
+                source.append(indent + "self.icount = 0; self.inst_substate = 0; return;")
+
+    def emit_cgoto_mixed(resolved, indent):
+        """Emit a cgoto with mixed inner/outer targets."""
+        if len(resolved) == 2:
+            t0, t1 = resolved[0], resolved[1]
+            # t != 0 -> t1, else -> t0
+            if t1[0] == "inner" and t0[0] == "inner":
+                source.append(indent + "if self.t != 0 { __state = %d; } else { __state = %d; } continue;" % (t1[1], t0[1]))
+            elif t1[0] == "outer" and t0[0] == "outer":
+                source.append(indent + "if self.t != 0 { self.inst_substate = %d; } else { self.inst_substate = %d; } break;" % (t1[1], t0[1]))
+            elif t1[0] == "inner" and t0[0] == "outer":
+                source.append(indent + "if self.t != 0 { __state = %d; continue; } else { self.inst_substate = %d; break; }" % (t1[1], t0[1]))
+            else:  # t1 outer, t0 inner
+                source.append(indent + "if self.t != 0 { self.inst_substate = %d; break; } else { __state = %d; continue; }" % (t1[1], t0[1]))
+        elif len(resolved) == 3:
+            parts = []
+            for i, (kind, val) in enumerate(resolved):
+                pat = "0" if i == 0 else ("1" if i == 1 else "_")
+                if kind == "inner":
+                    parts.append("%s => { __state = %d; }" % (pat, val))
+                else:
+                    parts.append("%s => { self.inst_substate = %d; break; }" % (pat, val))
+            source.append(indent + "match self.t { %s }" % ", ".join(parts))
+            source.append(indent + "continue;")
+        elif len(resolved) == 4:
+            parts = []
+            for i, (kind, val) in enumerate(resolved):
+                pat = str(i) if i < 3 else "_"
+                if kind == "inner":
+                    parts.append("%s => { __state = %d; }" % (pat, val))
+                else:
+                    parts.append("%s => { self.inst_substate = %d; break; }" % (pat, val))
+            source.append(indent + "match self.t { %s }" % ", ".join(parts))
+            source.append(indent + "continue;")
+
+    def emit_cgoto_outer(resolved, indent):
+        """Emit a cgoto where all targets are outer (no inner loop)."""
+        if len(resolved) == 2:
+            source.append(indent + "if self.t != 0 { self.inst_substate = %d; } else { self.inst_substate = %d; } continue;" % (resolved[1][1], resolved[0][1]))
+        elif len(resolved) == 3:
+            source.append(indent + "match self.t { 0 => self.inst_substate = %d, 1 => self.inst_substate = %d, _ => self.inst_substate = %d }; continue;" % (resolved[0][1], resolved[1][1], resolved[2][1]))
+        elif len(resolved) == 4:
+            source.append(indent + "match self.t { 0 => self.inst_substate = %d, 1 => self.inst_substate = %d, 2 => self.inst_substate = %d, _ => self.inst_substate = %d }; continue;" % (resolved[0][1], resolved[1][1], resolved[2][1], resolved[3][1]))
+
+    # --- Main emission ---
+    usage = analyze_register_usage(code)
+    source = []
+    if usage['rx'] == 'd':
+        source.append("        let rx = ((self.irdi >> 9) & 7) as usize;")
+    elif usage['rx'] == 'a':
+        source.append("        let rx = self.map_sp((((self.irdi >> 9) & 7) | 8) as usize);")
+    if usage['ry'] == 'd':
+        source.append("        let ry = (self.irdi & 7) as usize;")
+    elif usage['ry'] == 'a':
+        source.append("        let ry = self.map_sp(((self.irdi & 7) | 8) as usize);")
+
+    source.append("        loop { match self.inst_substate {")
+
+    # Emit normal segment arms
+    for substate, resume_ci, seg_cis in segments:
+        emit_segment(substate, resume_ci, seg_cis, 0, True, substate)
+
+    # Emit cross-substate entry arms (skip addr error, start at inner state)
+    for (t_ss, t_inner), cross_ss_val in sorted(cross_goto_ss.items(), key=lambda x: x[1]):
+        for substate, resume_ci, seg_cis in segments:
+            if substate == t_ss:
+                emit_segment(cross_ss_val, resume_ci, seg_cis, t_inner, False, substate)
+                break
+
+    source.append("        _ => { self.inst_substate = 0; return; }")
+    source.append("        }}")
+
+    return source
+
+
+def emit_bus_end_partial(ci):
+    """Emit Rust for a bus_end in partial mode: perform access, set substate, return."""
+    # ci = ["bus_end", bid, space, is_byte, is_write, no_hi, no_lo, group01, is_rmc, critical, sr_update]
+    lines = []
+    bid = ci[1]
+
+    # SSW setup
+    ssw = "self.base_ssw = "
+    ssw += ["SSW_PROGRAM", "SSW_DATA", "SSW_CPU"][ci[2]]
+    if not ci[4]:
+        ssw += " | SSW_R"
+    if ci[7]:
+        ssw += " | SSW_N"
+    if ci[9]:
+        ssw += " | SSW_CRITICAL"
+    ssw += ";"
+    lines.append(ssw)
+
+    is_interrupt_vector_lookup = not ci[4] and ci[2] == 2
+    if is_interrupt_vector_lookup:
+        lines.append("self.start_interrupt_vector_lookup();")
+
+    # Bus access
+    if ci[4]:
+        if ci[3]:
+            lines.append("if self.aob & 1 != 0 { bus.write_data_byte(self.aob, self.dbout as u8); }")
+            lines.append("else { bus.write_data_byte(self.aob, (self.dbout >> 8) as u8); }")
+        else:
+            lines.append("bus.write_data(self.aob & !1u32, self.dbout);")
+    else:
+        if ci[2] == 2:
+            lines.append("self.edb = bus.read_cpu(self.aob);")
+        elif ci[3]:
+            space_fn = "bus.read_program" if ci[2] == 0 else "bus.read_data"
+            lines.append("self.edb = %s(self.aob & !1u32);" % space_fn)
+            lines.append("if self.aob & 1 == 0 { self.edb >>= 8; }")
+        else:
+            space_fn = "bus.read_program" if ci[2] == 0 else "bus.read_data"
+            lines.append("self.edb = %s(self.aob & !1u32);" % space_fn)
+
+    lines.append("self.icount -= 4;")
+
+    # SR update (RTE)
+    if ci[10]:
+        lines.append("self.sr = self.new_sr;")
+        lines.append("self.update_user_super();")
+        lines.append("self.update_interrupt();")
+
+    if is_interrupt_vector_lookup:
+        lines.append("self.end_interrupt_vector_lookup();")
+
+    # Suspend: set substate to resume point and return
+    lines.append("self.inst_substate = %d;" % (bid + 1))
+    lines.append("return;")
+
+    # The address error check will be the FIRST thing in the next segment (bid+1)
+    # We need to emit it there. But wait — we handle it in the next segment's start.
+    # Actually no — we need to add the address error check to the START of the next segment.
+    # This is handled by the caller: the next segment starts with the post-bus code.
+    # But the address error check is part of the bus_end logic...
+    # Let me reconsider: in the full handler, emit_bus_end emits the address error check
+    # AFTER the bus access. In partial mode, the address error check must be at the
+    # START of the resume segment (bid+1).
+
+    return lines
+
+
+def emit_bus_end_resume(ci):
+    """Emit the post-bus-access code that starts a resume segment."""
+    # This is the address error check + any sr_update that wasn't already done
+    lines = []
+
+    # Address error check AFTER bus access (at resume point)
+    if not ci[3] and ci[2] != 2:
+        fault = "S_DOUBLE_FAULT" if ci[8] else "S_ADDRESS_ERROR"
+        lines.append("if self.aob & 1 != 0 {")
+        lines.append("    self.icount -= 4;")
+        lines.append("    self.inst_state = %s;" % fault)
+        lines.append("    self.inst_substate = 0;")
+        lines.append("    return;")
+        lines.append("}")
+
+    return lines
+
+
 def emit_ci(ci, label_ids, aluname, alu_param_type, target_type):
     """Emit Rust lines for one IR operation. Returns list of strings."""
     op = ci[0]
@@ -2674,12 +3069,95 @@ def generate_rust_files(output_dir):
     print("Written %d files + dispatch.rs + mod.rs to %s" % (num_files, output_dir))
 
 
+def generate_rust_partial_files(output_dir):
+    """Generate all Rust partial handler files."""
+    import os
+    os.makedirs(output_dir, exist_ok=True)
+
+    gen_mode = GEN.direct  # NOT full — this enables bus access IDs in propagate_bus_access
+
+    handlers = []
+
+    for st in states:
+        name = handler_name_for_state(st)
+        code = generate_intermediate_code_from_state(st, gen_mode)
+        source = generate_rust_partial_source_from_code(code)
+        handlers.append((name, source))
+
+    for ii in instructions:
+        if ii[0] == 0xa000 or ii[0] == 0xf000 or ii[0] == 0x4afc:
+            continue
+        name = handler_name_for_instruction(ii)
+        code = generate_intermediate_code_from_instruction(ii[0], ii[1], " ".join(ii[2]), gen_mode)
+        source = generate_rust_partial_source_from_code(code)
+        handlers.append((name, source))
+
+    print("Generated %d partial handlers" % len(handlers))
+
+    CHUNK = 150
+    num_files = (len(handlers) + CHUNK - 1) // CHUNK
+    mod_lines = []
+
+    for file_idx in range(num_files):
+        start = file_idx * CHUNK
+        end = min(start + CHUNK, len(handlers))
+        chunk = handlers[start:end]
+        filename = "handlers_%02d.rs" % file_idx
+        mod_lines.append("mod handlers_%02d;\n" % file_idx)
+
+        filepath = os.path.join(output_dir, filename)
+        with open(filepath, 'w') as f:
+            f.write("use crate::cpu::M68000;\n")
+            f.write("use crate::types::*;\n\n")
+            f.write("#[allow(non_snake_case, unused_variables, unused_mut, unreachable_code, unused_assignments)]\n")
+            f.write("impl M68000 {\n")
+            for name, source in chunk:
+                f.write("    pub fn partial_%s(&mut self, bus: &mut impl crate::types::Bus) {\n" % name)
+                for line in source:
+                    f.write(line + "\n")
+                f.write("    }\n\n")
+            f.write("}\n")
+
+    # dispatch_partial.rs
+    mod_lines.append("mod dispatch_partial;\n")
+    filepath = os.path.join(output_dir, "dispatch_partial.rs")
+    with open(filepath, 'w') as f:
+        f.write("use crate::cpu::M68000;\n")
+        f.write("use crate::types::*;\n\n")
+        f.write("#[allow(unused_variables)]\n")
+        f.write("impl M68000 {\n")
+        f.write("    pub fn dispatch_partial(&mut self, bus: &mut impl crate::types::Bus) {\n")
+        f.write("        match self.inst_state {\n")
+        for idx, (name, _) in enumerate(handlers):
+            f.write("            %d => self.partial_%s(bus),\n" % (idx, name))
+        f.write("            _ => self.partial_state_illegal(bus),\n")
+        f.write("        }\n")
+        f.write("    }\n")
+        f.write("}\n")
+
+    # mod.rs
+    filepath = os.path.join(output_dir, "mod.rs")
+    with open(filepath, 'w') as f:
+        f.writelines(mod_lines)
+
+    print("Written %d files + dispatch_partial.rs + mod.rs to %s" % (num_files, output_dir))
+
+
 # ============================================================
 # Main
 # ============================================================
 
-if len(sys.argv) != 3:
+if len(sys.argv) < 3:
     print("Usage: python3 gen_rust.py m68000/m68000.lst src/handlers/")
+    print("       python3 gen_rust.py m68000/m68000.lst src/handlers/ --partial src/handlers_partial/")
     sys.exit(1)
 
 generate_rust_files(sys.argv[2])
+
+if "--partial" in sys.argv:
+    idx = sys.argv.index("--partial")
+    if idx + 1 < len(sys.argv):
+        generate_rust_partial_files(sys.argv[idx + 1])
+    else:
+        print("Error: --partial requires output directory argument")
+        sys.exit(1)
