@@ -147,3 +147,117 @@ An adapter bridges them. The execution core is never modified.
 ```
 Emulator ←→ Bus68k trait ←→ BusAdapter ←→ Bus trait ←→ M68000 execution core
 ```
+
+## Clock Architecture
+
+### 68000 Clock Structure
+
+The 68000 uses a single clock input (CLK) that is internally divided:
+
+```
+CLK:  ‾‾‾‾\____/‾‾‾‾\____/‾‾‾‾\____/‾‾‾‾\____/
+       S0    S1    S2    S3    S4    S5    S6    S7
+      |<-------- one bus cycle (4 clocks) -------->|
+      |<- internal ->|<- bus access ->|<- latch ->|
+```
+
+- **1 clock** = 1 period of CLK input (140.8 ns at 7.09 MHz for NTSC Amiga)
+- **1 bus cycle** = 4 clocks minimum (S0-S7, 8 states, 2 per clock)
+- **1 internal cycle** = 2 clocks (used for ALU operations without bus access)
+
+### Amiga Clock Relationships
+
+```
+28.37516 MHz   Master oscillator (NTSC) / 28.37516 MHz (PAL: 28.375156)
+    ÷ 4
+ 7.09379 MHz   68000 CLK (CPU clock)
+    ÷ 2
+ 3.54689 MHz   CCK (Color Clock) = 1 low-res pixel clock
+    × 2
+ 7.09379 MHz   CDAC (Chip RAM DMA clock) = same as CPU clock
+```
+
+Key relationship: **1 CPU clock = 1 CDAC cycle = 2 CCK half-cycles**
+
+The Amiga interleaves CPU and DMA on alternating CDAC cycles:
+- Even CDAC: DMA access (if scheduled) or CPU access
+- Odd CDAC: CPU access (always available)
+
+### What the Emulator Must Provide
+
+The emulator drives the CPU at the **bus cycle** level (4 clocks per call):
+
+```rust
+/// The emulator's main loop (simplified)
+fn run_scanline(cpu: &mut M68000, bus: &mut AmigaBus) {
+    // 227.5 CCK per NTSC scanline = 455 CDAC cycles = 455 CPU clocks
+    // = ~113.75 bus cycles per scanline (mix of 4-clock and 2-clock steps)
+    
+    let mut clocks_remaining = 455; // clocks per scanline
+    
+    while clocks_remaining > 0 {
+        // Check if this slot is stolen by DMA
+        if bus.dma_active_this_slot() {
+            bus.do_dma_access();
+            clocks_remaining -= 2; // DMA takes 1 CDAC = 2 clocks
+        } else {
+            // CPU gets this slot
+            let used = cpu.tick(bus); // returns 2 or 4 clocks
+            clocks_remaining -= used;
+        }
+        
+        // Advance other hardware (copper, blitter state machines, audio, etc.)
+        bus.advance_hardware(2); // advance by 1 CDAC
+    }
+}
+```
+
+### CPU Timing Granularity
+
+The CPU consumes time in two units:
+- **4 clocks**: bus access (read or write)
+- **2 clocks**: internal operation (ALU, register transfer)
+
+The `icount` field tracks this: each `icount -= 4` = bus access, each `icount -= 2` = internal.
+
+For cycle-exact Amiga emulation, the emulator needs to know WHEN each bus access happens
+(not just how many total clocks an instruction takes). This is why the `Bus68k::cycle()` 
+interface is called once per bus access — the emulator can interleave DMA between CPU bus cycles.
+
+### Required Emulator Clock Signals
+
+| Signal | Source | Rate | Purpose |
+|--------|--------|------|---------|
+| Master clock | Emulator | 28.375 MHz | Derives all other clocks |
+| CPU clock (CLK) | ÷4 from master | 7.09 MHz | Drives CPU `tick()` calls |
+| CCK | ÷8 from master | 3.55 MHz | Color clock, DMA scheduling |
+| CDAC | ÷4 from master | 7.09 MHz | Chip RAM access timing |
+| Horizontal sync | Every 227.5 CCK | 15.6 kHz | Scanline boundary |
+| Vertical sync | Every 262/312 lines | 59.94/50 Hz | Frame boundary |
+
+The emulator does NOT pass clock signals to the CPU. Instead, it calls `cpu.tick()` at the
+appropriate rate. The CPU is purely passive — it executes when called and returns how many
+clocks it consumed.
+
+### Execution Modes
+
+**Mode 1: Cycle-exact (Amiga)**
+```rust
+// Call tick() for each available CPU slot (2 or 4 clocks)
+let clocks = cpu.tick(bus);
+```
+
+**Mode 2: Batch (fast-forward, no DMA contention)**
+```rust
+// Run N clocks worth of instructions
+let actual = cpu.run(bus, 1000);
+```
+
+**Mode 3: Instruction-at-a-time (debugging)**
+```rust
+// Run exactly one instruction
+let clocks = cpu.execute_one(bus);
+```
+
+All three modes use the same execution core. The difference is how the emulator
+schedules calls and interleaves other hardware.
