@@ -2500,19 +2500,21 @@ def emit_bus_end(ci):
     if is_interrupt_vector_lookup:
         lines.append("self.start_interrupt_vector_lookup();")
 
+    # Address error check BEFORE bus access (not for byte access, not for cpu space)
+    if not ci[3] and ci[2] != 2:
+        fault = "S_DOUBLE_FAULT" if ci[8] else "S_ADDRESS_ERROR"
+        lines.append("if self.aob & 1 != 0 {")
+        lines.append("    self.inst_state = %s;" % fault)
+        lines.append("    return;")
+        lines.append("}")
+
     # Bus access
     if ci[4]:
         # Write
-        if ci[3]:
-            # Byte write
-            lines.append("bus.write_data(self.aob & !1u32, self.dbout);")
-        else:
-            # Word write
-            lines.append("bus.write_data(self.aob & !1u32, self.dbout);")
+        lines.append("bus.write_data(self.aob & !1u32, self.dbout);")
     else:
         # Read
         if ci[2] == 2:
-            # CPU space
             lines.append("self.edb = bus.read_cpu(self.aob);")
         elif ci[3]:
             # Byte read
@@ -2534,15 +2536,6 @@ def emit_bus_end(ci):
 
     if is_interrupt_vector_lookup:
         lines.append("self.end_interrupt_vector_lookup();")
-
-    # Address error check (not for byte access, not for cpu space)
-    if not ci[3] and ci[2] != 2:
-        fault = "S_DOUBLE_FAULT" if ci[8] else "S_ADDRESS_ERROR"
-        lines.append("if self.aob & 1 != 0 {")
-        lines.append("    self.icount -= 4;")
-        lines.append("    self.inst_state = %s;" % fault)
-        lines.append("    return;")
-        lines.append("}")
 
     return lines
 

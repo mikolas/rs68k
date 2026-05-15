@@ -23,25 +23,23 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16h(&mut self.da[16], v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R | SSW_N | SSW_CRITICAL;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         { let v = self.dbin; M68000::set_16h(&mut self.da[16], v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R | SSW_N | SSW_CRITICAL;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.sr = (self.sr & !SR_T) | SR_S;
@@ -50,37 +48,34 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.da[16], v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R | SSW_N | SSW_CRITICAL;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         if self.next_state == S_TRACE as u32 { self.next_state = 0; }
         self.aob = self.au;
         { let v = self.dbin; M68000::set_16h(&mut self.at, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R | SSW_N | SSW_CRITICAL;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = M68000::merge_16_32(M68000::high16(self.at), self.dbin);
         self.au = M68000::merge_16_32(M68000::high16(self.at), self.dbin).wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R | SSW_N | SSW_CRITICAL;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.icount -= 2;
         self.aob = self.au;
@@ -90,13 +85,12 @@ impl M68000 {
         self.ird = self.ir;
         if self.next_state != S_TRACE as u32 { self.next_state = self.int_next_state; }
         self.base_ssw = SSW_PROGRAM | SSW_R | SSW_N;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.set_ftu_const();
@@ -124,38 +118,35 @@ impl M68000 {
         self.au = self.au.wrapping_sub(4);
         self.alu_and(self.ftu, 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_N | SSW_CRITICAL;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.aob = self.au;
         self.dbout = self.aluo;
         self.ftu = self.ird;
         self.au = self.au.wrapping_add(2);
         self.alu_and(M68000::high16(self.pc), 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_N | SSW_CRITICAL;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.aob = self.au;
         self.dbout = self.aluo;
         self.au = self.au.wrapping_sub(4);
         self.alu_and(self.ftu, 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_N | SSW_CRITICAL;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.aob = self.au;
         self.ird = self.ir;
         if self.next_state != S_TRACE as u32 { self.next_state = self.int_next_state; }
@@ -165,25 +156,23 @@ impl M68000 {
         self.au = self.au.wrapping_sub(2);
         self.alu_and(((self.at) as u16), 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_N | SSW_CRITICAL;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.aob = self.au;
         self.dbout = self.aluo;
         self.au = self.au.wrapping_sub(4);
         self.alu_and(self.ftu, 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_N | SSW_CRITICAL;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.aob = self.au;
         self.dbout = self.aluo;
         self.da[16] = self.au;
@@ -191,60 +180,55 @@ impl M68000 {
         self.au = self.au.wrapping_add(2);
         self.alu_and(M68000::high16(self.pc), 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_N | SSW_CRITICAL;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.aob = self.au;
         self.dbout = self.aluo;
         self.at = M68000::ext32(self.ftu);
         self.au = self.au.wrapping_sub(4);
         self.alu_and(self.alub, 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_N | SSW_CRITICAL;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.aob = self.at;
         self.pc = self.at;
         self.au = self.at.wrapping_add(2);
         self.base_ssw = SSW_DATA | SSW_R | SSW_N | SSW_CRITICAL;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         { let v = self.dbin; M68000::set_16h(&mut self.at, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_DATA | SSW_R | SSW_N | SSW_CRITICAL;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = M68000::merge_16_32(M68000::high16(self.at), self.dbin);
         self.au = M68000::merge_16_32(M68000::high16(self.at), self.dbin).wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R | SSW_N | SSW_CRITICAL;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.icount -= 2;
         self.aob = self.au;
@@ -254,13 +238,12 @@ impl M68000 {
         self.ird = self.ir;
         if self.next_state != S_TRACE as u32 { self.next_state = self.int_next_state; }
         self.base_ssw = SSW_PROGRAM | SSW_R | SSW_N;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.set_ftu_const();
@@ -288,38 +271,35 @@ impl M68000 {
         self.au = self.au.wrapping_sub(4);
         self.alu_and(self.ftu, 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_N | SSW_CRITICAL;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.aob = self.au;
         self.dbout = self.aluo;
         self.ftu = self.ird;
         self.au = self.au.wrapping_add(2);
         self.alu_and(M68000::high16(self.pc), 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_N | SSW_CRITICAL;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.aob = self.au;
         self.dbout = self.aluo;
         self.au = self.au.wrapping_sub(4);
         self.alu_and(self.ftu, 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_N | SSW_CRITICAL;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.aob = self.au;
         self.ird = self.ir;
         if self.next_state != S_TRACE as u32 { self.next_state = self.int_next_state; }
@@ -329,25 +309,23 @@ impl M68000 {
         self.au = self.au.wrapping_sub(2);
         self.alu_and(((self.at) as u16), 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_N | SSW_CRITICAL;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.aob = self.au;
         self.dbout = self.aluo;
         self.au = self.au.wrapping_sub(4);
         self.alu_and(self.ftu, 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_N | SSW_CRITICAL;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.aob = self.au;
         self.dbout = self.aluo;
         self.da[16] = self.au;
@@ -355,60 +333,55 @@ impl M68000 {
         self.au = self.au.wrapping_add(2);
         self.alu_and(M68000::high16(self.pc), 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_N | SSW_CRITICAL;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.aob = self.au;
         self.dbout = self.aluo;
         self.at = M68000::ext32(self.ftu);
         self.au = self.au.wrapping_sub(4);
         self.alu_and(self.alub, 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_N | SSW_CRITICAL;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.aob = self.at;
         self.pc = self.at;
         self.au = self.at.wrapping_add(2);
         self.base_ssw = SSW_DATA | SSW_R | SSW_N | SSW_CRITICAL;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         { let v = self.dbin; M68000::set_16h(&mut self.at, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_DATA | SSW_R | SSW_N | SSW_CRITICAL;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = M68000::merge_16_32(M68000::high16(self.at), self.dbin);
         self.au = M68000::merge_16_32(M68000::high16(self.at), self.dbin).wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R | SSW_N | SSW_CRITICAL;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.icount -= 2;
         self.aob = self.au;
@@ -418,13 +391,12 @@ impl M68000 {
         self.ird = self.ir;
         if self.next_state != S_TRACE as u32 { self.next_state = self.int_next_state; }
         self.base_ssw = SSW_PROGRAM | SSW_R | SSW_N;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.set_ftu_const();
@@ -459,13 +431,12 @@ impl M68000 {
         self.au = self.au.wrapping_sub(4);
         self.alu_and(self.alub, 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_N;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.aob = self.at;
         self.base_ssw = SSW_CPU | SSW_R | SSW_N;
         self.start_interrupt_vector_lookup();
@@ -487,60 +458,55 @@ impl M68000 {
         self.au = self.au.wrapping_add(2);
         self.alu_and(M68000::high16(self.pc), 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_N;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.aob = self.au;
         self.dbout = self.aluo;
         self.at = M68000::ext32(self.ftu);
         self.au = self.au.wrapping_sub(4);
         self.alu_and(self.alub, 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_N;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.aob = self.at;
         self.pc = self.at;
         self.au = self.at.wrapping_add(2);
         self.base_ssw = SSW_DATA | SSW_R | SSW_N;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         { let v = self.dbin; M68000::set_16h(&mut self.at, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_DATA | SSW_R | SSW_N;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = M68000::merge_16_32(M68000::high16(self.at), self.dbin);
         self.au = M68000::merge_16_32(M68000::high16(self.at), self.dbin).wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R | SSW_N;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.icount -= 2;
         self.aob = self.au;
@@ -550,13 +516,12 @@ impl M68000 {
         self.ird = self.ir;
         if self.next_state != S_TRACE as u32 { self.next_state = self.int_next_state; }
         self.base_ssw = SSW_PROGRAM | SSW_R | SSW_N;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.set_ftu_const();
@@ -582,13 +547,12 @@ impl M68000 {
         self.au = self.au.wrapping_sub(4);
         self.alu_and(self.ftu, 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_N;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.aob = self.au;
         self.dbout = self.aluo;
         self.da[16] = self.au;
@@ -596,60 +560,55 @@ impl M68000 {
         self.au = self.au.wrapping_add(2);
         self.alu_and(M68000::high16(self.pc), 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_N;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.aob = self.au;
         self.dbout = self.aluo;
         self.at = M68000::ext32(self.ftu);
         self.au = self.au.wrapping_sub(4);
         self.alu_and(self.alub, 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_N;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.aob = self.at;
         self.pc = self.at;
         self.au = self.at.wrapping_add(2);
         self.base_ssw = SSW_DATA | SSW_R | SSW_N;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         { let v = self.dbin; M68000::set_16h(&mut self.at, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_DATA | SSW_R | SSW_N;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = M68000::merge_16_32(M68000::high16(self.at), self.dbin);
         self.au = M68000::merge_16_32(M68000::high16(self.at), self.dbin).wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R | SSW_N;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.icount -= 2;
         self.aob = self.au;
@@ -659,13 +618,12 @@ impl M68000 {
         self.ird = self.ir;
         if self.next_state != S_TRACE as u32 { self.next_state = self.int_next_state; }
         self.base_ssw = SSW_PROGRAM | SSW_R | SSW_N;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.set_ftu_const();
@@ -691,13 +649,12 @@ impl M68000 {
         self.au = self.au.wrapping_sub(4);
         self.alu_and(self.ftu, 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_N;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.aob = self.au;
         self.dbout = self.aluo;
         self.da[16] = self.au;
@@ -705,60 +662,55 @@ impl M68000 {
         self.au = self.au.wrapping_add(2);
         self.alu_and(M68000::high16(self.pc), 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_N;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.aob = self.au;
         self.dbout = self.aluo;
         self.at = M68000::ext32(self.ftu);
         self.au = self.au.wrapping_sub(4);
         self.alu_and(self.alub, 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_N;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.aob = self.at;
         self.pc = self.at;
         self.au = self.at.wrapping_add(2);
         self.base_ssw = SSW_DATA | SSW_R | SSW_N;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         { let v = self.dbin; M68000::set_16h(&mut self.at, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_DATA | SSW_R | SSW_N;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = M68000::merge_16_32(M68000::high16(self.at), self.dbin);
         self.au = M68000::merge_16_32(M68000::high16(self.at), self.dbin).wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R | SSW_N;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.icount -= 2;
         self.aob = self.au;
@@ -768,13 +720,12 @@ impl M68000 {
         self.ird = self.ir;
         if self.next_state != S_TRACE as u32 { self.next_state = self.int_next_state; }
         self.base_ssw = SSW_PROGRAM | SSW_R | SSW_N;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.set_ftu_const();
@@ -800,13 +751,12 @@ impl M68000 {
         self.au = self.au.wrapping_sub(4);
         self.alu_and(self.ftu, 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_N;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.aob = self.au;
         self.dbout = self.aluo;
         self.da[16] = self.au;
@@ -814,60 +764,55 @@ impl M68000 {
         self.au = self.au.wrapping_add(2);
         self.alu_and(M68000::high16(self.pc), 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_N;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.aob = self.au;
         self.dbout = self.aluo;
         self.at = M68000::ext32(self.ftu);
         self.au = self.au.wrapping_sub(4);
         self.alu_and(self.alub, 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_N;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.aob = self.at;
         self.pc = self.at;
         self.au = self.at.wrapping_add(2);
         self.base_ssw = SSW_DATA | SSW_R | SSW_N;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         { let v = self.dbin; M68000::set_16h(&mut self.at, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_DATA | SSW_R | SSW_N;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = M68000::merge_16_32(M68000::high16(self.at), self.dbin);
         self.au = M68000::merge_16_32(M68000::high16(self.at), self.dbin).wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R | SSW_N;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.icount -= 2;
         self.aob = self.au;
@@ -877,13 +822,12 @@ impl M68000 {
         self.ird = self.ir;
         if self.next_state != S_TRACE as u32 { self.next_state = self.int_next_state; }
         self.base_ssw = SSW_PROGRAM | SSW_R | SSW_N;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.set_ftu_const();
@@ -909,13 +853,12 @@ impl M68000 {
         self.au = self.au.wrapping_sub(4);
         self.alu_and(self.ftu, 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_N;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.aob = self.au;
         self.dbout = self.aluo;
         self.da[16] = self.au;
@@ -923,60 +866,55 @@ impl M68000 {
         self.au = self.au.wrapping_add(2);
         self.alu_and(M68000::high16(self.pc), 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_N;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.aob = self.au;
         self.dbout = self.aluo;
         self.at = M68000::ext32(self.ftu);
         self.au = self.au.wrapping_sub(4);
         self.alu_and(self.alub, 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_N;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.aob = self.at;
         self.pc = self.at;
         self.au = self.at.wrapping_add(2);
         self.base_ssw = SSW_DATA | SSW_R | SSW_N;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         { let v = self.dbin; M68000::set_16h(&mut self.at, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_DATA | SSW_R | SSW_N;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = M68000::merge_16_32(M68000::high16(self.at), self.dbin);
         self.au = M68000::merge_16_32(M68000::high16(self.at), self.dbin).wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R | SSW_N;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.icount -= 2;
         self.aob = self.au;
@@ -986,13 +924,12 @@ impl M68000 {
         self.ird = self.ir;
         if self.next_state != S_TRACE as u32 { self.next_state = self.int_next_state; }
         self.base_ssw = SSW_PROGRAM | SSW_R | SSW_N;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.set_ftu_const();
@@ -1018,13 +955,12 @@ impl M68000 {
         self.au = self.au.wrapping_sub(4);
         self.alu_and(self.ftu, 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_N;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.aob = self.au;
         self.dbout = self.aluo;
         self.da[16] = self.au;
@@ -1032,60 +968,55 @@ impl M68000 {
         self.au = self.au.wrapping_add(2);
         self.alu_and(M68000::high16(self.pc), 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_N;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.aob = self.au;
         self.dbout = self.aluo;
         self.at = M68000::ext32(self.ftu);
         self.au = self.au.wrapping_sub(4);
         self.alu_and(self.alub, 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_N;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.aob = self.at;
         self.pc = self.at;
         self.au = self.at.wrapping_add(2);
         self.base_ssw = SSW_DATA | SSW_R | SSW_N;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         { let v = self.dbin; M68000::set_16h(&mut self.at, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_DATA | SSW_R | SSW_N;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = M68000::merge_16_32(M68000::high16(self.at), self.dbin);
         self.au = M68000::merge_16_32(M68000::high16(self.at), self.dbin).wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R | SSW_N;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.icount -= 2;
         self.aob = self.au;
@@ -1095,13 +1026,12 @@ impl M68000 {
         self.ird = self.ir;
         if self.next_state != S_TRACE as u32 { self.next_state = self.int_next_state; }
         self.base_ssw = SSW_PROGRAM | SSW_R | SSW_N;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.set_ftu_const();
@@ -1117,13 +1047,12 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -1136,13 +1065,12 @@ impl M68000 {
         M68000::set_8_32(&mut self.da[ry], ((self.aluo) as u8));
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.set_ftu_const();
@@ -1158,13 +1086,12 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.da[ry];
@@ -1183,13 +1110,12 @@ impl M68000 {
         self.alu_or8(((self.dt) as u8), ((self.dbin) as u8));
         self.sr_nzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -1213,13 +1139,12 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.da[ry];
@@ -1243,13 +1168,12 @@ impl M68000 {
         self.alu_or8(((self.dt) as u8), ((self.dbin) as u8));
         self.sr_nzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -1273,13 +1197,12 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.alub = self.dbin;
@@ -1305,13 +1228,12 @@ impl M68000 {
         self.alu_or8(((self.dt) as u8), ((self.dbin) as u8));
         self.sr_nzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -1335,25 +1257,23 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
         self.au = M68000::ext32(self.dbin).wrapping_add(self.da[ry]);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -1373,13 +1293,12 @@ impl M68000 {
         self.alu_or8(((self.dt) as u8), ((self.dbin) as u8));
         self.sr_nzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -1406,13 +1325,12 @@ impl M68000 {
             { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
             self.au = self.au.wrapping_add(2);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.alu_ext(self.dbin);
@@ -1425,13 +1343,12 @@ impl M68000 {
         1 => {
             self.au = M68000::ext32(((self.da[self.map_sp((self.irc >> 12) as usize)]) as u16)).wrapping_add(self.au);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.step_movem();
@@ -1440,13 +1357,12 @@ impl M68000 {
         2 => {
             self.au = self.da[self.map_sp((self.irc >> 12) as usize)].wrapping_add(self.au);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.step_movem();
@@ -1470,13 +1386,12 @@ impl M68000 {
             self.alu_or8(((self.dt) as u8), ((self.dbin) as u8));
             self.sr_nzvc();
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.aob = self.au;
@@ -1502,13 +1417,12 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -1518,13 +1432,12 @@ impl M68000 {
         self.au = M68000::ext32(self.dbin);
         self.alu_or8(((self.dt) as u8), ((self.dbin) as u8));
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.at;
@@ -1542,13 +1455,12 @@ impl M68000 {
         self.alu_or8(((self.dt) as u8), ((self.dbin) as u8));
         self.sr_nzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -1571,26 +1483,24 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
         { let v = self.dbin; M68000::set_16h(&mut self.at, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.pc = self.au;
@@ -1599,13 +1509,12 @@ impl M68000 {
         self.au = M68000::merge_16_32(M68000::high16(self.at), self.dbin);
         self.alu_or8(((self.dt) as u8), ((self.dbin) as u8));
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.at;
@@ -1623,13 +1532,12 @@ impl M68000 {
         self.alu_or8(((self.dt) as u8), ((self.dbin) as u8));
         self.sr_nzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -1652,13 +1560,12 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.ftu = self.sr;
@@ -1678,13 +1585,12 @@ impl M68000 {
         self.ftu = self.dbin;
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -1694,13 +1600,12 @@ impl M68000 {
         self.ird = self.ir;
         if self.next_state != S_TRACE as u32 { self.next_state = self.int_next_state; }
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.set_ftu_const();
@@ -1716,13 +1621,12 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -1735,13 +1639,12 @@ impl M68000 {
         { let v = self.aluo; M68000::set_16l_32(&mut self.da[ry], v); }
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.set_ftu_const();
@@ -1757,13 +1660,12 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.da[ry];
@@ -1771,13 +1673,12 @@ impl M68000 {
         self.alu_and(self.dbin, 0xffffu16);
         self.dcr = ((self.dt) as u8);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.ir = self.irc;
@@ -1786,13 +1687,12 @@ impl M68000 {
         self.alu_or(((self.dt) as u16), self.dbin);
         self.sr_nzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -1801,13 +1701,12 @@ impl M68000 {
         self.dbout = self.aluo;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
         if self.sr & SR_T != 0 { self.next_state = S_TRACE as u32; }
@@ -1821,13 +1720,12 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.da[ry];
@@ -1840,13 +1738,12 @@ impl M68000 {
         self.au = self.pc.wrapping_add(2);
         self.alu_and(self.alub, 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.ir = self.irc;
@@ -1855,13 +1752,12 @@ impl M68000 {
         self.alu_or(((self.dt) as u16), self.dbin);
         self.sr_nzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -1870,13 +1766,12 @@ impl M68000 {
         self.dbout = self.aluo;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
         if self.sr & SR_T != 0 { self.next_state = S_TRACE as u32; }
@@ -1890,13 +1785,12 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.alub = self.dbin;
@@ -1911,13 +1805,12 @@ impl M68000 {
         self.au = self.pc;
         self.alu_and(self.alub, 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.ir = self.irc;
@@ -1926,13 +1819,12 @@ impl M68000 {
         self.alu_or(((self.dt) as u16), self.dbin);
         self.sr_nzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -1941,13 +1833,12 @@ impl M68000 {
         self.dbout = self.aluo;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
         if self.sr & SR_T != 0 { self.next_state = S_TRACE as u32; }
@@ -1961,25 +1852,23 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
         self.au = M68000::ext32(self.dbin).wrapping_add(self.da[ry]);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -1988,13 +1877,12 @@ impl M68000 {
         self.alu_and(self.dbin, 0xffffu16);
         self.dcr = ((self.dt) as u8);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.ir = self.irc;
@@ -2003,13 +1891,12 @@ impl M68000 {
         self.alu_or(((self.dt) as u16), self.dbin);
         self.sr_nzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -2018,13 +1905,12 @@ impl M68000 {
         self.dbout = self.aluo;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
         if self.sr & SR_T != 0 { self.next_state = S_TRACE as u32; }
@@ -2041,13 +1927,12 @@ impl M68000 {
             { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
             self.au = self.au.wrapping_add(2);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.alu_ext(self.dbin);
@@ -2060,13 +1945,12 @@ impl M68000 {
         1 => {
             self.au = M68000::ext32(((self.da[self.map_sp((self.irc >> 12) as usize)]) as u16)).wrapping_add(self.au);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.step_movem();
@@ -2075,13 +1959,12 @@ impl M68000 {
         2 => {
             self.au = self.da[self.map_sp((self.irc >> 12) as usize)].wrapping_add(self.au);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.step_movem();
@@ -2094,13 +1977,12 @@ impl M68000 {
             self.alu_and(self.dbin, 0xffffu16);
             self.dcr = ((self.dt) as u8);
             self.base_ssw = SSW_DATA | SSW_R;
-            self.edb = bus.read_data(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_data(self.aob & !1u32);
+            self.icount -= 4;
             self.dbin = self.edb;
             self.aob = self.au;
             self.ir = self.irc;
@@ -2109,13 +1991,12 @@ impl M68000 {
             self.alu_or(((self.dt) as u16), self.dbin);
             self.sr_nzvc();
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.aob = self.au;
@@ -2124,13 +2005,12 @@ impl M68000 {
             self.dbout = self.aluo;
             self.au = self.pc.wrapping_add(2);
             self.base_ssw = SSW_DATA;
-            bus.write_data(self.aob & !1u32, self.dbout);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            bus.write_data(self.aob & !1u32, self.dbout);
+            self.icount -= 4;
             self.set_ftu_const();
             self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
             if self.sr & SR_T != 0 { self.next_state = S_TRACE as u32; }
@@ -2146,13 +2026,12 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -2162,26 +2041,24 @@ impl M68000 {
         self.au = M68000::ext32(self.dbin);
         self.alu_or(((self.dt) as u16), self.dbin);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.at;
         self.au = self.pc.wrapping_add(2);
         self.alu_and(self.dbin, 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.ir = self.irc;
@@ -2190,13 +2067,12 @@ impl M68000 {
         self.alu_or(((self.dt) as u16), self.dbin);
         self.sr_nzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -2205,13 +2081,12 @@ impl M68000 {
         self.dbout = self.aluo;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
         if self.sr & SR_T != 0 { self.next_state = S_TRACE as u32; }
@@ -2224,26 +2099,24 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
         { let v = self.dbin; M68000::set_16h(&mut self.at, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.pc = self.au;
@@ -2252,26 +2125,24 @@ impl M68000 {
         self.au = M68000::merge_16_32(M68000::high16(self.at), self.dbin);
         self.alu_or(((self.dt) as u16), self.dbin);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.at;
         self.au = self.pc.wrapping_add(2);
         self.alu_and(self.dbin, 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.ir = self.irc;
@@ -2280,13 +2151,12 @@ impl M68000 {
         self.alu_or(((self.dt) as u16), self.dbin);
         self.sr_nzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -2295,13 +2165,12 @@ impl M68000 {
         self.dbout = self.aluo;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
         if self.sr & SR_T != 0 { self.next_state = S_TRACE as u32; }
@@ -2315,13 +2184,12 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.ftu = self.sr;
@@ -2343,13 +2211,12 @@ impl M68000 {
         self.ftu = self.dbin;
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -2359,13 +2226,12 @@ impl M68000 {
         self.ird = self.ir;
         if self.next_state != S_TRACE as u32 { self.next_state = self.int_next_state; }
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.set_ftu_const();
@@ -2380,26 +2246,24 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16h(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.pc = self.au;
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -2409,13 +2273,12 @@ impl M68000 {
         self.sr_nzvc();
         { let v = self.aluo; M68000::set_16l_32(&mut self.da[ry], v); }
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.alu_or(M68000::high16(self.dt), M68000::high16(self.da[ry]));
@@ -2438,39 +2301,36 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16h(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.pc = self.au;
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.da[ry];
         self.au = self.da[ry].wrapping_add(2);
         self.alu_and(self.dbin, 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.alub = self.dbin;
@@ -2478,13 +2338,12 @@ impl M68000 {
         self.at = self.au;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.ir = self.irc;
@@ -2493,13 +2352,12 @@ impl M68000 {
         self.alu_or(((self.dt) as u16), self.dbin);
         self.sr_nzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -2508,26 +2366,24 @@ impl M68000 {
         self.alu_or(M68000::high16(self.dt), self.alue);
         self.sr_nzvc_u();
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.aob = self.au;
         self.ird = self.ir;
         if self.next_state != S_TRACE as u32 { self.next_state = self.int_next_state; }
         self.dbout = self.aluo;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
         if self.sr & SR_T != 0 { self.next_state = S_TRACE as u32; }
@@ -2540,39 +2396,36 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16h(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.pc = self.au;
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.da[ry];
         self.au = self.da[ry].wrapping_add(2);
         self.alu_and(self.dbin, 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.alub = self.dbin;
@@ -2582,13 +2435,12 @@ impl M68000 {
         self.da[ry] = self.au;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.ir = self.irc;
@@ -2597,13 +2449,12 @@ impl M68000 {
         self.alu_or(((self.dt) as u16), self.dbin);
         self.sr_nzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -2612,26 +2463,24 @@ impl M68000 {
         self.alu_or(M68000::high16(self.dt), self.alue);
         self.sr_nzvc_u();
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.aob = self.au;
         self.ird = self.ir;
         if self.next_state != S_TRACE as u32 { self.next_state = self.int_next_state; }
         self.dbout = self.aluo;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
         if self.sr & SR_T != 0 { self.next_state = S_TRACE as u32; }
@@ -2644,26 +2493,24 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16h(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.pc = self.au;
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.au = self.da[ry].wrapping_sub(4);
@@ -2673,13 +2520,12 @@ impl M68000 {
         self.da[ry] = self.au;
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.alub = self.dbin;
@@ -2687,13 +2533,12 @@ impl M68000 {
         self.at = self.au;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.ir = self.irc;
@@ -2702,13 +2547,12 @@ impl M68000 {
         self.alu_or(((self.dt) as u16), self.dbin);
         self.sr_nzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -2717,26 +2561,24 @@ impl M68000 {
         self.alu_or(M68000::high16(self.dt), self.alue);
         self.sr_nzvc_u();
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.aob = self.au;
         self.ird = self.ir;
         if self.next_state != S_TRACE as u32 { self.next_state = self.int_next_state; }
         self.dbout = self.aluo;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
         if self.sr & SR_T != 0 { self.next_state = S_TRACE as u32; }
@@ -2749,51 +2591,47 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16h(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.pc = self.au;
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
         self.au = M68000::ext32(self.dbin).wrapping_add(self.da[ry]);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
         self.au = self.au.wrapping_add(2);
         self.alu_and(self.dbin, 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.alub = self.dbin;
@@ -2801,13 +2639,12 @@ impl M68000 {
         self.at = self.au;
         self.au = self.pc.wrapping_add(4);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.ir = self.irc;
@@ -2816,13 +2653,12 @@ impl M68000 {
         self.alu_or(((self.dt) as u16), self.dbin);
         self.sr_nzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -2831,26 +2667,24 @@ impl M68000 {
         self.alu_or(M68000::high16(self.dt), self.alue);
         self.sr_nzvc_u();
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.aob = self.au;
         self.ird = self.ir;
         if self.next_state != S_TRACE as u32 { self.next_state = self.int_next_state; }
         self.dbout = self.aluo;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
         if self.sr & SR_T != 0 { self.next_state = S_TRACE as u32; }
@@ -2866,26 +2700,24 @@ impl M68000 {
             { let v = self.dbin; M68000::set_16h(&mut self.dt, v); }
             self.au = self.au.wrapping_add(2);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.dbin = self.edb;
             self.aob = self.au;
             self.pc = self.au;
             { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
             self.au = self.au.wrapping_add(2);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.alu_ext(self.dbin);
@@ -2898,13 +2730,12 @@ impl M68000 {
         1 => {
             self.au = M68000::ext32(((self.da[self.map_sp((self.irc >> 12) as usize)]) as u16)).wrapping_add(self.au);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.step_movem();
@@ -2913,13 +2744,12 @@ impl M68000 {
         2 => {
             self.au = self.da[self.map_sp((self.irc >> 12) as usize)].wrapping_add(self.au);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.step_movem();
@@ -2930,13 +2760,12 @@ impl M68000 {
             self.au = self.au.wrapping_add(2);
             self.alu_and(self.dbin, 0xffffu16);
             self.base_ssw = SSW_DATA | SSW_R;
-            self.edb = bus.read_data(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_data(self.aob & !1u32);
+            self.icount -= 4;
             self.dbin = self.edb;
             self.aob = self.au;
             self.alub = self.dbin;
@@ -2944,13 +2773,12 @@ impl M68000 {
             self.at = self.au;
             self.au = self.pc.wrapping_add(4);
             self.base_ssw = SSW_DATA | SSW_R;
-            self.edb = bus.read_data(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_data(self.aob & !1u32);
+            self.icount -= 4;
             self.dbin = self.edb;
             self.aob = self.au;
             self.ir = self.irc;
@@ -2959,13 +2787,12 @@ impl M68000 {
             self.alu_or(((self.dt) as u16), self.dbin);
             self.sr_nzvc();
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.aob = self.au;
@@ -2974,26 +2801,24 @@ impl M68000 {
             self.alu_or(M68000::high16(self.dt), self.alue);
             self.sr_nzvc_u();
             self.base_ssw = SSW_DATA;
-            bus.write_data(self.aob & !1u32, self.dbout);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            bus.write_data(self.aob & !1u32, self.dbout);
+            self.icount -= 4;
             self.aob = self.au;
             self.ird = self.ir;
             if self.next_state != S_TRACE as u32 { self.next_state = self.int_next_state; }
             self.dbout = self.aluo;
             self.au = self.pc.wrapping_add(2);
             self.base_ssw = SSW_DATA;
-            bus.write_data(self.aob & !1u32, self.dbout);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            bus.write_data(self.aob & !1u32, self.dbout);
+            self.icount -= 4;
             self.set_ftu_const();
             self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
             if self.sr & SR_T != 0 { self.next_state = S_TRACE as u32; }
@@ -3008,26 +2833,24 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16h(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.pc = self.au;
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -3037,26 +2860,24 @@ impl M68000 {
         self.au = M68000::ext32(self.dbin);
         self.alu_or(((self.dt) as u16), self.dbin);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
         self.au = self.au.wrapping_add(2);
         self.alu_and(self.dbin, 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.alub = self.dbin;
@@ -3064,13 +2885,12 @@ impl M68000 {
         self.at = self.au;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.ir = self.irc;
@@ -3079,13 +2899,12 @@ impl M68000 {
         self.alu_or(((self.dt) as u16), self.dbin);
         self.sr_nzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -3094,26 +2913,24 @@ impl M68000 {
         self.alu_or(M68000::high16(self.dt), self.alue);
         self.sr_nzvc_u();
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.aob = self.au;
         self.ird = self.ir;
         if self.next_state != S_TRACE as u32 { self.next_state = self.int_next_state; }
         self.dbout = self.aluo;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
         if self.sr & SR_T != 0 { self.next_state = S_TRACE as u32; }
@@ -3125,39 +2942,36 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16h(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.pc = self.au;
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
         { let v = self.dbin; M68000::set_16h(&mut self.at, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.pc = self.au;
@@ -3166,26 +2980,24 @@ impl M68000 {
         self.au = M68000::merge_16_32(M68000::high16(self.at), self.dbin);
         self.alu_or(((self.dt) as u16), self.dbin);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
         self.au = self.au.wrapping_add(2);
         self.alu_and(self.dbin, 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.alub = self.dbin;
@@ -3193,13 +3005,12 @@ impl M68000 {
         self.at = self.au;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.ir = self.irc;
@@ -3208,13 +3019,12 @@ impl M68000 {
         self.alu_or(((self.dt) as u16), self.dbin);
         self.sr_nzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -3223,26 +3033,24 @@ impl M68000 {
         self.alu_or(M68000::high16(self.dt), self.alue);
         self.sr_nzvc_u();
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.aob = self.au;
         self.ird = self.ir;
         if self.next_state != S_TRACE as u32 { self.next_state = self.int_next_state; }
         self.dbout = self.aluo;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
         if self.sr & SR_T != 0 { self.next_state = S_TRACE as u32; }
@@ -3267,13 +3075,12 @@ impl M68000 {
             self.au = self.pc.wrapping_add(2);
             self.alu_and(((self.da[ry]) as u16), 0xffffu16);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             if self.t != 0 { __state = 2; } else { __state = 1; } continue;
@@ -3311,13 +3118,12 @@ impl M68000 {
         self.aob = self.au;
         self.au = M68000::ext32(self.dbin).wrapping_add(self.da[ry]);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -3342,13 +3148,12 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.da[rx], v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.set_ftu_const();
@@ -3378,13 +3183,12 @@ impl M68000 {
         self.ird = self.ir;
         if self.next_state != S_TRACE as u32 { self.next_state = self.int_next_state; }
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.set_ftu_const();
@@ -3419,13 +3223,12 @@ impl M68000 {
         self.ird = self.ir;
         if self.next_state != S_TRACE as u32 { self.next_state = self.int_next_state; }
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.set_ftu_const();
@@ -3462,13 +3265,12 @@ impl M68000 {
         self.ird = self.ir;
         if self.next_state != S_TRACE as u32 { self.next_state = self.int_next_state; }
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.set_ftu_const();
@@ -3483,13 +3285,12 @@ impl M68000 {
         self.aob = self.au;
         self.au = M68000::ext32(self.dbin).wrapping_add(self.da[ry]);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -3511,13 +3312,12 @@ impl M68000 {
         self.ird = self.ir;
         if self.next_state != S_TRACE as u32 { self.next_state = self.int_next_state; }
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.set_ftu_const();
@@ -3542,13 +3342,12 @@ impl M68000 {
         1 => {
             self.au = M68000::ext32(((self.da[self.map_sp((self.irc >> 12) as usize)]) as u16)).wrapping_add(self.au);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.step_movem();
@@ -3557,13 +3356,12 @@ impl M68000 {
         2 => {
             self.au = self.da[self.map_sp((self.irc >> 12) as usize)].wrapping_add(self.au);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.step_movem();
@@ -3589,13 +3387,12 @@ impl M68000 {
             self.ird = self.ir;
             if self.next_state != S_TRACE as u32 { self.next_state = self.int_next_state; }
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.set_ftu_const();
@@ -3616,13 +3413,12 @@ impl M68000 {
         self.au = M68000::ext32(self.dbin);
         self.alu_eor8(((self.da[rx]) as u8), ((self.dbin) as u8));
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.at;
@@ -3642,13 +3438,12 @@ impl M68000 {
         self.ird = self.ir;
         if self.next_state != S_TRACE as u32 { self.next_state = self.int_next_state; }
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.set_ftu_const();
@@ -3663,13 +3458,12 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16h(&mut self.at, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.pc = self.au;
@@ -3678,13 +3472,12 @@ impl M68000 {
         self.au = M68000::merge_16_32(M68000::high16(self.at), self.dbin);
         self.alu_eor8(((self.da[rx]) as u8), ((self.dbin) as u8));
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.at;
@@ -3704,13 +3497,12 @@ impl M68000 {
         self.ird = self.ir;
         if self.next_state != S_TRACE as u32 { self.next_state = self.int_next_state; }
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.set_ftu_const();
@@ -3724,13 +3516,12 @@ impl M68000 {
         self.aob = self.au;
         self.au = M68000::ext32(self.dbin).wrapping_add(self.pc);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -3752,13 +3543,12 @@ impl M68000 {
         self.ird = self.ir;
         if self.next_state != S_TRACE as u32 { self.next_state = self.int_next_state; }
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.set_ftu_const();
@@ -3782,13 +3572,12 @@ impl M68000 {
         1 => {
             self.au = M68000::ext32(((self.da[self.map_sp((self.irc >> 12) as usize)]) as u16)).wrapping_add(self.au);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.step_movem();
@@ -3797,13 +3586,12 @@ impl M68000 {
         2 => {
             self.au = self.da[self.map_sp((self.irc >> 12) as usize)].wrapping_add(self.au);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.step_movem();
@@ -3829,13 +3617,12 @@ impl M68000 {
             self.ird = self.ir;
             if self.next_state != S_TRACE as u32 { self.next_state = self.int_next_state; }
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.set_ftu_const();
@@ -3858,13 +3645,12 @@ impl M68000 {
             { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
             self.au = self.au.wrapping_add(2);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.aob = self.au;
@@ -3877,13 +3663,12 @@ impl M68000 {
             self.au = self.pc.wrapping_add(2);
             self.alu_and8(((self.dt) as u16), 0xffffu16);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             if self.t != 0 { __state = 2; } else { __state = 1; } continue;
@@ -3933,13 +3718,12 @@ impl M68000 {
             self.au = self.pc.wrapping_add(2);
             self.alu_eor(((self.da[ry]) as u16), (1u16 << (self.dcr & 15)));
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             if self.t != 0 { __state = 2; } else { __state = 1; } continue;
@@ -3981,13 +3765,12 @@ impl M68000 {
         self.aob = self.au;
         self.au = M68000::ext32(self.dbin).wrapping_add(self.da[ry]);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -4027,13 +3810,12 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.da[rx], v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.set_ftu_const();
@@ -4061,13 +3843,12 @@ impl M68000 {
         self.au = self.au.wrapping_add(2);
         self.alu_eor8(((self.dbin) as u8), (((1u16 << (self.dcr & 7))) as u8));
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.at;
@@ -4109,13 +3890,12 @@ impl M68000 {
         self.au = self.au.wrapping_add(2);
         self.alu_eor8(((self.dbin) as u8), (((1u16 << (self.dcr & 7))) as u8));
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.at;
@@ -4159,13 +3939,12 @@ impl M68000 {
         self.au = self.au.wrapping_add(2);
         self.alu_eor8(((self.dbin) as u8), (((1u16 << (self.dcr & 7))) as u8));
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.at;
@@ -4189,13 +3968,12 @@ impl M68000 {
         self.aob = self.au;
         self.au = M68000::ext32(self.dbin).wrapping_add(self.da[ry]);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -4215,13 +3993,12 @@ impl M68000 {
         self.au = self.au.wrapping_add(2);
         self.alu_eor8(((self.dbin) as u8), (((1u16 << (self.dcr & 7))) as u8));
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.at;
@@ -4255,13 +4032,12 @@ impl M68000 {
         1 => {
             self.au = M68000::ext32(((self.da[self.map_sp((self.irc >> 12) as usize)]) as u16)).wrapping_add(self.au);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.step_movem();
@@ -4270,13 +4046,12 @@ impl M68000 {
         2 => {
             self.au = self.da[self.map_sp((self.irc >> 12) as usize)].wrapping_add(self.au);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.step_movem();
@@ -4300,13 +4075,12 @@ impl M68000 {
             self.au = self.au.wrapping_add(2);
             self.alu_eor8(((self.dbin) as u8), (((1u16 << (self.dcr & 7))) as u8));
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.aob = self.at;
@@ -4336,13 +4110,12 @@ impl M68000 {
         self.au = M68000::ext32(self.dbin);
         self.alu_eor8(((self.da[rx]) as u8), ((self.dbin) as u8));
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.at;
@@ -4360,13 +4133,12 @@ impl M68000 {
         self.au = self.au.wrapping_add(2);
         self.alu_eor8(((self.dbin) as u8), (((1u16 << (self.dcr & 7))) as u8));
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.at;
@@ -4390,13 +4162,12 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16h(&mut self.at, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.pc = self.au;
@@ -4405,13 +4176,12 @@ impl M68000 {
         self.au = M68000::merge_16_32(M68000::high16(self.at), self.dbin);
         self.alu_eor8(((self.da[rx]) as u8), ((self.dbin) as u8));
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.at;
@@ -4429,13 +4199,12 @@ impl M68000 {
         self.au = self.au.wrapping_add(2);
         self.alu_eor8(((self.dbin) as u8), (((1u16 << (self.dcr & 7))) as u8));
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.at;
@@ -4471,13 +4240,12 @@ impl M68000 {
             self.au = self.pc.wrapping_add(2);
             self.alu_or(((self.da[ry]) as u16), (1u16 << (self.dcr & 15)));
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             if self.t != 0 { __state = 2; } else { __state = 1; } continue;
@@ -4523,13 +4291,12 @@ impl M68000 {
         self.aob = self.au;
         self.au = M68000::ext32(self.dbin).wrapping_add(self.da[ry]);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -4552,13 +4319,12 @@ impl M68000 {
         self.ird = self.ir;
         if self.next_state != S_TRACE as u32 { self.next_state = self.int_next_state; }
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.set_ftu_const();
@@ -4588,13 +4354,12 @@ impl M68000 {
         self.au = self.au.wrapping_add(2);
         self.alu_eor8(((self.aluo) as u8), (((1u16 << (self.dcr & 7))) as u8));
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.at;
@@ -4638,13 +4403,12 @@ impl M68000 {
         self.au = self.au.wrapping_add(2);
         self.alu_eor8(((self.aluo) as u8), (((1u16 << (self.dcr & 7))) as u8));
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.at;
@@ -4690,13 +4454,12 @@ impl M68000 {
         self.au = self.au.wrapping_add(2);
         self.alu_eor8(((self.aluo) as u8), (((1u16 << (self.dcr & 7))) as u8));
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.at;
@@ -4720,13 +4483,12 @@ impl M68000 {
         self.aob = self.au;
         self.au = M68000::ext32(self.dbin).wrapping_add(self.da[ry]);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -4748,13 +4510,12 @@ impl M68000 {
         self.au = self.au.wrapping_add(2);
         self.alu_eor8(((self.aluo) as u8), (((1u16 << (self.dcr & 7))) as u8));
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.at;
@@ -4788,13 +4549,12 @@ impl M68000 {
         1 => {
             self.au = M68000::ext32(((self.da[self.map_sp((self.irc >> 12) as usize)]) as u16)).wrapping_add(self.au);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.step_movem();
@@ -4803,13 +4563,12 @@ impl M68000 {
         2 => {
             self.au = self.da[self.map_sp((self.irc >> 12) as usize)].wrapping_add(self.au);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.step_movem();
@@ -4835,13 +4594,12 @@ impl M68000 {
             self.au = self.au.wrapping_add(2);
             self.alu_eor8(((self.aluo) as u8), (((1u16 << (self.dcr & 7))) as u8));
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.aob = self.at;
@@ -4871,13 +4629,12 @@ impl M68000 {
         self.au = M68000::ext32(self.dbin);
         self.alu_or8(((self.da[rx]) as u8), ((self.dbin) as u8));
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.at;
@@ -4897,13 +4654,12 @@ impl M68000 {
         self.au = self.au.wrapping_add(2);
         self.alu_eor8(((self.aluo) as u8), (((1u16 << (self.dcr & 7))) as u8));
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.at;
@@ -4927,13 +4683,12 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16h(&mut self.at, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.pc = self.au;
@@ -4942,13 +4697,12 @@ impl M68000 {
         self.au = M68000::merge_16_32(M68000::high16(self.at), self.dbin);
         self.alu_or8(((self.da[rx]) as u8), ((self.dbin) as u8));
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.at;
@@ -4968,13 +4722,12 @@ impl M68000 {
         self.au = self.au.wrapping_add(2);
         self.alu_eor8(((self.aluo) as u8), (((1u16 << (self.dcr & 7))) as u8));
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.at;
@@ -5010,13 +4763,12 @@ impl M68000 {
             self.au = self.pc.wrapping_add(2);
             self.alu_or(((self.da[ry]) as u16), (1u16 << (self.dcr & 15)));
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             if self.t != 0 { __state = 2; } else { __state = 1; } continue;
@@ -5058,13 +4810,12 @@ impl M68000 {
         self.aob = self.au;
         self.au = M68000::ext32(self.dbin).wrapping_add(self.da[ry]);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -5099,13 +4850,12 @@ impl M68000 {
         self.ird = self.ir;
         if self.next_state != S_TRACE as u32 { self.next_state = self.int_next_state; }
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.set_ftu_const();
@@ -5133,13 +4883,12 @@ impl M68000 {
         self.au = self.au.wrapping_add(2);
         self.alu_or8(((self.dbin) as u8), (((1u16 << (self.dcr & 7))) as u8));
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.at;
@@ -5181,13 +4930,12 @@ impl M68000 {
         self.au = self.au.wrapping_add(2);
         self.alu_or8(((self.dbin) as u8), (((1u16 << (self.dcr & 7))) as u8));
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.at;
@@ -5231,13 +4979,12 @@ impl M68000 {
         self.au = self.au.wrapping_add(2);
         self.alu_or8(((self.dbin) as u8), (((1u16 << (self.dcr & 7))) as u8));
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.at;
@@ -5261,13 +5008,12 @@ impl M68000 {
         self.aob = self.au;
         self.au = M68000::ext32(self.dbin).wrapping_add(self.da[ry]);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -5287,13 +5033,12 @@ impl M68000 {
         self.au = self.au.wrapping_add(2);
         self.alu_or8(((self.dbin) as u8), (((1u16 << (self.dcr & 7))) as u8));
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.at;
@@ -5327,13 +5072,12 @@ impl M68000 {
         1 => {
             self.au = M68000::ext32(((self.da[self.map_sp((self.irc >> 12) as usize)]) as u16)).wrapping_add(self.au);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.step_movem();
@@ -5342,13 +5086,12 @@ impl M68000 {
         2 => {
             self.au = self.da[self.map_sp((self.irc >> 12) as usize)].wrapping_add(self.au);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.step_movem();
@@ -5372,13 +5115,12 @@ impl M68000 {
             self.au = self.au.wrapping_add(2);
             self.alu_or8(((self.dbin) as u8), (((1u16 << (self.dcr & 7))) as u8));
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.aob = self.at;
@@ -5408,13 +5150,12 @@ impl M68000 {
         self.au = M68000::ext32(self.dbin);
         self.alu_or8(((self.da[rx]) as u8), ((self.dbin) as u8));
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.at;
@@ -5432,13 +5173,12 @@ impl M68000 {
         self.au = self.au.wrapping_add(2);
         self.alu_or8(((self.dbin) as u8), (((1u16 << (self.dcr & 7))) as u8));
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.at;
@@ -5462,13 +5202,12 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16h(&mut self.at, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.pc = self.au;
@@ -5477,13 +5216,12 @@ impl M68000 {
         self.au = M68000::merge_16_32(M68000::high16(self.at), self.dbin);
         self.alu_or8(((self.da[rx]) as u8), ((self.dbin) as u8));
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.at;
@@ -5501,13 +5239,12 @@ impl M68000 {
         self.au = self.au.wrapping_add(2);
         self.alu_or8(((self.dbin) as u8), (((1u16 << (self.dcr & 7))) as u8));
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.at;
@@ -5532,13 +5269,12 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -5551,13 +5287,12 @@ impl M68000 {
         M68000::set_8_32(&mut self.da[ry], ((self.aluo) as u8));
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.set_ftu_const();
@@ -5573,13 +5308,12 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.da[ry];
@@ -5598,13 +5332,12 @@ impl M68000 {
         self.alu_and8(((self.dt) as u16), self.dbin);
         self.sr_nzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -5628,13 +5361,12 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.da[ry];
@@ -5658,13 +5390,12 @@ impl M68000 {
         self.alu_and8(((self.dt) as u16), self.dbin);
         self.sr_nzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -5688,13 +5419,12 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.alub = self.dbin;
@@ -5720,13 +5450,12 @@ impl M68000 {
         self.alu_and8(((self.dt) as u16), self.dbin);
         self.sr_nzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -5750,25 +5479,23 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
         self.au = M68000::ext32(self.dbin).wrapping_add(self.da[ry]);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -5788,13 +5515,12 @@ impl M68000 {
         self.alu_and8(((self.dt) as u16), self.dbin);
         self.sr_nzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -5821,13 +5547,12 @@ impl M68000 {
             { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
             self.au = self.au.wrapping_add(2);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.alu_ext(self.dbin);
@@ -5840,13 +5565,12 @@ impl M68000 {
         1 => {
             self.au = M68000::ext32(((self.da[self.map_sp((self.irc >> 12) as usize)]) as u16)).wrapping_add(self.au);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.step_movem();
@@ -5855,13 +5579,12 @@ impl M68000 {
         2 => {
             self.au = self.da[self.map_sp((self.irc >> 12) as usize)].wrapping_add(self.au);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.step_movem();
@@ -5885,13 +5608,12 @@ impl M68000 {
             self.alu_and8(((self.dt) as u16), self.dbin);
             self.sr_nzvc();
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.aob = self.au;
@@ -5917,13 +5639,12 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -5933,13 +5654,12 @@ impl M68000 {
         self.au = M68000::ext32(self.dbin);
         self.alu_and8(((self.dt) as u16), self.dbin);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.at;
@@ -5957,13 +5677,12 @@ impl M68000 {
         self.alu_and8(((self.dt) as u16), self.dbin);
         self.sr_nzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -5986,26 +5705,24 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
         { let v = self.dbin; M68000::set_16h(&mut self.at, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.pc = self.au;
@@ -6014,13 +5731,12 @@ impl M68000 {
         self.au = M68000::merge_16_32(M68000::high16(self.at), self.dbin);
         self.alu_and8(((self.dt) as u16), self.dbin);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.at;
@@ -6038,13 +5754,12 @@ impl M68000 {
         self.alu_and8(((self.dt) as u16), self.dbin);
         self.sr_nzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -6067,13 +5782,12 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.ftu = self.sr;
@@ -6093,13 +5807,12 @@ impl M68000 {
         self.ftu = self.dbin;
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -6109,13 +5822,12 @@ impl M68000 {
         self.ird = self.ir;
         if self.next_state != S_TRACE as u32 { self.next_state = self.int_next_state; }
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.set_ftu_const();
@@ -6131,13 +5843,12 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -6150,13 +5861,12 @@ impl M68000 {
         { let v = self.aluo; M68000::set_16l_32(&mut self.da[ry], v); }
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.set_ftu_const();
@@ -6172,13 +5882,12 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.da[ry];
@@ -6186,13 +5895,12 @@ impl M68000 {
         self.alu_and(self.dbin, 0xffffu16);
         self.dcr = ((self.dt) as u8);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.ir = self.irc;
@@ -6201,13 +5909,12 @@ impl M68000 {
         self.alu_and(((self.dt) as u16), self.dbin);
         self.sr_nzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -6216,13 +5923,12 @@ impl M68000 {
         self.dbout = self.aluo;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
         if self.sr & SR_T != 0 { self.next_state = S_TRACE as u32; }
@@ -6236,13 +5942,12 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.da[ry];
@@ -6255,13 +5960,12 @@ impl M68000 {
         self.au = self.pc.wrapping_add(2);
         self.alu_and(self.alub, 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.ir = self.irc;
@@ -6270,13 +5974,12 @@ impl M68000 {
         self.alu_and(((self.dt) as u16), self.dbin);
         self.sr_nzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -6285,13 +5988,12 @@ impl M68000 {
         self.dbout = self.aluo;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
         if self.sr & SR_T != 0 { self.next_state = S_TRACE as u32; }
@@ -6305,13 +6007,12 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.alub = self.dbin;
@@ -6326,13 +6027,12 @@ impl M68000 {
         self.au = self.pc;
         self.alu_and(self.alub, 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.ir = self.irc;
@@ -6341,13 +6041,12 @@ impl M68000 {
         self.alu_and(((self.dt) as u16), self.dbin);
         self.sr_nzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -6356,13 +6055,12 @@ impl M68000 {
         self.dbout = self.aluo;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
         if self.sr & SR_T != 0 { self.next_state = S_TRACE as u32; }
@@ -6376,25 +6074,23 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
         self.au = M68000::ext32(self.dbin).wrapping_add(self.da[ry]);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -6403,13 +6099,12 @@ impl M68000 {
         self.alu_and(self.dbin, 0xffffu16);
         self.dcr = ((self.dt) as u8);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.ir = self.irc;
@@ -6418,13 +6113,12 @@ impl M68000 {
         self.alu_and(((self.dt) as u16), self.dbin);
         self.sr_nzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -6433,13 +6127,12 @@ impl M68000 {
         self.dbout = self.aluo;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
         if self.sr & SR_T != 0 { self.next_state = S_TRACE as u32; }
@@ -6456,13 +6149,12 @@ impl M68000 {
             { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
             self.au = self.au.wrapping_add(2);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.alu_ext(self.dbin);
@@ -6475,13 +6167,12 @@ impl M68000 {
         1 => {
             self.au = M68000::ext32(((self.da[self.map_sp((self.irc >> 12) as usize)]) as u16)).wrapping_add(self.au);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.step_movem();
@@ -6490,13 +6181,12 @@ impl M68000 {
         2 => {
             self.au = self.da[self.map_sp((self.irc >> 12) as usize)].wrapping_add(self.au);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.step_movem();
@@ -6509,13 +6199,12 @@ impl M68000 {
             self.alu_and(self.dbin, 0xffffu16);
             self.dcr = ((self.dt) as u8);
             self.base_ssw = SSW_DATA | SSW_R;
-            self.edb = bus.read_data(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_data(self.aob & !1u32);
+            self.icount -= 4;
             self.dbin = self.edb;
             self.aob = self.au;
             self.ir = self.irc;
@@ -6524,13 +6213,12 @@ impl M68000 {
             self.alu_and(((self.dt) as u16), self.dbin);
             self.sr_nzvc();
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.aob = self.au;
@@ -6539,13 +6227,12 @@ impl M68000 {
             self.dbout = self.aluo;
             self.au = self.pc.wrapping_add(2);
             self.base_ssw = SSW_DATA;
-            bus.write_data(self.aob & !1u32, self.dbout);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            bus.write_data(self.aob & !1u32, self.dbout);
+            self.icount -= 4;
             self.set_ftu_const();
             self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
             if self.sr & SR_T != 0 { self.next_state = S_TRACE as u32; }
@@ -6561,13 +6248,12 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -6577,26 +6263,24 @@ impl M68000 {
         self.au = M68000::ext32(self.dbin);
         self.alu_and(((self.dt) as u16), self.dbin);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.at;
         self.au = self.pc.wrapping_add(2);
         self.alu_and(self.dbin, 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.ir = self.irc;
@@ -6605,13 +6289,12 @@ impl M68000 {
         self.alu_and(((self.dt) as u16), self.dbin);
         self.sr_nzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -6620,13 +6303,12 @@ impl M68000 {
         self.dbout = self.aluo;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
         if self.sr & SR_T != 0 { self.next_state = S_TRACE as u32; }
@@ -6639,26 +6321,24 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
         { let v = self.dbin; M68000::set_16h(&mut self.at, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.pc = self.au;
@@ -6667,26 +6347,24 @@ impl M68000 {
         self.au = M68000::merge_16_32(M68000::high16(self.at), self.dbin);
         self.alu_and(((self.dt) as u16), self.dbin);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.at;
         self.au = self.pc.wrapping_add(2);
         self.alu_and(self.dbin, 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.ir = self.irc;
@@ -6695,13 +6373,12 @@ impl M68000 {
         self.alu_and(((self.dt) as u16), self.dbin);
         self.sr_nzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -6710,13 +6387,12 @@ impl M68000 {
         self.dbout = self.aluo;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
         if self.sr & SR_T != 0 { self.next_state = S_TRACE as u32; }
@@ -6730,13 +6406,12 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.ftu = self.sr;
@@ -6758,13 +6433,12 @@ impl M68000 {
         self.ftu = self.dbin;
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -6774,13 +6448,12 @@ impl M68000 {
         self.ird = self.ir;
         if self.next_state != S_TRACE as u32 { self.next_state = self.int_next_state; }
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.set_ftu_const();
@@ -6795,26 +6468,24 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16h(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.pc = self.au;
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -6824,13 +6495,12 @@ impl M68000 {
         self.sr_nzvc();
         { let v = self.aluo; M68000::set_16l_32(&mut self.da[ry], v); }
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.alu_and(M68000::high16(self.dt), M68000::high16(self.da[ry]));
@@ -6853,39 +6523,36 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16h(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.pc = self.au;
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.da[ry];
         self.au = self.da[ry].wrapping_add(2);
         self.alu_and(self.dbin, 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.alub = self.dbin;
@@ -6893,13 +6560,12 @@ impl M68000 {
         self.at = self.au;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.ir = self.irc;
@@ -6908,13 +6574,12 @@ impl M68000 {
         self.alu_and(((self.dt) as u16), self.dbin);
         self.sr_nzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -6923,26 +6588,24 @@ impl M68000 {
         self.alu_and(M68000::high16(self.dt), self.alue);
         self.sr_nzvc_u();
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.aob = self.au;
         self.ird = self.ir;
         if self.next_state != S_TRACE as u32 { self.next_state = self.int_next_state; }
         self.dbout = self.aluo;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
         if self.sr & SR_T != 0 { self.next_state = S_TRACE as u32; }
@@ -6955,39 +6618,36 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16h(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.pc = self.au;
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.da[ry];
         self.au = self.da[ry].wrapping_add(2);
         self.alu_and(self.dbin, 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.alub = self.dbin;
@@ -6997,13 +6657,12 @@ impl M68000 {
         self.da[ry] = self.au;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.ir = self.irc;
@@ -7012,13 +6671,12 @@ impl M68000 {
         self.alu_and(((self.dt) as u16), self.dbin);
         self.sr_nzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -7027,26 +6685,24 @@ impl M68000 {
         self.alu_and(M68000::high16(self.dt), self.alue);
         self.sr_nzvc_u();
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.aob = self.au;
         self.ird = self.ir;
         if self.next_state != S_TRACE as u32 { self.next_state = self.int_next_state; }
         self.dbout = self.aluo;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
         if self.sr & SR_T != 0 { self.next_state = S_TRACE as u32; }
@@ -7059,26 +6715,24 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16h(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.pc = self.au;
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.au = self.da[ry].wrapping_sub(4);
@@ -7088,13 +6742,12 @@ impl M68000 {
         self.da[ry] = self.au;
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.alub = self.dbin;
@@ -7102,13 +6755,12 @@ impl M68000 {
         self.at = self.au;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.ir = self.irc;
@@ -7117,13 +6769,12 @@ impl M68000 {
         self.alu_and(((self.dt) as u16), self.dbin);
         self.sr_nzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -7132,26 +6783,24 @@ impl M68000 {
         self.alu_and(M68000::high16(self.dt), self.alue);
         self.sr_nzvc_u();
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.aob = self.au;
         self.ird = self.ir;
         if self.next_state != S_TRACE as u32 { self.next_state = self.int_next_state; }
         self.dbout = self.aluo;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
         if self.sr & SR_T != 0 { self.next_state = S_TRACE as u32; }
@@ -7164,51 +6813,47 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16h(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.pc = self.au;
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
         self.au = M68000::ext32(self.dbin).wrapping_add(self.da[ry]);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
         self.au = self.au.wrapping_add(2);
         self.alu_and(self.dbin, 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.alub = self.dbin;
@@ -7216,13 +6861,12 @@ impl M68000 {
         self.at = self.au;
         self.au = self.pc.wrapping_add(4);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.ir = self.irc;
@@ -7231,13 +6875,12 @@ impl M68000 {
         self.alu_and(((self.dt) as u16), self.dbin);
         self.sr_nzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -7246,26 +6889,24 @@ impl M68000 {
         self.alu_and(M68000::high16(self.dt), self.alue);
         self.sr_nzvc_u();
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.aob = self.au;
         self.ird = self.ir;
         if self.next_state != S_TRACE as u32 { self.next_state = self.int_next_state; }
         self.dbout = self.aluo;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
         if self.sr & SR_T != 0 { self.next_state = S_TRACE as u32; }
@@ -7281,26 +6922,24 @@ impl M68000 {
             { let v = self.dbin; M68000::set_16h(&mut self.dt, v); }
             self.au = self.au.wrapping_add(2);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.dbin = self.edb;
             self.aob = self.au;
             self.pc = self.au;
             { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
             self.au = self.au.wrapping_add(2);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.alu_ext(self.dbin);
@@ -7313,13 +6952,12 @@ impl M68000 {
         1 => {
             self.au = M68000::ext32(((self.da[self.map_sp((self.irc >> 12) as usize)]) as u16)).wrapping_add(self.au);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.step_movem();
@@ -7328,13 +6966,12 @@ impl M68000 {
         2 => {
             self.au = self.da[self.map_sp((self.irc >> 12) as usize)].wrapping_add(self.au);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.step_movem();
@@ -7345,13 +6982,12 @@ impl M68000 {
             self.au = self.au.wrapping_add(2);
             self.alu_and(self.dbin, 0xffffu16);
             self.base_ssw = SSW_DATA | SSW_R;
-            self.edb = bus.read_data(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_data(self.aob & !1u32);
+            self.icount -= 4;
             self.dbin = self.edb;
             self.aob = self.au;
             self.alub = self.dbin;
@@ -7359,13 +6995,12 @@ impl M68000 {
             self.at = self.au;
             self.au = self.pc.wrapping_add(4);
             self.base_ssw = SSW_DATA | SSW_R;
-            self.edb = bus.read_data(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_data(self.aob & !1u32);
+            self.icount -= 4;
             self.dbin = self.edb;
             self.aob = self.au;
             self.ir = self.irc;
@@ -7374,13 +7009,12 @@ impl M68000 {
             self.alu_and(((self.dt) as u16), self.dbin);
             self.sr_nzvc();
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.aob = self.au;
@@ -7389,26 +7023,24 @@ impl M68000 {
             self.alu_and(M68000::high16(self.dt), self.alue);
             self.sr_nzvc_u();
             self.base_ssw = SSW_DATA;
-            bus.write_data(self.aob & !1u32, self.dbout);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            bus.write_data(self.aob & !1u32, self.dbout);
+            self.icount -= 4;
             self.aob = self.au;
             self.ird = self.ir;
             if self.next_state != S_TRACE as u32 { self.next_state = self.int_next_state; }
             self.dbout = self.aluo;
             self.au = self.pc.wrapping_add(2);
             self.base_ssw = SSW_DATA;
-            bus.write_data(self.aob & !1u32, self.dbout);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            bus.write_data(self.aob & !1u32, self.dbout);
+            self.icount -= 4;
             self.set_ftu_const();
             self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
             if self.sr & SR_T != 0 { self.next_state = S_TRACE as u32; }
@@ -7423,26 +7055,24 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16h(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.pc = self.au;
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -7452,26 +7082,24 @@ impl M68000 {
         self.au = M68000::ext32(self.dbin);
         self.alu_and(((self.dt) as u16), self.dbin);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
         self.au = self.au.wrapping_add(2);
         self.alu_and(self.dbin, 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.alub = self.dbin;
@@ -7479,13 +7107,12 @@ impl M68000 {
         self.at = self.au;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.ir = self.irc;
@@ -7494,13 +7121,12 @@ impl M68000 {
         self.alu_and(((self.dt) as u16), self.dbin);
         self.sr_nzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -7509,26 +7135,24 @@ impl M68000 {
         self.alu_and(M68000::high16(self.dt), self.alue);
         self.sr_nzvc_u();
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.aob = self.au;
         self.ird = self.ir;
         if self.next_state != S_TRACE as u32 { self.next_state = self.int_next_state; }
         self.dbout = self.aluo;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
         if self.sr & SR_T != 0 { self.next_state = S_TRACE as u32; }
@@ -7540,39 +7164,36 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16h(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.pc = self.au;
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
         { let v = self.dbin; M68000::set_16h(&mut self.at, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.pc = self.au;
@@ -7581,26 +7202,24 @@ impl M68000 {
         self.au = M68000::merge_16_32(M68000::high16(self.at), self.dbin);
         self.alu_and(((self.dt) as u16), self.dbin);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
         self.au = self.au.wrapping_add(2);
         self.alu_and(self.dbin, 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.alub = self.dbin;
@@ -7608,13 +7227,12 @@ impl M68000 {
         self.at = self.au;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.ir = self.irc;
@@ -7623,13 +7241,12 @@ impl M68000 {
         self.alu_and(((self.dt) as u16), self.dbin);
         self.sr_nzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -7638,26 +7255,24 @@ impl M68000 {
         self.alu_and(M68000::high16(self.dt), self.alue);
         self.sr_nzvc_u();
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.aob = self.au;
         self.ird = self.ir;
         if self.next_state != S_TRACE as u32 { self.next_state = self.int_next_state; }
         self.dbout = self.aluo;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
         if self.sr & SR_T != 0 { self.next_state = S_TRACE as u32; }
@@ -7671,13 +7286,12 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -7690,13 +7304,12 @@ impl M68000 {
         M68000::set_8_32(&mut self.da[ry], ((self.aluo) as u8));
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.set_ftu_const();
@@ -7712,13 +7325,12 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.da[ry];
@@ -7737,13 +7349,12 @@ impl M68000 {
         self.alu_sub8(((self.dt) as u8), ((self.dbin) as u8));
         self.sr_xnzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -7767,13 +7378,12 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.da[ry];
@@ -7796,13 +7406,12 @@ impl M68000 {
         self.alu_sub8(((self.dt) as u8), ((self.dbin) as u8));
         self.sr_xnzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -7826,13 +7435,12 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.alub = self.dbin;
@@ -7857,13 +7465,12 @@ impl M68000 {
         self.alu_sub8(((self.dt) as u8), ((self.dbin) as u8));
         self.sr_xnzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -7887,25 +7494,23 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
         self.au = M68000::ext32(self.dbin).wrapping_add(self.da[ry]);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -7925,13 +7530,12 @@ impl M68000 {
         self.alu_sub8(((self.dt) as u8), ((self.dbin) as u8));
         self.sr_xnzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -7958,13 +7562,12 @@ impl M68000 {
             { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
             self.au = self.au.wrapping_add(2);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.alu_ext(self.dbin);
@@ -7977,13 +7580,12 @@ impl M68000 {
         1 => {
             self.au = M68000::ext32(((self.da[self.map_sp((self.irc >> 12) as usize)]) as u16)).wrapping_add(self.au);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.step_movem();
@@ -7992,13 +7594,12 @@ impl M68000 {
         2 => {
             self.au = self.da[self.map_sp((self.irc >> 12) as usize)].wrapping_add(self.au);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.step_movem();
@@ -8022,13 +7623,12 @@ impl M68000 {
             self.alu_sub8(((self.dt) as u8), ((self.dbin) as u8));
             self.sr_xnzvc();
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.aob = self.au;
@@ -8054,13 +7654,12 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -8069,13 +7668,12 @@ impl M68000 {
         self.at = M68000::ext32(self.dbin);
         self.au = M68000::ext32(self.dbin);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.at;
@@ -8093,13 +7691,12 @@ impl M68000 {
         self.alu_sub8(((self.dt) as u8), ((self.dbin) as u8));
         self.sr_xnzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -8122,26 +7719,24 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
         { let v = self.dbin; M68000::set_16h(&mut self.at, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.pc = self.au;
@@ -8149,13 +7744,12 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.at, v); }
         self.au = M68000::merge_16_32(M68000::high16(self.at), self.dbin);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.at;
@@ -8173,13 +7767,12 @@ impl M68000 {
         self.alu_sub8(((self.dt) as u8), ((self.dbin) as u8));
         self.sr_xnzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -8203,13 +7796,12 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -8222,13 +7814,12 @@ impl M68000 {
         { let v = self.aluo; M68000::set_16l_32(&mut self.da[ry], v); }
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.set_ftu_const();
@@ -8244,13 +7835,12 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.da[ry];
@@ -8258,13 +7848,12 @@ impl M68000 {
         self.alu_and(self.dbin, 0xffffu16);
         self.dcr = ((self.dt) as u8);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.ir = self.irc;
@@ -8273,13 +7862,12 @@ impl M68000 {
         self.alu_sub(((self.dt) as u16), self.dbin);
         self.sr_xnzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -8288,13 +7876,12 @@ impl M68000 {
         self.dbout = self.aluo;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
         if self.sr & SR_T != 0 { self.next_state = S_TRACE as u32; }
@@ -8308,13 +7895,12 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.da[ry];
@@ -8326,13 +7912,12 @@ impl M68000 {
         self.au = self.pc.wrapping_add(2);
         self.alu_and(self.alub, 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.ir = self.irc;
@@ -8341,13 +7926,12 @@ impl M68000 {
         self.alu_sub(((self.dt) as u16), self.dbin);
         self.sr_xnzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -8356,13 +7940,12 @@ impl M68000 {
         self.dbout = self.aluo;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
         if self.sr & SR_T != 0 { self.next_state = S_TRACE as u32; }
@@ -8376,13 +7959,12 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.alub = self.dbin;
@@ -8396,13 +7978,12 @@ impl M68000 {
         self.au = self.pc;
         self.alu_and(self.alub, 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.ir = self.irc;
@@ -8411,13 +7992,12 @@ impl M68000 {
         self.alu_sub(((self.dt) as u16), self.dbin);
         self.sr_xnzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -8426,13 +8006,12 @@ impl M68000 {
         self.dbout = self.aluo;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
         if self.sr & SR_T != 0 { self.next_state = S_TRACE as u32; }
@@ -8446,25 +8025,23 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
         self.au = M68000::ext32(self.dbin).wrapping_add(self.da[ry]);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -8473,13 +8050,12 @@ impl M68000 {
         self.alu_and(self.dbin, 0xffffu16);
         self.dcr = ((self.dt) as u8);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.ir = self.irc;
@@ -8488,13 +8064,12 @@ impl M68000 {
         self.alu_sub(((self.dt) as u16), self.dbin);
         self.sr_xnzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -8503,13 +8078,12 @@ impl M68000 {
         self.dbout = self.aluo;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
         if self.sr & SR_T != 0 { self.next_state = S_TRACE as u32; }
@@ -8526,13 +8100,12 @@ impl M68000 {
             { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
             self.au = self.au.wrapping_add(2);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.alu_ext(self.dbin);
@@ -8545,13 +8118,12 @@ impl M68000 {
         1 => {
             self.au = M68000::ext32(((self.da[self.map_sp((self.irc >> 12) as usize)]) as u16)).wrapping_add(self.au);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.step_movem();
@@ -8560,13 +8132,12 @@ impl M68000 {
         2 => {
             self.au = self.da[self.map_sp((self.irc >> 12) as usize)].wrapping_add(self.au);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.step_movem();
@@ -8579,13 +8150,12 @@ impl M68000 {
             self.alu_and(self.dbin, 0xffffu16);
             self.dcr = ((self.dt) as u8);
             self.base_ssw = SSW_DATA | SSW_R;
-            self.edb = bus.read_data(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_data(self.aob & !1u32);
+            self.icount -= 4;
             self.dbin = self.edb;
             self.aob = self.au;
             self.ir = self.irc;
@@ -8594,13 +8164,12 @@ impl M68000 {
             self.alu_sub(((self.dt) as u16), self.dbin);
             self.sr_xnzvc();
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.aob = self.au;
@@ -8609,13 +8178,12 @@ impl M68000 {
             self.dbout = self.aluo;
             self.au = self.pc.wrapping_add(2);
             self.base_ssw = SSW_DATA;
-            bus.write_data(self.aob & !1u32, self.dbout);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            bus.write_data(self.aob & !1u32, self.dbout);
+            self.icount -= 4;
             self.set_ftu_const();
             self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
             if self.sr & SR_T != 0 { self.next_state = S_TRACE as u32; }
@@ -8631,13 +8199,12 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -8646,26 +8213,24 @@ impl M68000 {
         self.at = M68000::ext32(self.dbin);
         self.au = M68000::ext32(self.dbin);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.at;
         self.au = self.pc.wrapping_add(2);
         self.alu_and(self.dbin, 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.ir = self.irc;
@@ -8674,13 +8239,12 @@ impl M68000 {
         self.alu_sub(((self.dt) as u16), self.dbin);
         self.sr_xnzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -8689,13 +8253,12 @@ impl M68000 {
         self.dbout = self.aluo;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
         if self.sr & SR_T != 0 { self.next_state = S_TRACE as u32; }
@@ -8708,26 +8271,24 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
         { let v = self.dbin; M68000::set_16h(&mut self.at, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.pc = self.au;
@@ -8735,26 +8296,24 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.at, v); }
         self.au = M68000::merge_16_32(M68000::high16(self.at), self.dbin);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.at;
         self.au = self.pc.wrapping_add(2);
         self.alu_and(self.dbin, 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.ir = self.irc;
@@ -8763,13 +8322,12 @@ impl M68000 {
         self.alu_sub(((self.dt) as u16), self.dbin);
         self.sr_xnzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -8778,13 +8336,12 @@ impl M68000 {
         self.dbout = self.aluo;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
         if self.sr & SR_T != 0 { self.next_state = S_TRACE as u32; }
@@ -8797,26 +8354,24 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16h(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.pc = self.au;
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -8826,13 +8381,12 @@ impl M68000 {
         self.sr_xnzvc();
         { let v = self.aluo; M68000::set_16l_32(&mut self.da[ry], v); }
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.alu_subc(M68000::high16(self.dt), M68000::high16(self.da[ry]));
@@ -8855,39 +8409,36 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16h(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.pc = self.au;
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.da[ry];
         self.au = self.da[ry].wrapping_add(2);
         self.alu_and(self.dbin, 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.alub = self.dbin;
@@ -8895,13 +8446,12 @@ impl M68000 {
         self.at = self.au;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.ir = self.irc;
@@ -8910,13 +8460,12 @@ impl M68000 {
         self.alu_sub(((self.dt) as u16), self.dbin);
         self.sr_xnzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -8925,26 +8474,24 @@ impl M68000 {
         self.alu_subc(M68000::high16(self.dt), self.alue);
         self.sr_xnzvc_u();
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.aob = self.au;
         self.ird = self.ir;
         if self.next_state != S_TRACE as u32 { self.next_state = self.int_next_state; }
         self.dbout = self.aluo;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
         if self.sr & SR_T != 0 { self.next_state = S_TRACE as u32; }
@@ -8957,39 +8504,36 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16h(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.pc = self.au;
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.da[ry];
         self.au = self.da[ry].wrapping_add(2);
         self.alu_and(self.dbin, 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.alub = self.dbin;
@@ -8999,13 +8543,12 @@ impl M68000 {
         self.da[ry] = self.au;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.ir = self.irc;
@@ -9014,13 +8557,12 @@ impl M68000 {
         self.alu_sub(((self.dt) as u16), self.dbin);
         self.sr_xnzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -9029,26 +8571,24 @@ impl M68000 {
         self.alu_subc(M68000::high16(self.dt), self.alue);
         self.sr_xnzvc_u();
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.aob = self.au;
         self.ird = self.ir;
         if self.next_state != S_TRACE as u32 { self.next_state = self.int_next_state; }
         self.dbout = self.aluo;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
         if self.sr & SR_T != 0 { self.next_state = S_TRACE as u32; }
@@ -9061,26 +8601,24 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16h(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.pc = self.au;
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.au = self.da[ry].wrapping_sub(4);
@@ -9090,13 +8628,12 @@ impl M68000 {
         self.da[ry] = self.au;
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.alub = self.dbin;
@@ -9104,13 +8641,12 @@ impl M68000 {
         self.at = self.au;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.ir = self.irc;
@@ -9119,13 +8655,12 @@ impl M68000 {
         self.alu_sub(((self.dt) as u16), self.dbin);
         self.sr_xnzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -9134,26 +8669,24 @@ impl M68000 {
         self.alu_subc(M68000::high16(self.dt), self.alue);
         self.sr_xnzvc_u();
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.aob = self.au;
         self.ird = self.ir;
         if self.next_state != S_TRACE as u32 { self.next_state = self.int_next_state; }
         self.dbout = self.aluo;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
         if self.sr & SR_T != 0 { self.next_state = S_TRACE as u32; }
@@ -9166,51 +8699,47 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16h(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.pc = self.au;
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
         self.au = M68000::ext32(self.dbin).wrapping_add(self.da[ry]);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
         self.au = self.au.wrapping_add(2);
         self.alu_and(self.dbin, 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.alub = self.dbin;
@@ -9218,13 +8747,12 @@ impl M68000 {
         self.at = self.au;
         self.au = self.pc.wrapping_add(4);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.ir = self.irc;
@@ -9233,13 +8761,12 @@ impl M68000 {
         self.alu_sub(((self.dt) as u16), self.dbin);
         self.sr_xnzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -9248,26 +8775,24 @@ impl M68000 {
         self.alu_subc(M68000::high16(self.dt), self.alue);
         self.sr_xnzvc_u();
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.aob = self.au;
         self.ird = self.ir;
         if self.next_state != S_TRACE as u32 { self.next_state = self.int_next_state; }
         self.dbout = self.aluo;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
         if self.sr & SR_T != 0 { self.next_state = S_TRACE as u32; }
@@ -9283,26 +8808,24 @@ impl M68000 {
             { let v = self.dbin; M68000::set_16h(&mut self.dt, v); }
             self.au = self.au.wrapping_add(2);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.dbin = self.edb;
             self.aob = self.au;
             self.pc = self.au;
             { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
             self.au = self.au.wrapping_add(2);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.alu_ext(self.dbin);
@@ -9315,13 +8838,12 @@ impl M68000 {
         1 => {
             self.au = M68000::ext32(((self.da[self.map_sp((self.irc >> 12) as usize)]) as u16)).wrapping_add(self.au);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.step_movem();
@@ -9330,13 +8852,12 @@ impl M68000 {
         2 => {
             self.au = self.da[self.map_sp((self.irc >> 12) as usize)].wrapping_add(self.au);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.step_movem();
@@ -9347,13 +8868,12 @@ impl M68000 {
             self.au = self.au.wrapping_add(2);
             self.alu_and(self.dbin, 0xffffu16);
             self.base_ssw = SSW_DATA | SSW_R;
-            self.edb = bus.read_data(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_data(self.aob & !1u32);
+            self.icount -= 4;
             self.dbin = self.edb;
             self.aob = self.au;
             self.alub = self.dbin;
@@ -9361,13 +8881,12 @@ impl M68000 {
             self.at = self.au;
             self.au = self.pc.wrapping_add(4);
             self.base_ssw = SSW_DATA | SSW_R;
-            self.edb = bus.read_data(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_data(self.aob & !1u32);
+            self.icount -= 4;
             self.dbin = self.edb;
             self.aob = self.au;
             self.ir = self.irc;
@@ -9376,13 +8895,12 @@ impl M68000 {
             self.alu_sub(((self.dt) as u16), self.dbin);
             self.sr_xnzvc();
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.aob = self.au;
@@ -9391,26 +8909,24 @@ impl M68000 {
             self.alu_subc(M68000::high16(self.dt), self.alue);
             self.sr_xnzvc_u();
             self.base_ssw = SSW_DATA;
-            bus.write_data(self.aob & !1u32, self.dbout);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            bus.write_data(self.aob & !1u32, self.dbout);
+            self.icount -= 4;
             self.aob = self.au;
             self.ird = self.ir;
             if self.next_state != S_TRACE as u32 { self.next_state = self.int_next_state; }
             self.dbout = self.aluo;
             self.au = self.pc.wrapping_add(2);
             self.base_ssw = SSW_DATA;
-            bus.write_data(self.aob & !1u32, self.dbout);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            bus.write_data(self.aob & !1u32, self.dbout);
+            self.icount -= 4;
             self.set_ftu_const();
             self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
             if self.sr & SR_T != 0 { self.next_state = S_TRACE as u32; }
@@ -9425,26 +8941,24 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16h(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.pc = self.au;
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -9453,26 +8967,24 @@ impl M68000 {
         self.at = M68000::ext32(self.dbin);
         self.au = M68000::ext32(self.dbin);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
         self.au = self.au.wrapping_add(2);
         self.alu_and(self.dbin, 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.alub = self.dbin;
@@ -9480,13 +8992,12 @@ impl M68000 {
         self.at = self.au;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.ir = self.irc;
@@ -9495,13 +9006,12 @@ impl M68000 {
         self.alu_sub(((self.dt) as u16), self.dbin);
         self.sr_xnzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -9510,26 +9020,24 @@ impl M68000 {
         self.alu_subc(M68000::high16(self.dt), self.alue);
         self.sr_xnzvc_u();
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.aob = self.au;
         self.ird = self.ir;
         if self.next_state != S_TRACE as u32 { self.next_state = self.int_next_state; }
         self.dbout = self.aluo;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
         if self.sr & SR_T != 0 { self.next_state = S_TRACE as u32; }
@@ -9541,39 +9049,36 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16h(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.pc = self.au;
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
         { let v = self.dbin; M68000::set_16h(&mut self.at, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.pc = self.au;
@@ -9581,26 +9086,24 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.at, v); }
         self.au = M68000::merge_16_32(M68000::high16(self.at), self.dbin);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
         self.au = self.au.wrapping_add(2);
         self.alu_and(self.dbin, 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.alub = self.dbin;
@@ -9608,13 +9111,12 @@ impl M68000 {
         self.at = self.au;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.ir = self.irc;
@@ -9623,13 +9125,12 @@ impl M68000 {
         self.alu_sub(((self.dt) as u16), self.dbin);
         self.sr_xnzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -9638,26 +9139,24 @@ impl M68000 {
         self.alu_subc(M68000::high16(self.dt), self.alue);
         self.sr_xnzvc_u();
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.aob = self.au;
         self.ird = self.ir;
         if self.next_state != S_TRACE as u32 { self.next_state = self.int_next_state; }
         self.dbout = self.aluo;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
         if self.sr & SR_T != 0 { self.next_state = S_TRACE as u32; }
@@ -9671,13 +9170,12 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -9690,13 +9188,12 @@ impl M68000 {
         M68000::set_8_32(&mut self.da[ry], ((self.aluo) as u8));
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.set_ftu_const();
@@ -9712,13 +9209,12 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.da[ry];
@@ -9737,13 +9233,12 @@ impl M68000 {
         self.alu_add8(((self.dt) as u8), ((self.dbin) as u8));
         self.sr_xnzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -9767,13 +9262,12 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.da[ry];
@@ -9796,13 +9290,12 @@ impl M68000 {
         self.alu_add8(((self.dt) as u8), ((self.dbin) as u8));
         self.sr_xnzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -9826,13 +9319,12 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.alub = self.dbin;
@@ -9857,13 +9349,12 @@ impl M68000 {
         self.alu_add8(((self.dt) as u8), ((self.dbin) as u8));
         self.sr_xnzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -9887,25 +9378,23 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
         self.au = M68000::ext32(self.dbin).wrapping_add(self.da[ry]);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -9925,13 +9414,12 @@ impl M68000 {
         self.alu_add8(((self.dt) as u8), ((self.dbin) as u8));
         self.sr_xnzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -9958,13 +9446,12 @@ impl M68000 {
             { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
             self.au = self.au.wrapping_add(2);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.alu_ext(self.dbin);
@@ -9977,13 +9464,12 @@ impl M68000 {
         1 => {
             self.au = M68000::ext32(((self.da[self.map_sp((self.irc >> 12) as usize)]) as u16)).wrapping_add(self.au);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.step_movem();
@@ -9992,13 +9478,12 @@ impl M68000 {
         2 => {
             self.au = self.da[self.map_sp((self.irc >> 12) as usize)].wrapping_add(self.au);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.step_movem();
@@ -10022,13 +9507,12 @@ impl M68000 {
             self.alu_add8(((self.dt) as u8), ((self.dbin) as u8));
             self.sr_xnzvc();
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.aob = self.au;
@@ -10054,13 +9538,12 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -10069,13 +9552,12 @@ impl M68000 {
         self.at = M68000::ext32(self.dbin);
         self.au = M68000::ext32(self.dbin);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.at;
@@ -10093,13 +9575,12 @@ impl M68000 {
         self.alu_add8(((self.dt) as u8), ((self.dbin) as u8));
         self.sr_xnzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -10122,26 +9603,24 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
         { let v = self.dbin; M68000::set_16h(&mut self.at, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.pc = self.au;
@@ -10149,13 +9628,12 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.at, v); }
         self.au = M68000::merge_16_32(M68000::high16(self.at), self.dbin);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.at;
@@ -10173,13 +9651,12 @@ impl M68000 {
         self.alu_add8(((self.dt) as u8), ((self.dbin) as u8));
         self.sr_xnzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -10203,13 +9680,12 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -10222,13 +9698,12 @@ impl M68000 {
         { let v = self.aluo; M68000::set_16l_32(&mut self.da[ry], v); }
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.set_ftu_const();
@@ -10244,13 +9719,12 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.da[ry];
@@ -10258,13 +9732,12 @@ impl M68000 {
         self.alu_and(self.dbin, 0xffffu16);
         self.dcr = ((self.dt) as u8);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.ir = self.irc;
@@ -10273,13 +9746,12 @@ impl M68000 {
         self.alu_add(((self.dt) as u16), self.dbin);
         self.sr_xnzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -10288,13 +9760,12 @@ impl M68000 {
         self.dbout = self.aluo;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
         if self.sr & SR_T != 0 { self.next_state = S_TRACE as u32; }
@@ -10308,13 +9779,12 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.da[ry];
@@ -10326,13 +9796,12 @@ impl M68000 {
         self.au = self.pc.wrapping_add(2);
         self.alu_and(self.alub, 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.ir = self.irc;
@@ -10341,13 +9810,12 @@ impl M68000 {
         self.alu_add(((self.dt) as u16), self.dbin);
         self.sr_xnzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -10356,13 +9824,12 @@ impl M68000 {
         self.dbout = self.aluo;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
         if self.sr & SR_T != 0 { self.next_state = S_TRACE as u32; }
@@ -10376,13 +9843,12 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.alub = self.dbin;
@@ -10396,13 +9862,12 @@ impl M68000 {
         self.au = self.pc;
         self.alu_and(self.alub, 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.ir = self.irc;
@@ -10411,13 +9876,12 @@ impl M68000 {
         self.alu_add(((self.dt) as u16), self.dbin);
         self.sr_xnzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -10426,13 +9890,12 @@ impl M68000 {
         self.dbout = self.aluo;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
         if self.sr & SR_T != 0 { self.next_state = S_TRACE as u32; }
@@ -10446,25 +9909,23 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
         self.au = M68000::ext32(self.dbin).wrapping_add(self.da[ry]);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -10473,13 +9934,12 @@ impl M68000 {
         self.alu_and(self.dbin, 0xffffu16);
         self.dcr = ((self.dt) as u8);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.ir = self.irc;
@@ -10488,13 +9948,12 @@ impl M68000 {
         self.alu_add(((self.dt) as u16), self.dbin);
         self.sr_xnzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -10503,13 +9962,12 @@ impl M68000 {
         self.dbout = self.aluo;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
         if self.sr & SR_T != 0 { self.next_state = S_TRACE as u32; }
@@ -10526,13 +9984,12 @@ impl M68000 {
             { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
             self.au = self.au.wrapping_add(2);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.alu_ext(self.dbin);
@@ -10545,13 +10002,12 @@ impl M68000 {
         1 => {
             self.au = M68000::ext32(((self.da[self.map_sp((self.irc >> 12) as usize)]) as u16)).wrapping_add(self.au);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.step_movem();
@@ -10560,13 +10016,12 @@ impl M68000 {
         2 => {
             self.au = self.da[self.map_sp((self.irc >> 12) as usize)].wrapping_add(self.au);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.step_movem();
@@ -10579,13 +10034,12 @@ impl M68000 {
             self.alu_and(self.dbin, 0xffffu16);
             self.dcr = ((self.dt) as u8);
             self.base_ssw = SSW_DATA | SSW_R;
-            self.edb = bus.read_data(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_data(self.aob & !1u32);
+            self.icount -= 4;
             self.dbin = self.edb;
             self.aob = self.au;
             self.ir = self.irc;
@@ -10594,13 +10048,12 @@ impl M68000 {
             self.alu_add(((self.dt) as u16), self.dbin);
             self.sr_xnzvc();
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.aob = self.au;
@@ -10609,13 +10062,12 @@ impl M68000 {
             self.dbout = self.aluo;
             self.au = self.pc.wrapping_add(2);
             self.base_ssw = SSW_DATA;
-            bus.write_data(self.aob & !1u32, self.dbout);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            bus.write_data(self.aob & !1u32, self.dbout);
+            self.icount -= 4;
             self.set_ftu_const();
             self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
             if self.sr & SR_T != 0 { self.next_state = S_TRACE as u32; }
@@ -10631,13 +10083,12 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -10646,26 +10097,24 @@ impl M68000 {
         self.at = M68000::ext32(self.dbin);
         self.au = M68000::ext32(self.dbin);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.at;
         self.au = self.pc.wrapping_add(2);
         self.alu_and(self.dbin, 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.ir = self.irc;
@@ -10674,13 +10123,12 @@ impl M68000 {
         self.alu_add(((self.dt) as u16), self.dbin);
         self.sr_xnzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -10689,13 +10137,12 @@ impl M68000 {
         self.dbout = self.aluo;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
         if self.sr & SR_T != 0 { self.next_state = S_TRACE as u32; }
@@ -10708,26 +10155,24 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
         { let v = self.dbin; M68000::set_16h(&mut self.at, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.pc = self.au;
@@ -10735,26 +10180,24 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.at, v); }
         self.au = M68000::merge_16_32(M68000::high16(self.at), self.dbin);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.at;
         self.au = self.pc.wrapping_add(2);
         self.alu_and(self.dbin, 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.ir = self.irc;
@@ -10763,13 +10206,12 @@ impl M68000 {
         self.alu_add(((self.dt) as u16), self.dbin);
         self.sr_xnzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -10778,13 +10220,12 @@ impl M68000 {
         self.dbout = self.aluo;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
         if self.sr & SR_T != 0 { self.next_state = S_TRACE as u32; }
@@ -10797,26 +10238,24 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16h(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.pc = self.au;
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -10826,13 +10265,12 @@ impl M68000 {
         self.sr_xnzvc();
         { let v = self.aluo; M68000::set_16l_32(&mut self.da[ry], v); }
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.alu_addc(M68000::high16(self.dt), M68000::high16(self.da[ry]));
@@ -10855,39 +10293,36 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16h(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.pc = self.au;
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.da[ry];
         self.au = self.da[ry].wrapping_add(2);
         self.alu_and(self.dbin, 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.alub = self.dbin;
@@ -10895,13 +10330,12 @@ impl M68000 {
         self.at = self.au;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.ir = self.irc;
@@ -10910,13 +10344,12 @@ impl M68000 {
         self.alu_add(((self.dt) as u16), self.dbin);
         self.sr_xnzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -10925,26 +10358,24 @@ impl M68000 {
         self.alu_addc(M68000::high16(self.dt), self.alue);
         self.sr_xnzvc_u();
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.aob = self.au;
         self.ird = self.ir;
         if self.next_state != S_TRACE as u32 { self.next_state = self.int_next_state; }
         self.dbout = self.aluo;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
         if self.sr & SR_T != 0 { self.next_state = S_TRACE as u32; }
@@ -10957,39 +10388,36 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16h(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.pc = self.au;
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.da[ry];
         self.au = self.da[ry].wrapping_add(2);
         self.alu_and(self.dbin, 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.alub = self.dbin;
@@ -10999,13 +10427,12 @@ impl M68000 {
         self.da[ry] = self.au;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.ir = self.irc;
@@ -11014,13 +10441,12 @@ impl M68000 {
         self.alu_add(((self.dt) as u16), self.dbin);
         self.sr_xnzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -11029,26 +10455,24 @@ impl M68000 {
         self.alu_addc(M68000::high16(self.dt), self.alue);
         self.sr_xnzvc_u();
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.aob = self.au;
         self.ird = self.ir;
         if self.next_state != S_TRACE as u32 { self.next_state = self.int_next_state; }
         self.dbout = self.aluo;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
         if self.sr & SR_T != 0 { self.next_state = S_TRACE as u32; }
@@ -11061,26 +10485,24 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16h(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.pc = self.au;
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.au = self.da[ry].wrapping_sub(4);
@@ -11090,13 +10512,12 @@ impl M68000 {
         self.da[ry] = self.au;
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.alub = self.dbin;
@@ -11104,13 +10525,12 @@ impl M68000 {
         self.at = self.au;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.ir = self.irc;
@@ -11119,13 +10539,12 @@ impl M68000 {
         self.alu_add(((self.dt) as u16), self.dbin);
         self.sr_xnzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -11134,26 +10553,24 @@ impl M68000 {
         self.alu_addc(M68000::high16(self.dt), self.alue);
         self.sr_xnzvc_u();
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.aob = self.au;
         self.ird = self.ir;
         if self.next_state != S_TRACE as u32 { self.next_state = self.int_next_state; }
         self.dbout = self.aluo;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
         if self.sr & SR_T != 0 { self.next_state = S_TRACE as u32; }
@@ -11166,51 +10583,47 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16h(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.pc = self.au;
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
         self.au = M68000::ext32(self.dbin).wrapping_add(self.da[ry]);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
         self.au = self.au.wrapping_add(2);
         self.alu_and(self.dbin, 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.alub = self.dbin;
@@ -11218,13 +10631,12 @@ impl M68000 {
         self.at = self.au;
         self.au = self.pc.wrapping_add(4);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.ir = self.irc;
@@ -11233,13 +10645,12 @@ impl M68000 {
         self.alu_add(((self.dt) as u16), self.dbin);
         self.sr_xnzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -11248,26 +10659,24 @@ impl M68000 {
         self.alu_addc(M68000::high16(self.dt), self.alue);
         self.sr_xnzvc_u();
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.aob = self.au;
         self.ird = self.ir;
         if self.next_state != S_TRACE as u32 { self.next_state = self.int_next_state; }
         self.dbout = self.aluo;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
         if self.sr & SR_T != 0 { self.next_state = S_TRACE as u32; }
@@ -11283,26 +10692,24 @@ impl M68000 {
             { let v = self.dbin; M68000::set_16h(&mut self.dt, v); }
             self.au = self.au.wrapping_add(2);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.dbin = self.edb;
             self.aob = self.au;
             self.pc = self.au;
             { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
             self.au = self.au.wrapping_add(2);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.alu_ext(self.dbin);
@@ -11315,13 +10722,12 @@ impl M68000 {
         1 => {
             self.au = M68000::ext32(((self.da[self.map_sp((self.irc >> 12) as usize)]) as u16)).wrapping_add(self.au);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.step_movem();
@@ -11330,13 +10736,12 @@ impl M68000 {
         2 => {
             self.au = self.da[self.map_sp((self.irc >> 12) as usize)].wrapping_add(self.au);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.step_movem();
@@ -11347,13 +10752,12 @@ impl M68000 {
             self.au = self.au.wrapping_add(2);
             self.alu_and(self.dbin, 0xffffu16);
             self.base_ssw = SSW_DATA | SSW_R;
-            self.edb = bus.read_data(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_data(self.aob & !1u32);
+            self.icount -= 4;
             self.dbin = self.edb;
             self.aob = self.au;
             self.alub = self.dbin;
@@ -11361,13 +10765,12 @@ impl M68000 {
             self.at = self.au;
             self.au = self.pc.wrapping_add(4);
             self.base_ssw = SSW_DATA | SSW_R;
-            self.edb = bus.read_data(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_data(self.aob & !1u32);
+            self.icount -= 4;
             self.dbin = self.edb;
             self.aob = self.au;
             self.ir = self.irc;
@@ -11376,13 +10779,12 @@ impl M68000 {
             self.alu_add(((self.dt) as u16), self.dbin);
             self.sr_xnzvc();
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.aob = self.au;
@@ -11391,26 +10793,24 @@ impl M68000 {
             self.alu_addc(M68000::high16(self.dt), self.alue);
             self.sr_xnzvc_u();
             self.base_ssw = SSW_DATA;
-            bus.write_data(self.aob & !1u32, self.dbout);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            bus.write_data(self.aob & !1u32, self.dbout);
+            self.icount -= 4;
             self.aob = self.au;
             self.ird = self.ir;
             if self.next_state != S_TRACE as u32 { self.next_state = self.int_next_state; }
             self.dbout = self.aluo;
             self.au = self.pc.wrapping_add(2);
             self.base_ssw = SSW_DATA;
-            bus.write_data(self.aob & !1u32, self.dbout);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            bus.write_data(self.aob & !1u32, self.dbout);
+            self.icount -= 4;
             self.set_ftu_const();
             self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
             if self.sr & SR_T != 0 { self.next_state = S_TRACE as u32; }
@@ -11425,26 +10825,24 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16h(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.pc = self.au;
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -11453,26 +10851,24 @@ impl M68000 {
         self.at = M68000::ext32(self.dbin);
         self.au = M68000::ext32(self.dbin);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
         self.au = self.au.wrapping_add(2);
         self.alu_and(self.dbin, 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.alub = self.dbin;
@@ -11480,13 +10876,12 @@ impl M68000 {
         self.at = self.au;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.ir = self.irc;
@@ -11495,13 +10890,12 @@ impl M68000 {
         self.alu_add(((self.dt) as u16), self.dbin);
         self.sr_xnzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -11510,26 +10904,24 @@ impl M68000 {
         self.alu_addc(M68000::high16(self.dt), self.alue);
         self.sr_xnzvc_u();
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.aob = self.au;
         self.ird = self.ir;
         if self.next_state != S_TRACE as u32 { self.next_state = self.int_next_state; }
         self.dbout = self.aluo;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
         if self.sr & SR_T != 0 { self.next_state = S_TRACE as u32; }
@@ -11541,39 +10933,36 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16h(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.pc = self.au;
         { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
         { let v = self.dbin; M68000::set_16h(&mut self.at, v); }
         self.au = self.au.wrapping_add(2);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.pc = self.au;
@@ -11581,26 +10970,24 @@ impl M68000 {
         { let v = self.dbin; M68000::set_16l_32(&mut self.at, v); }
         self.au = M68000::merge_16_32(M68000::high16(self.at), self.dbin);
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
         self.au = self.au.wrapping_add(2);
         self.alu_and(self.dbin, 0xffffu16);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.alub = self.dbin;
@@ -11608,13 +10995,12 @@ impl M68000 {
         self.at = self.au;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA | SSW_R;
-        self.edb = bus.read_data(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_data(self.aob & !1u32);
+        self.icount -= 4;
         self.dbin = self.edb;
         self.aob = self.au;
         self.ir = self.irc;
@@ -11623,13 +11009,12 @@ impl M68000 {
         self.alu_add(((self.dt) as u16), self.dbin);
         self.sr_xnzvc();
         self.base_ssw = SSW_PROGRAM | SSW_R;
-        self.edb = bus.read_program(self.aob & !1u32);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        self.edb = bus.read_program(self.aob & !1u32);
+        self.icount -= 4;
         self.irc = self.edb;
         self.dbin = self.edb;
         self.aob = self.au;
@@ -11638,26 +11023,24 @@ impl M68000 {
         self.alu_addc(M68000::high16(self.dt), self.alue);
         self.sr_xnzvc_u();
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.aob = self.au;
         self.ird = self.ir;
         if self.next_state != S_TRACE as u32 { self.next_state = self.int_next_state; }
         self.dbout = self.aluo;
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
-        self.icount -= 4;
         if self.aob & 1 != 0 {
-            self.icount -= 4;
             self.inst_state = S_ADDRESS_ERROR;
             return;
         }
+        bus.write_data(self.aob & !1u32, self.dbout);
+        self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
         if self.sr & SR_T != 0 { self.next_state = S_TRACE as u32; }
@@ -11674,13 +11057,12 @@ impl M68000 {
             { let v = self.dbin; M68000::set_16l_32(&mut self.dt, v); }
             self.au = self.au.wrapping_add(2);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             self.aob = self.au;
@@ -11695,13 +11077,12 @@ impl M68000 {
             self.au = self.pc.wrapping_add(2);
             self.alu_and(((self.da[ry]) as u16), 0xffffu16);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
             if self.aob & 1 != 0 {
-                self.icount -= 4;
                 self.inst_state = S_ADDRESS_ERROR;
                 return;
             }
+            self.edb = bus.read_program(self.aob & !1u32);
+            self.icount -= 4;
             self.irc = self.edb;
             self.dbin = self.edb;
             if self.t != 0 { __state = 2; } else { __state = 1; } continue;
