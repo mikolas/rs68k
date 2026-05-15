@@ -89,6 +89,7 @@ fn setup_cpu(ps: &ProcessorState) -> M68000 {
     cpu.da[16] = ps.ssp;
 
     cpu.sr = ps.sr;
+    cpu.isr = ps.sr & 0x1f;  // ISR holds CCR bits from previous instruction's ALU result
     cpu.sp = if ps.sr & SR_S != 0 { 16 } else { 15 };
 
     // Prefetch: [0] = IR = IRD, [1] = IRC
