@@ -486,3 +486,137 @@ fn partial_sst_all() {
         panic!("{} files failed", total_fail);
     }
 }
+
+// ─── clock() interface test ───────────────────────────────────────────────────
+
+use rs68k::pins::Inputs68k;
+
+/// Execute one instruction via the clock() interface with instant DTACK.
+/// Handles reads and writes through the memory model.
+fn execute_one_clocked(cpu: &mut M68000, mem: &mut TestMemory) -> u32 {
+    let icount_before = cpu.icount;
+    let mut clocks = 0u32;
+    let mut was_active = false;
+    let mut last_write_addr: u32 = 0;
+    let mut last_write_data: u16 = 0;
+    let mut last_was_write = false;
+    let mut last_was_byte = false;
+
+    loop {
+        let mut inputs = Inputs68k::default();
+        inputs.dtack_n = false; // instant acknowledge
+
+        // Provide read data when bus cycle is active and reading
+        if !cpu.pins().as_n && cpu.pins().rw {
+            let addr = cpu.pins().addr & 0x00FF_FFFE;
+            inputs.data_in = mem.read_word_raw(addr);
+        }
+
+        // Detect write: capture address/data while AS is asserted and rw=false
+        if !cpu.pins().as_n && !cpu.pins().rw {
+            last_write_addr = cpu.pins().addr;
+            last_write_data = cpu.pins().data_out;
+            last_was_write = true;
+            last_was_byte = cpu.pins().uds_n != cpu.pins().lds_n; // one strobe = byte
+        }
+
+        // If AS just went high after a write, commit the write to memory
+        if cpu.pins().as_n && last_was_write {
+            if last_was_byte {
+                // Byte write: UDS=even byte (high), LDS=odd byte (low)
+                if last_write_addr & 1 != 0 {
+                    mem.data.insert(last_write_addr & 0x00ffffff, last_write_data as u8);
+                } else {
+                    mem.data.insert(last_write_addr & 0x00ffffff, (last_write_data >> 8) as u8);
+                }
+            } else {
+                mem.write_word(last_write_addr & 0x00FF_FFFE, last_write_data);
+            }
+            last_was_write = false;
+        }
+
+        if !cpu.pins().as_n {
+            was_active = true;
+        }
+
+        cpu.clock(&inputs);
+        clocks += 1;
+
+        if clocks >= 2000 {
+            panic!("clock() timeout after {} clocks", clocks);
+        }
+
+        // Done: instruction boundary (substate 0, bus idle, had activity)
+        if cpu.inst_substate == 0 && cpu.pins().as_n && was_active && clocks > 2 {
+            break;
+        }
+    }
+
+    (icount_before - cpu.icount) as u32
+}
+
+#[test]
+fn clock_nop() {
+    let mut mem = TestMemory::new();
+    let pc = 0x1000u32;
+    mem.write_word(pc, 0x4e71);     // NOP
+    mem.write_word(pc + 2, 0x4e71); // next NOP
+    mem.write_word(pc + 4, 0x4e71);
+
+    let mut cpu = setup_cpu(0x4e71, 0x4e71, pc);
+    let cycles = execute_one_clocked(&mut cpu, &mut mem);
+    assert_eq!(cycles, 4, "NOP should take 4 cycles");
+}
+
+#[test]
+fn clock_moveq() {
+    let mut mem = TestMemory::new();
+    let pc = 0x1000u32;
+    mem.write_word(pc, 0x702a);     // MOVEQ #42, D0
+    mem.write_word(pc + 2, 0x4e71);
+    mem.write_word(pc + 4, 0x4e71);
+
+    let mut cpu = setup_cpu(0x702a, 0x4e71, pc);
+    let cycles = execute_one_clocked(&mut cpu, &mut mem);
+    assert_eq!(cycles, 4, "MOVEQ should take 4 cycles");
+    assert_eq!(cpu.da[0], 42);
+}
+
+#[test]
+fn clock_vs_full() {
+    // Compare clock() results against execute_one() for a few instructions
+    let test_cases: &[(u16, u16, &[(u32, u16)])] = &[
+        (0x4e71, 0x4e71, &[]),                    // NOP
+        (0x702a, 0x4e71, &[]),                    // MOVEQ #42, D0
+        (0x3010, 0x4e71, &[(0x0000, 0x1234)]),    // MOVE.w (A0), D0
+    ];
+
+    for &(opcode, next, mem_setup) in test_cases {
+        let pc = 0x1000u32;
+        let mut mem = TestMemory::new();
+        mem.write_word(pc, opcode);
+        mem.write_word(pc + 2, next);
+        mem.write_word(pc + 4, 0x4e71);
+        mem.write_word(pc + 6, 0x4e71);
+        for &(addr, val) in mem_setup {
+            mem.write_word(addr, val);
+        }
+
+        // Full handler
+        let mut full_cpu = setup_cpu(opcode, next, pc);
+        let mut full_mem = mem.clone_mem();
+        let full_cycles = full_cpu.execute_one(&mut full_mem);
+
+        // Clock interface
+        let mut clk_cpu = setup_cpu(opcode, next, pc);
+        let mut clk_mem = mem.clone_mem();
+        let clk_cycles = execute_one_clocked(&mut clk_cpu, &mut clk_mem);
+
+        assert_eq!(full_cycles, clk_cycles,
+            "opcode {:04x}: cycles full={} clock={}", opcode, full_cycles, clk_cycles);
+        assert_eq!(full_cpu.da, clk_cpu.da,
+            "opcode {:04x}: registers differ", opcode);
+        assert_eq!(full_cpu.sr, clk_cpu.sr,
+            "opcode {:04x}: SR differs", opcode);
+    }
+}

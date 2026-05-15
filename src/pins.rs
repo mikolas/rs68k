@@ -2,12 +2,12 @@
 //!
 //! Provides `clock()` method that advances the CPU by one CLK period,
 //! modeling all real 68000 bus signals including E clock, VPA sync,
-//! and bus arbitration.
+//! and bus arbitration. Uses partial handlers internally.
 
 use crate::cpu::M68000;
 use crate::types::*;
 
-/// CPU output pins
+/// CPU output pins — updated after each clock().
 #[derive(Clone, Debug, Default)]
 pub struct Pins68k {
     pub addr: u32,       // A1-A23
@@ -22,7 +22,7 @@ pub struct Pins68k {
     pub vma_n: bool,     // Valid memory address (active low)
 }
 
-/// CPU input pins
+/// CPU input pins — provided by the system each clock().
 #[derive(Clone, Debug)]
 pub struct Inputs68k {
     pub data_in: u16,    // D0-D15 (read data)
@@ -42,54 +42,41 @@ impl Default for Inputs68k {
     fn default() -> Self {
         Self {
             data_in: 0,
-            dtack_n: true,   // not acknowledged
-            berr_n: true,    // no error
-            vpa_n: true,     // no peripheral
-            ipl0_n: true,    // no interrupt (level 0)
+            dtack_n: true,
+            berr_n: true,
+            vpa_n: true,
+            ipl0_n: true,
             ipl1_n: true,
             ipl2_n: true,
-            br_n: true,      // no bus request
-            bgack_n: true,   // no bus grant ack
-            halt_n: true,    // not halted
-            reset_n: true,   // not reset
+            br_n: true,
+            bgack_n: true,
+            halt_n: true,
+            reset_n: true,
         }
     }
 }
 
-/// Bus cycle phase within the S0-S7 state machine
+/// Bus cycle phase within the S0-S7 state machine.
 #[derive(Clone, Copy, Debug, PartialEq)]
 enum BusPhase {
-    /// Idle — no bus cycle active, executing internal operations
     Idle,
-    /// S0-S1: drive address and FC
     S0,
-    /// S2-S3: assert AS, UDS/LDS
     S2,
-    /// S4-S5: wait for DTACK (may repeat for wait states)
     S4,
-    /// S6-S7: latch data, negate strobes
     S6,
 }
 
-/// Pin-level state (added to M68000)
+/// Pin-level state.
 pub struct PinState {
     pub pins: Pins68k,
-    pub e_clock: u8,         // 0-9 counter for E generation
+    pub e_clock: u8,
     pub bus_phase: BusPhase,
-    pub bus_granted: bool,   // CPU has released bus to DMA
-    pub vpa_pending: bool,   // VPA was asserted, waiting for E sync
-    pub vma_active: bool,    // VMA asserted during E-sync cycle
-
-    // Pending bus cycle from execution core
-    pub pending_read: bool,
-    pub pending_write: bool,
-    pub pending_byte: bool,  // byte access (only one strobe)
-    pub pending_addr: u32,
-    pub pending_data: u16,   // write data
-    pub pending_fc: u8,
-
-    // Internal clock counter for tracking 2-clock internal cycles
+    pub bus_granted: bool,
+    pub vpa_pending: bool,
+    pub vma_active: bool,
+    pub pending_byte: bool,
     pub internal_clocks: u32,
+    bus_request: bool,  // handler requested a bus cycle
 }
 
 impl Default for PinState {
@@ -105,55 +92,66 @@ impl Default for PinState {
             bus_granted: false,
             vpa_pending: false,
             vma_active: false,
-            pending_read: false,
-            pending_write: false,
             pending_byte: false,
-            pending_addr: 0,
-            pending_data: 0,
-            pending_fc: 0,
             internal_clocks: 0,
+            bus_request: false,
         }
     }
 }
 
+/// Dummy bus — never called, required by dispatch_partial signature.
+struct NullBus;
+impl Bus for NullBus {
+    fn read_program(&mut self, _: u32) -> u16 { 0 }
+    fn read_data(&mut self, _: u32) -> u16 { 0 }
+    fn write_data(&mut self, _: u32, _: u16) {}
+    fn write_data_byte(&mut self, _: u32, _: u8) {}
+    fn read_cpu(&mut self, _: u32) -> u16 { 0 }
+}
+
 impl M68000 {
-    /// Advance CPU by one CLK period. Updates all output pins.
+    /// Advance CPU by one CLK period. Call at system clock rate.
     pub fn clock(&mut self, inputs: &Inputs68k) {
-        // Advance E clock (free-running, always ticks)
+        // E clock — free-running, always advances
         self.pin_state.e_clock = (self.pin_state.e_clock + 1) % 10;
         self.pin_state.pins.e = self.pin_state.e_clock < 6;
 
-        // Handle reset
+        // Reset
         if !inputs.reset_n {
             self.pin_state.bus_phase = BusPhase::Idle;
             self.pin_state.pins.as_n = true;
             self.pin_state.pins.uds_n = true;
             self.pin_state.pins.lds_n = true;
+            self.pin_state.bus_request = false;
+            self.pin_state.internal_clocks = 0;
             self.inst_state = S_RESET;
+            self.inst_substate = 0;
             return;
         }
 
-        // Handle halt
+        // Halt
         if !inputs.halt_n && self.pin_state.bus_phase == BusPhase::Idle {
-            return; // frozen
+            return;
         }
 
         // Bus arbitration
-        if !inputs.br_n && self.pin_state.bus_phase == BusPhase::Idle {
-            self.pin_state.pins.bg_n = false; // grant bus
+        if !inputs.br_n && self.pin_state.bus_phase == BusPhase::Idle
+            && !self.pin_state.bus_request
+        {
+            self.pin_state.pins.bg_n = false;
         }
         if !inputs.bgack_n {
             self.pin_state.bus_granted = true;
-            self.pin_state.pins.bg_n = true; // negate grant
+            self.pin_state.pins.bg_n = true;
         }
         if inputs.bgack_n && self.pin_state.bus_granted {
-            self.pin_state.bus_granted = false; // DMA released bus
+            self.pin_state.bus_granted = false;
         }
         if self.pin_state.bus_granted {
-            return; // CPU tri-stated, DMA owns bus
+            return;
         }
 
-        // Update interrupt level from IPL pins
+        // IPL sampling
         let ipl = ((!inputs.ipl2_n as u8) << 2)
                 | ((!inputs.ipl1_n as u8) << 1)
                 | (!inputs.ipl0_n as u8);
@@ -164,33 +162,28 @@ impl M68000 {
         // Bus state machine
         match self.pin_state.bus_phase {
             BusPhase::Idle => {
-                // Check if execution core needs a bus cycle
-                if self.pin_state.pending_read || self.pin_state.pending_write {
+                if self.pin_state.bus_request {
+                    // Start bus cycle
                     self.pin_state.bus_phase = BusPhase::S0;
-                    // Drive address and FC
-                    self.pin_state.pins.addr = self.pin_state.pending_addr & 0x00FFFFFE;
-                    self.pin_state.pins.fc = self.pin_state.pending_fc;
-                    self.pin_state.pins.rw = self.pin_state.pending_read;
+                    self.pin_state.pins.addr = self.aob & 0x00FF_FFFE;
+                    self.pin_state.pins.fc = self.fc();
+                    self.pin_state.pins.rw = self.base_ssw & SSW_R != 0;
                 } else if self.pin_state.internal_clocks > 0 {
-                    // Internal cycle (2 clocks per step)
                     self.pin_state.internal_clocks -= 1;
                     if self.pin_state.internal_clocks == 0 {
-                        // Internal cycle complete, run more of the instruction
                         self.run_core_step();
                     }
                 } else {
-                    // Need more work from execution core
                     self.run_core_step();
                 }
             }
 
             BusPhase::S0 => {
-                // S0→S2: assert strobes
                 self.pin_state.bus_phase = BusPhase::S2;
                 self.pin_state.pins.as_n = false;
+                // Strobes
                 if self.pin_state.pending_byte {
-                    // Byte access: only one strobe
-                    if self.pin_state.pending_addr & 1 == 0 {
+                    if self.aob & 1 == 0 {
                         self.pin_state.pins.uds_n = false;
                         self.pin_state.pins.lds_n = true;
                     } else {
@@ -201,95 +194,91 @@ impl M68000 {
                     self.pin_state.pins.uds_n = false;
                     self.pin_state.pins.lds_n = false;
                 }
-                // Drive write data
+                // Write data
                 if !self.pin_state.pins.rw {
-                    self.pin_state.pins.data_out = self.pin_state.pending_data;
+                    self.pin_state.pins.data_out = self.dbout;
                 }
             }
 
             BusPhase::S2 => {
-                // S2→S4: wait for DTACK
                 self.pin_state.bus_phase = BusPhase::S4;
             }
 
             BusPhase::S4 => {
-                // Check VPA (peripheral access — need E-clock sync)
+                // VPA handling
                 if !inputs.vpa_n && !self.pin_state.vpa_pending {
                     self.pin_state.vpa_pending = true;
                 }
 
                 if self.pin_state.vpa_pending {
-                    // Wait for E clock falling edge (transition from high to low)
                     if self.pin_state.e_clock == 6 {
-                        // E just went low — assert VMA
                         self.pin_state.pins.vma_n = false;
                         self.pin_state.vma_active = true;
                     }
                     if self.pin_state.vma_active && self.pin_state.e_clock == 0 {
-                        // E rose again — cycle complete
                         self.pin_state.vpa_pending = false;
                         self.pin_state.vma_active = false;
                         self.pin_state.pins.vma_n = true;
                         self.pin_state.bus_phase = BusPhase::S6;
                     }
-                    // else: keep waiting (insert wait states)
                 } else if !inputs.dtack_n {
-                    // Normal DTACK — proceed to S6
                     self.pin_state.bus_phase = BusPhase::S6;
                 } else if !inputs.berr_n {
-                    // Bus error
                     self.pin_state.bus_phase = BusPhase::S6;
                     self.inst_state = S_BUS_ERROR;
                 }
-                // else: wait state (stay in S4)
+                // else: wait state
             }
 
             BusPhase::S6 => {
-                // Latch read data, negate strobes, complete cycle
-                if self.pin_state.pending_read {
-                    // Latch data from bus
+                // Latch read data
+                if self.pin_state.pins.rw {
                     self.edb = inputs.data_in;
                 }
-                // Negate all strobes
+                // Negate strobes
                 self.pin_state.pins.as_n = true;
                 self.pin_state.pins.uds_n = true;
                 self.pin_state.pins.lds_n = true;
-                // Clear pending
-                self.pin_state.pending_read = false;
-                self.pin_state.pending_write = false;
+                // Bus cycle complete
+                self.pin_state.bus_request = false;
                 self.pin_state.bus_phase = BusPhase::Idle;
-                // Continue execution
+                self.icount -= 4;
+                // Resume execution
                 self.run_core_step();
             }
         }
     }
 
-    /// Run one step of the execution core, capturing any bus requests.
+    /// Run the partial handler. Computes internal clocks and detects bus requests.
     fn run_core_step(&mut self) {
-        // The execution core uses the simple Bus trait internally.
-        // We provide a capturing adapter that records bus requests
-        // instead of executing them immediately.
-        let mut capture = BusCapture::new();
-        
-        // Run one micro-step of the current instruction
-        // This is a simplified model — in practice we'd need to
-        // suspend/resume the handler at each bus access point.
-        // For now, this is a placeholder for the full implementation.
-        //
-        // TODO: Implement coroutine-style execution that yields at bus accesses
-        // For now, the pin-level interface is structural — the full implementation
-        // requires splitting handlers into suspendable steps.
-        let _ = capture;
+        let icount_before = self.icount;
+
+        // Set up instruction context at instruction boundary
+        if self.inst_substate == 0 {
+            self.ipc = self.pc.wrapping_sub(2);
+            self.irdi = self.ird;
+        }
+
+        self.dispatch_partial(&mut NullBus);
+
+        // Compute internal clocks consumed (icount decrements by 2 per internal step)
+        let consumed = icount_before - self.icount;
+        if consumed > 0 {
+            // Internal clocks burn before the bus request (or before instruction end)
+            // Each unit of icount = 1 clock period
+            self.pin_state.internal_clocks = consumed as u32;
+        }
+
+        // Check if handler requested a bus cycle (inst_substate != 0 means suspended at bus_end)
+        if self.inst_substate != 0 {
+            self.pin_state.bus_request = true;
+        } else {
+            self.pin_state.bus_request = false;
+        }
     }
 
-    /// Get current output pins
+    /// Get current output pins (no state change).
     pub fn pins(&self) -> &Pins68k {
         &self.pin_state.pins
     }
-}
-
-/// Placeholder for bus capture adapter
-struct BusCapture;
-impl BusCapture {
-    fn new() -> Self { Self }
 }
