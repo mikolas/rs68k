@@ -40,6 +40,8 @@ pub trait Bus {
     fn read_data(&mut self, addr: u32) -> u16;
     /// Write word to data space.
     fn write_data(&mut self, addr: u32, data: u16);
+    /// Write byte to data space. addr bit 0 selects high (0) or low (1) byte.
+    fn write_data_byte(&mut self, addr: u32, data: u8);
     /// Read from CPU space (interrupt acknowledge).
     fn read_cpu(&mut self, addr: u32) -> u16;
 }

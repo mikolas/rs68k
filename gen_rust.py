@@ -2503,7 +2503,13 @@ def emit_bus_end(ci):
     # Bus access (always performed — matches C++ which reads even on odd address)
     if ci[4]:
         # Write
-        lines.append("bus.write_data(self.aob & !1u32, self.dbout);")
+        if ci[3]:
+            # Byte write: extract the active byte from dbout based on address bit 0
+            lines.append("if self.aob & 1 != 0 { bus.write_data_byte(self.aob, self.dbout as u8); }")
+            lines.append("else { bus.write_data_byte(self.aob, (self.dbout >> 8) as u8); }")
+        else:
+            # Word write
+            lines.append("bus.write_data(self.aob & !1u32, self.dbout);")
     else:
         # Read
         if ci[2] == 2:

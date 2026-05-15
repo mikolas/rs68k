@@ -966,7 +966,8 @@ impl M68000 {
         M68000::set_8xl(&mut self.dbout, self.aluo);
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
+        if self.aob & 1 != 0 { bus.write_data_byte(self.aob, self.dbout as u8); }
+        else { bus.write_data_byte(self.aob, (self.dbout >> 8) as u8); }
         self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
@@ -1011,7 +1012,8 @@ impl M68000 {
         M68000::set_8xl(&mut self.dbout, self.aluo);
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
+        if self.aob & 1 != 0 { bus.write_data_byte(self.aob, self.dbout as u8); }
+        else { bus.write_data_byte(self.aob, (self.dbout >> 8) as u8); }
         self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
@@ -1058,7 +1060,8 @@ impl M68000 {
         M68000::set_8xl(&mut self.dbout, self.aluo);
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
+        if self.aob & 1 != 0 { bus.write_data_byte(self.aob, self.dbout as u8); }
+        else { bus.write_data_byte(self.aob, (self.dbout >> 8) as u8); }
         self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
@@ -1112,7 +1115,8 @@ impl M68000 {
         M68000::set_8xl(&mut self.dbout, self.aluo);
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
+        if self.aob & 1 != 0 { bus.write_data_byte(self.aob, self.dbout as u8); }
+        else { bus.write_data_byte(self.aob, (self.dbout >> 8) as u8); }
         self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
@@ -1195,7 +1199,8 @@ impl M68000 {
             M68000::set_8xl(&mut self.dbout, self.aluo);
             self.au = self.pc.wrapping_add(2);
             self.base_ssw = SSW_DATA;
-            bus.write_data(self.aob & !1u32, self.dbout);
+            if self.aob & 1 != 0 { bus.write_data_byte(self.aob, self.dbout as u8); }
+            else { bus.write_data_byte(self.aob, (self.dbout >> 8) as u8); }
             self.icount -= 4;
             self.set_ftu_const();
             self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
@@ -1252,7 +1257,8 @@ impl M68000 {
         M68000::set_8xl(&mut self.dbout, self.aluo);
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
+        if self.aob & 1 != 0 { bus.write_data_byte(self.aob, self.dbout as u8); }
+        else { bus.write_data_byte(self.aob, (self.dbout >> 8) as u8); }
         self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
@@ -1318,7 +1324,8 @@ impl M68000 {
         M68000::set_8xl(&mut self.dbout, self.aluo);
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
+        if self.aob & 1 != 0 { bus.write_data_byte(self.aob, self.dbout as u8); }
+        else { bus.write_data_byte(self.aob, (self.dbout >> 8) as u8); }
         self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
@@ -3324,7 +3331,8 @@ impl M68000 {
         M68000::set_8xl(&mut self.dbout, self.aluo);
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
+        if self.aob & 1 != 0 { bus.write_data_byte(self.aob, self.dbout as u8); }
+        else { bus.write_data_byte(self.aob, (self.dbout >> 8) as u8); }
         self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
@@ -3369,7 +3377,8 @@ impl M68000 {
         M68000::set_8xl(&mut self.dbout, self.aluo);
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
+        if self.aob & 1 != 0 { bus.write_data_byte(self.aob, self.dbout as u8); }
+        else { bus.write_data_byte(self.aob, (self.dbout >> 8) as u8); }
         self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
@@ -3416,7 +3425,8 @@ impl M68000 {
         M68000::set_8xl(&mut self.dbout, self.aluo);
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
+        if self.aob & 1 != 0 { bus.write_data_byte(self.aob, self.dbout as u8); }
+        else { bus.write_data_byte(self.aob, (self.dbout >> 8) as u8); }
         self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
@@ -3470,7 +3480,8 @@ impl M68000 {
         M68000::set_8xl(&mut self.dbout, self.aluo);
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
+        if self.aob & 1 != 0 { bus.write_data_byte(self.aob, self.dbout as u8); }
+        else { bus.write_data_byte(self.aob, (self.dbout >> 8) as u8); }
         self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
@@ -3553,7 +3564,8 @@ impl M68000 {
             M68000::set_8xl(&mut self.dbout, self.aluo);
             self.au = self.pc.wrapping_add(2);
             self.base_ssw = SSW_DATA;
-            bus.write_data(self.aob & !1u32, self.dbout);
+            if self.aob & 1 != 0 { bus.write_data_byte(self.aob, self.dbout as u8); }
+            else { bus.write_data_byte(self.aob, (self.dbout >> 8) as u8); }
             self.icount -= 4;
             self.set_ftu_const();
             self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
@@ -3610,7 +3622,8 @@ impl M68000 {
         M68000::set_8xl(&mut self.dbout, self.aluo);
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
+        if self.aob & 1 != 0 { bus.write_data_byte(self.aob, self.dbout as u8); }
+        else { bus.write_data_byte(self.aob, (self.dbout >> 8) as u8); }
         self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
@@ -3676,7 +3689,8 @@ impl M68000 {
         M68000::set_8xl(&mut self.dbout, self.aluo);
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
+        if self.aob & 1 != 0 { bus.write_data_byte(self.aob, self.dbout as u8); }
+        else { bus.write_data_byte(self.aob, (self.dbout >> 8) as u8); }
         self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
@@ -5717,7 +5731,8 @@ impl M68000 {
         M68000::set_8xl(&mut self.dbout, self.aluo);
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
+        if self.aob & 1 != 0 { bus.write_data_byte(self.aob, self.dbout as u8); }
+        else { bus.write_data_byte(self.aob, (self.dbout >> 8) as u8); }
         self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
@@ -5762,7 +5777,8 @@ impl M68000 {
         M68000::set_8xl(&mut self.dbout, self.aluo);
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
+        if self.aob & 1 != 0 { bus.write_data_byte(self.aob, self.dbout as u8); }
+        else { bus.write_data_byte(self.aob, (self.dbout >> 8) as u8); }
         self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
@@ -5809,7 +5825,8 @@ impl M68000 {
         M68000::set_8xl(&mut self.dbout, self.aluo);
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
+        if self.aob & 1 != 0 { bus.write_data_byte(self.aob, self.dbout as u8); }
+        else { bus.write_data_byte(self.aob, (self.dbout >> 8) as u8); }
         self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
@@ -5863,7 +5880,8 @@ impl M68000 {
         M68000::set_8xl(&mut self.dbout, self.aluo);
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
+        if self.aob & 1 != 0 { bus.write_data_byte(self.aob, self.dbout as u8); }
+        else { bus.write_data_byte(self.aob, (self.dbout >> 8) as u8); }
         self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
@@ -5946,7 +5964,8 @@ impl M68000 {
             M68000::set_8xl(&mut self.dbout, self.aluo);
             self.au = self.pc.wrapping_add(2);
             self.base_ssw = SSW_DATA;
-            bus.write_data(self.aob & !1u32, self.dbout);
+            if self.aob & 1 != 0 { bus.write_data_byte(self.aob, self.dbout as u8); }
+            else { bus.write_data_byte(self.aob, (self.dbout >> 8) as u8); }
             self.icount -= 4;
             self.set_ftu_const();
             self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
@@ -6003,7 +6022,8 @@ impl M68000 {
         M68000::set_8xl(&mut self.dbout, self.aluo);
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
+        if self.aob & 1 != 0 { bus.write_data_byte(self.aob, self.dbout as u8); }
+        else { bus.write_data_byte(self.aob, (self.dbout >> 8) as u8); }
         self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
@@ -6069,7 +6089,8 @@ impl M68000 {
         M68000::set_8xl(&mut self.dbout, self.aluo);
         self.au = self.pc.wrapping_add(2);
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
+        if self.aob & 1 != 0 { bus.write_data_byte(self.aob, self.dbout as u8); }
+        else { bus.write_data_byte(self.aob, (self.dbout >> 8) as u8); }
         self.icount -= 4;
         self.set_ftu_const();
         self.inst_state = if self.next_state != 0 { self.next_state as u16 } else { self.decode_table[self.ird as usize] };
@@ -9054,7 +9075,8 @@ impl M68000 {
         self.alu_and8(self.dbin, 0xffffu16);
         self.sr_nzvc();
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
+        if self.aob & 1 != 0 { bus.write_data_byte(self.aob, self.dbout as u8); }
+        else { bus.write_data_byte(self.aob, (self.dbout >> 8) as u8); }
         self.icount -= 4;
         self.aob = self.au;
         self.ir = self.irc;
@@ -9104,7 +9126,8 @@ impl M68000 {
         self.alu_and8(self.dbin, 0xffffu16);
         self.sr_nzvc();
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
+        if self.aob & 1 != 0 { bus.write_data_byte(self.aob, self.dbout as u8); }
+        else { bus.write_data_byte(self.aob, (self.dbout >> 8) as u8); }
         self.icount -= 4;
         self.aob = self.au;
         self.ir = self.irc;
@@ -9156,7 +9179,8 @@ impl M68000 {
         self.alu_and8(self.dbin, 0xffffu16);
         self.sr_nzvc();
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
+        if self.aob & 1 != 0 { bus.write_data_byte(self.aob, self.dbout as u8); }
+        else { bus.write_data_byte(self.aob, (self.dbout >> 8) as u8); }
         self.icount -= 4;
         self.aob = self.au;
         self.ir = self.irc;
@@ -9214,7 +9238,8 @@ impl M68000 {
         self.alu_and8(self.dbin, 0xffffu16);
         self.sr_nzvc();
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
+        if self.aob & 1 != 0 { bus.write_data_byte(self.aob, self.dbout as u8); }
+        else { bus.write_data_byte(self.aob, (self.dbout >> 8) as u8); }
         self.icount -= 4;
         self.aob = self.au;
         self.ir = self.irc;
@@ -9301,7 +9326,8 @@ impl M68000 {
             self.alu_and8(self.dbin, 0xffffu16);
             self.sr_nzvc();
             self.base_ssw = SSW_DATA;
-            bus.write_data(self.aob & !1u32, self.dbout);
+            if self.aob & 1 != 0 { bus.write_data_byte(self.aob, self.dbout as u8); }
+            else { bus.write_data_byte(self.aob, (self.dbout >> 8) as u8); }
             self.icount -= 4;
             self.aob = self.au;
             self.ir = self.irc;
@@ -9363,7 +9389,8 @@ impl M68000 {
         self.alu_and8(self.dbin, 0xffffu16);
         self.sr_nzvc();
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
+        if self.aob & 1 != 0 { bus.write_data_byte(self.aob, self.dbout as u8); }
+        else { bus.write_data_byte(self.aob, (self.dbout >> 8) as u8); }
         self.icount -= 4;
         self.aob = self.au;
         self.ir = self.irc;
@@ -9434,7 +9461,8 @@ impl M68000 {
         self.alu_and8(self.dbin, 0xffffu16);
         self.sr_nzvc();
         self.base_ssw = SSW_DATA;
-        bus.write_data(self.aob & !1u32, self.dbout);
+        if self.aob & 1 != 0 { bus.write_data_byte(self.aob, self.dbout as u8); }
+        else { bus.write_data_byte(self.aob, (self.dbout >> 8) as u8); }
         self.icount -= 4;
         self.aob = self.au;
         self.ir = self.irc;

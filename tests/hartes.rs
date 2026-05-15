@@ -70,6 +70,9 @@ impl Bus for TestMemory {
     fn write_data(&mut self, addr: u32, data: u16) {
         self.write_word(addr, data);
     }
+    fn write_data_byte(&mut self, addr: u32, data: u8) {
+        self.write_byte(addr, data);
+    }
     fn read_cpu(&mut self, addr: u32) -> u16 {
         self.read_word(addr)
     }
