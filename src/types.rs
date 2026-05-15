@@ -9,7 +9,6 @@ pub const S_ILLEGAL: u16 = 6;
 pub const S_PRIVILEGE: u16 = 7;
 pub const S_LINEA: u16 = 8;
 pub const S_LINEF: u16 = 9;
-
 /// SR flags
 pub const SR_C: u16 = 0x0001;
 pub const SR_V: u16 = 0x0002;

@@ -242,37 +242,23 @@ impl M68000 {
             self.irdi = self.ird;
         }
         self.dispatch(bus);
-        // Continue dispatching exception states (0-4: reset, bus_error,
-        // address_error, double_fault, interrupt) and privilege violation (7).
-        // S_TRACE (5) belongs to the next instruction.
-        // S_ILLEGAL (6), S_LINEA (8), S_LINEF (9) could be the next instruction's
-        // decode result, so we handle them in a second pass.
+        // Continue dispatching exception states triggered during this instruction.
+        // States 0-4,7 (reset/bus_error/address_error/double_fault/interrupt/privilege)
+        // are always triggered mid-instruction and must be dispatched here.
+        // State 5 (trace): only dispatch if the original instruction was an exception
+        // handler (states 0-9), not a normal instruction (trace belongs to next call).
+        // States 6,8,9 (illegal/linea/linef): these are set by decode_table for the
+        // NEXT instruction and should NOT be dispatched here.
+        let trace_is_next = orig_state >= 10;
         loop {
             match self.inst_state {
                 S_DOUBLE_FAULT => break,
-                S_TRACE => break,
-                S_RESET | S_BUS_ERROR | S_ADDRESS_ERROR | S_INTERRUPT => {
+                S_TRACE if trace_is_next => break,
+                S_TRACE => self.dispatch(bus),
+                S_RESET | S_BUS_ERROR | S_ADDRESS_ERROR | S_INTERRUPT | S_PRIVILEGE => {
                     self.dispatch(bus);
                 }
-                S_PRIVILEGE => {
-                    // Privilege violation triggered by current instruction
-                    self.dispatch(bus);
-                }
-                _ => break, // >= 6 (except 7 handled above): done
-            }
-        }
-        // RTE/RTR: if the instruction restored SR with T=1, trace fires
-        // immediately as part of this instruction.
-        if self.inst_state == S_TRACE && (orig_state == 767 || orig_state == 770) {
-            self.dispatch(bus);
-            loop {
-                match self.inst_state {
-                    S_DOUBLE_FAULT => break,
-                    S_RESET | S_BUS_ERROR | S_ADDRESS_ERROR | S_INTERRUPT | S_PRIVILEGE => {
-                        self.dispatch(bus);
-                    }
-                    _ => break,
-                }
+                _ => break,
             }
         }
         (before - self.icount) as u32

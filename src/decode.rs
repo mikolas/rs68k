@@ -1,5 +1,5 @@
 use crate::cpu::M68000;
-use crate::types::S_ILLEGAL;
+use crate::types::{S_ILLEGAL, S_LINEA, S_LINEF};
 
 struct DecodeEntry {
     value: u16,
@@ -1551,6 +1551,13 @@ impl M68000 {
                 cvalue = ((cvalue | mask).wrapping_add(1)) & !mask;
                 if cvalue == 0 { break; }
             }
+        }
+        // Line-A and Line-F traps (not in the packed table)
+        for opcode in 0xA000..=0xAFFFu16 {
+            self.decode_table[opcode as usize] = S_LINEA;
+        }
+        for opcode in 0xF000..=0xFFFFu16 {
+            self.decode_table[opcode as usize] = S_LINEF;
         }
     }
 }
