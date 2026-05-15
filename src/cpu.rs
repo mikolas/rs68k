@@ -231,4 +231,16 @@ impl M68000 {
         self.int_vector = ((self.edb & 0xff) as u32) << 2;
         self.int_next_state = 0;
     }
+
+    /// Execute one instruction. Returns cycles consumed.
+    pub fn execute_one(&mut self, bus: &mut impl crate::types::Bus) -> u32 {
+        let before = self.icount;
+        // Set up instruction context (matches MAME execute_run)
+        if self.inst_state >= S_ILLEGAL {
+            self.ipc = self.pc.wrapping_sub(2);
+            self.irdi = self.ird;
+        }
+        self.dispatch(bus);
+        (before - self.icount) as u32
+    }
 }
