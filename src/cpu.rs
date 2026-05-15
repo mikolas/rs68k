@@ -242,25 +242,36 @@ impl M68000 {
             self.irdi = self.ird;
         }
         self.dispatch(bus);
-        // If we transitioned to a special state (exception), keep executing
-        // until we reach a normal instruction state (>= S_ILLEGAL) or halt.
-        // S_TRACE: stop — trace fires on the NEXT execute_one call.
-        while self.inst_state < S_ILLEGAL {
-            if self.inst_state == S_DOUBLE_FAULT || self.inst_state == S_TRACE {
-                break;
+        // Continue dispatching exception states (0-4: reset, bus_error,
+        // address_error, double_fault, interrupt) and privilege violation (7).
+        // S_TRACE (5) belongs to the next instruction.
+        // S_ILLEGAL (6), S_LINEA (8), S_LINEF (9) could be the next instruction's
+        // decode result, so we handle them in a second pass.
+        loop {
+            match self.inst_state {
+                S_DOUBLE_FAULT => break,
+                S_TRACE => break,
+                S_RESET | S_BUS_ERROR | S_ADDRESS_ERROR | S_INTERRUPT => {
+                    self.dispatch(bus);
+                }
+                S_PRIVILEGE => {
+                    // Privilege violation triggered by current instruction
+                    self.dispatch(bus);
+                }
+                _ => break, // >= 6 (except 7 handled above): done
             }
-            self.dispatch(bus);
         }
         // RTE/RTR: if the instruction restored SR with T=1, trace fires
         // immediately as part of this instruction.
-        if self.inst_state == S_TRACE {
-            // Check if original instruction was RTE(767) or RTR(769)
-            let is_rte_rtr = orig_state == 767 || orig_state == 770;
-            if is_rte_rtr {
-                self.dispatch(bus);
-                while self.inst_state < S_ILLEGAL {
-                    if self.inst_state == S_DOUBLE_FAULT { break; }
-                    self.dispatch(bus);
+        if self.inst_state == S_TRACE && (orig_state == 767 || orig_state == 770) {
+            self.dispatch(bus);
+            loop {
+                match self.inst_state {
+                    S_DOUBLE_FAULT => break,
+                    S_RESET | S_BUS_ERROR | S_ADDRESS_ERROR | S_INTERRUPT | S_PRIVILEGE => {
+                        self.dispatch(bus);
+                    }
+                    _ => break,
                 }
             }
         }
