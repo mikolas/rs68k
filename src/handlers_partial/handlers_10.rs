@@ -13,8 +13,7 @@ impl M68000 {
             self.alu_and(self.dbin, 0xffffu16);
             self.dcr = ((self.da[rx]) as u8);
             self.base_ssw = SSW_DATA | SSW_R;
-            self.edb = bus.read_data(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 2;
             return;
         }
@@ -36,8 +35,7 @@ impl M68000 {
             self.alu_lsl(self.aluo);
             self.sr_xnzvc();
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 4;
             return;
         }
@@ -56,8 +54,7 @@ impl M68000 {
             self.dbout = self.aluo;
             self.au = self.pc.wrapping_add(2);
             self.base_ssw = SSW_DATA;
-            bus.write_data(self.aob & !1u32, self.dbout);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 6;
             return;
         }
@@ -93,8 +90,7 @@ impl M68000 {
             self.au = self.pc.wrapping_add(2);
             self.alu_and(self.alub, 0xffffu16);
             self.base_ssw = SSW_DATA | SSW_R;
-            self.edb = bus.read_data(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 2;
             return;
         }
@@ -116,8 +112,7 @@ impl M68000 {
             self.alu_lsl(self.aluo);
             self.sr_xnzvc();
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 4;
             return;
         }
@@ -136,8 +131,7 @@ impl M68000 {
             self.dbout = self.aluo;
             self.au = self.pc.wrapping_add(2);
             self.base_ssw = SSW_DATA;
-            bus.write_data(self.aob & !1u32, self.dbout);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 6;
             return;
         }
@@ -175,8 +169,7 @@ impl M68000 {
             self.au = self.pc;
             self.alu_and(self.alub, 0xffffu16);
             self.base_ssw = SSW_DATA | SSW_R;
-            self.edb = bus.read_data(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 2;
             return;
         }
@@ -198,8 +191,7 @@ impl M68000 {
             self.alu_lsl(self.aluo);
             self.sr_xnzvc();
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 4;
             return;
         }
@@ -218,8 +210,7 @@ impl M68000 {
             self.dbout = self.aluo;
             self.au = self.pc.wrapping_add(2);
             self.base_ssw = SSW_DATA;
-            bus.write_data(self.aob & !1u32, self.dbout);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 6;
             return;
         }
@@ -248,8 +239,7 @@ impl M68000 {
             self.aob = self.au;
             self.au = M68000::ext32(self.dbin).wrapping_add(self.da[ry]);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 2;
             return;
         }
@@ -268,8 +258,7 @@ impl M68000 {
             self.alu_and(self.dbin, 0xffffu16);
             self.dcr = ((self.da[rx]) as u8);
             self.base_ssw = SSW_DATA | SSW_R;
-            self.edb = bus.read_data(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 4;
             return;
         }
@@ -291,8 +280,7 @@ impl M68000 {
             self.alu_lsl(self.aluo);
             self.sr_xnzvc();
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 6;
             return;
         }
@@ -311,8 +299,7 @@ impl M68000 {
             self.dbout = self.aluo;
             self.au = self.pc.wrapping_add(2);
             self.base_ssw = SSW_DATA;
-            bus.write_data(self.aob & !1u32, self.dbout);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 8;
             return;
         }
@@ -351,8 +338,7 @@ impl M68000 {
             1 => {
                 self.au = M68000::ext32(((self.da[self.map_sp((self.irc >> 12) as usize)]) as u16)).wrapping_add(self.au);
                 self.base_ssw = SSW_PROGRAM | SSW_R;
-                self.edb = bus.read_program(self.aob & !1u32);
-                self.icount -= 4;
+                self.pin_state.pending_byte = false;
                 self.inst_substate = 2;
                 return;
             }
@@ -378,8 +364,7 @@ impl M68000 {
             1 => {
                 self.au = self.da[self.map_sp((self.irc >> 12) as usize)].wrapping_add(self.au);
                 self.base_ssw = SSW_PROGRAM | SSW_R;
-                self.edb = bus.read_program(self.aob & !1u32);
-                self.icount -= 4;
+                self.pin_state.pending_byte = false;
                 self.inst_substate = 10;
                 return;
             }
@@ -409,8 +394,7 @@ impl M68000 {
                 self.alu_and(self.dbin, 0xffffu16);
                 self.dcr = ((self.da[rx]) as u8);
                 self.base_ssw = SSW_DATA | SSW_R;
-                self.edb = bus.read_data(self.aob & !1u32);
-                self.icount -= 4;
+                self.pin_state.pending_byte = false;
                 self.inst_substate = 4;
                 return;
             }
@@ -436,8 +420,7 @@ impl M68000 {
             self.alu_lsl(self.aluo);
             self.sr_xnzvc();
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 6;
             return;
         }
@@ -456,8 +439,7 @@ impl M68000 {
             self.dbout = self.aluo;
             self.au = self.pc.wrapping_add(2);
             self.base_ssw = SSW_DATA;
-            bus.write_data(self.aob & !1u32, self.dbout);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 8;
             return;
         }
@@ -486,8 +468,7 @@ impl M68000 {
             1 => {
                 self.au = self.da[self.map_sp((self.irc >> 12) as usize)].wrapping_add(self.au);
                 self.base_ssw = SSW_PROGRAM | SSW_R;
-                self.edb = bus.read_program(self.aob & !1u32);
-                self.icount -= 4;
+                self.pin_state.pending_byte = false;
                 self.inst_substate = 10;
                 return;
             }
@@ -511,8 +492,7 @@ impl M68000 {
                 self.alu_and(self.dbin, 0xffffu16);
                 self.dcr = ((self.da[rx]) as u8);
                 self.base_ssw = SSW_DATA | SSW_R;
-                self.edb = bus.read_data(self.aob & !1u32);
-                self.icount -= 4;
+                self.pin_state.pending_byte = false;
                 self.inst_substate = 4;
                 return;
             }
@@ -535,8 +515,7 @@ impl M68000 {
             self.au = M68000::ext32(self.dbin);
             self.alu_and(((self.da[rx]) as u16), self.dbin);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 2;
             return;
         }
@@ -553,8 +532,7 @@ impl M68000 {
             self.au = self.pc.wrapping_add(2);
             self.alu_and(self.dbin, 0xffffu16);
             self.base_ssw = SSW_DATA | SSW_R;
-            self.edb = bus.read_data(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 4;
             return;
         }
@@ -576,8 +554,7 @@ impl M68000 {
             self.alu_lsl(self.aluo);
             self.sr_xnzvc();
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 6;
             return;
         }
@@ -596,8 +573,7 @@ impl M68000 {
             self.dbout = self.aluo;
             self.au = self.pc.wrapping_add(2);
             self.base_ssw = SSW_DATA;
-            bus.write_data(self.aob & !1u32, self.dbout);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 8;
             return;
         }
@@ -626,8 +602,7 @@ impl M68000 {
             { let v = self.dbin; M68000::set_16h(&mut self.at, v); }
             self.au = self.au.wrapping_add(2);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 2;
             return;
         }
@@ -646,8 +621,7 @@ impl M68000 {
             self.au = M68000::merge_16_32(M68000::high16(self.at), self.dbin);
             self.alu_and(((self.da[rx]) as u16), self.dbin);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 4;
             return;
         }
@@ -664,8 +638,7 @@ impl M68000 {
             self.au = self.pc.wrapping_add(2);
             self.alu_and(self.dbin, 0xffffu16);
             self.base_ssw = SSW_DATA | SSW_R;
-            self.edb = bus.read_data(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 6;
             return;
         }
@@ -687,8 +660,7 @@ impl M68000 {
             self.alu_lsl(self.aluo);
             self.sr_xnzvc();
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 8;
             return;
         }
@@ -707,8 +679,7 @@ impl M68000 {
             self.dbout = self.aluo;
             self.au = self.pc.wrapping_add(2);
             self.base_ssw = SSW_DATA;
-            bus.write_data(self.aob & !1u32, self.dbout);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 10;
             return;
         }
@@ -739,8 +710,7 @@ impl M68000 {
             self.alu_andx(self.dbin, 0xffffu16);
             self.dcr = ((self.da[rx]) as u8);
             self.base_ssw = SSW_DATA | SSW_R;
-            self.edb = bus.read_data(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 2;
             return;
         }
@@ -762,8 +732,7 @@ impl M68000 {
             self.alu_roxr(self.aluo);
             self.sr_xnzvc();
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 4;
             return;
         }
@@ -782,8 +751,7 @@ impl M68000 {
             self.dbout = self.aluo;
             self.au = self.pc.wrapping_add(2);
             self.base_ssw = SSW_DATA;
-            bus.write_data(self.aob & !1u32, self.dbout);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 6;
             return;
         }
@@ -818,8 +786,7 @@ impl M68000 {
             self.au = self.pc.wrapping_add(2);
             self.alu_andx(self.alub, 0xffffu16);
             self.base_ssw = SSW_DATA | SSW_R;
-            self.edb = bus.read_data(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 2;
             return;
         }
@@ -841,8 +808,7 @@ impl M68000 {
             self.alu_roxr(self.aluo);
             self.sr_xnzvc();
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 4;
             return;
         }
@@ -861,8 +827,7 @@ impl M68000 {
             self.dbout = self.aluo;
             self.au = self.pc.wrapping_add(2);
             self.base_ssw = SSW_DATA;
-            bus.write_data(self.aob & !1u32, self.dbout);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 6;
             return;
         }
@@ -899,8 +864,7 @@ impl M68000 {
             self.au = self.pc;
             self.alu_andx(self.alub, 0xffffu16);
             self.base_ssw = SSW_DATA | SSW_R;
-            self.edb = bus.read_data(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 2;
             return;
         }
@@ -922,8 +886,7 @@ impl M68000 {
             self.alu_roxr(self.aluo);
             self.sr_xnzvc();
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 4;
             return;
         }
@@ -942,8 +905,7 @@ impl M68000 {
             self.dbout = self.aluo;
             self.au = self.pc.wrapping_add(2);
             self.base_ssw = SSW_DATA;
-            bus.write_data(self.aob & !1u32, self.dbout);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 6;
             return;
         }
@@ -972,8 +934,7 @@ impl M68000 {
             self.aob = self.au;
             self.au = M68000::ext32(self.dbin).wrapping_add(self.da[ry]);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 2;
             return;
         }
@@ -992,8 +953,7 @@ impl M68000 {
             self.alu_andx(self.dbin, 0xffffu16);
             self.dcr = ((self.da[rx]) as u8);
             self.base_ssw = SSW_DATA | SSW_R;
-            self.edb = bus.read_data(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 4;
             return;
         }
@@ -1015,8 +975,7 @@ impl M68000 {
             self.alu_roxr(self.aluo);
             self.sr_xnzvc();
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 6;
             return;
         }
@@ -1035,8 +994,7 @@ impl M68000 {
             self.dbout = self.aluo;
             self.au = self.pc.wrapping_add(2);
             self.base_ssw = SSW_DATA;
-            bus.write_data(self.aob & !1u32, self.dbout);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 8;
             return;
         }
@@ -1075,8 +1033,7 @@ impl M68000 {
             1 => {
                 self.au = M68000::ext32(((self.da[self.map_sp((self.irc >> 12) as usize)]) as u16)).wrapping_add(self.au);
                 self.base_ssw = SSW_PROGRAM | SSW_R;
-                self.edb = bus.read_program(self.aob & !1u32);
-                self.icount -= 4;
+                self.pin_state.pending_byte = false;
                 self.inst_substate = 2;
                 return;
             }
@@ -1102,8 +1059,7 @@ impl M68000 {
             1 => {
                 self.au = self.da[self.map_sp((self.irc >> 12) as usize)].wrapping_add(self.au);
                 self.base_ssw = SSW_PROGRAM | SSW_R;
-                self.edb = bus.read_program(self.aob & !1u32);
-                self.icount -= 4;
+                self.pin_state.pending_byte = false;
                 self.inst_substate = 10;
                 return;
             }
@@ -1133,8 +1089,7 @@ impl M68000 {
                 self.alu_andx(self.dbin, 0xffffu16);
                 self.dcr = ((self.da[rx]) as u8);
                 self.base_ssw = SSW_DATA | SSW_R;
-                self.edb = bus.read_data(self.aob & !1u32);
-                self.icount -= 4;
+                self.pin_state.pending_byte = false;
                 self.inst_substate = 4;
                 return;
             }
@@ -1160,8 +1115,7 @@ impl M68000 {
             self.alu_roxr(self.aluo);
             self.sr_xnzvc();
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 6;
             return;
         }
@@ -1180,8 +1134,7 @@ impl M68000 {
             self.dbout = self.aluo;
             self.au = self.pc.wrapping_add(2);
             self.base_ssw = SSW_DATA;
-            bus.write_data(self.aob & !1u32, self.dbout);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 8;
             return;
         }
@@ -1210,8 +1163,7 @@ impl M68000 {
             1 => {
                 self.au = self.da[self.map_sp((self.irc >> 12) as usize)].wrapping_add(self.au);
                 self.base_ssw = SSW_PROGRAM | SSW_R;
-                self.edb = bus.read_program(self.aob & !1u32);
-                self.icount -= 4;
+                self.pin_state.pending_byte = false;
                 self.inst_substate = 10;
                 return;
             }
@@ -1235,8 +1187,7 @@ impl M68000 {
                 self.alu_andx(self.dbin, 0xffffu16);
                 self.dcr = ((self.da[rx]) as u8);
                 self.base_ssw = SSW_DATA | SSW_R;
-                self.edb = bus.read_data(self.aob & !1u32);
-                self.icount -= 4;
+                self.pin_state.pending_byte = false;
                 self.inst_substate = 4;
                 return;
             }
@@ -1258,8 +1209,7 @@ impl M68000 {
             self.at = M68000::ext32(self.dbin);
             self.au = M68000::ext32(self.dbin);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 2;
             return;
         }
@@ -1276,8 +1226,7 @@ impl M68000 {
             self.au = self.pc.wrapping_add(2);
             self.alu_andx(self.dbin, 0xffffu16);
             self.base_ssw = SSW_DATA | SSW_R;
-            self.edb = bus.read_data(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 4;
             return;
         }
@@ -1299,8 +1248,7 @@ impl M68000 {
             self.alu_roxr(self.aluo);
             self.sr_xnzvc();
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 6;
             return;
         }
@@ -1319,8 +1267,7 @@ impl M68000 {
             self.dbout = self.aluo;
             self.au = self.pc.wrapping_add(2);
             self.base_ssw = SSW_DATA;
-            bus.write_data(self.aob & !1u32, self.dbout);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 8;
             return;
         }
@@ -1349,8 +1296,7 @@ impl M68000 {
             { let v = self.dbin; M68000::set_16h(&mut self.at, v); }
             self.au = self.au.wrapping_add(2);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 2;
             return;
         }
@@ -1368,8 +1314,7 @@ impl M68000 {
             { let v = self.dbin; M68000::set_16l_32(&mut self.at, v); }
             self.au = M68000::merge_16_32(M68000::high16(self.at), self.dbin);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 4;
             return;
         }
@@ -1386,8 +1331,7 @@ impl M68000 {
             self.au = self.pc.wrapping_add(2);
             self.alu_andx(self.dbin, 0xffffu16);
             self.base_ssw = SSW_DATA | SSW_R;
-            self.edb = bus.read_data(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 6;
             return;
         }
@@ -1409,8 +1353,7 @@ impl M68000 {
             self.alu_roxr(self.aluo);
             self.sr_xnzvc();
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 8;
             return;
         }
@@ -1429,8 +1372,7 @@ impl M68000 {
             self.dbout = self.aluo;
             self.au = self.pc.wrapping_add(2);
             self.base_ssw = SSW_DATA;
-            bus.write_data(self.aob & !1u32, self.dbout);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 10;
             return;
         }
@@ -1461,8 +1403,7 @@ impl M68000 {
             self.alu_andx(self.dbin, 0xffffu16);
             self.dcr = ((self.da[rx]) as u8);
             self.base_ssw = SSW_DATA | SSW_R;
-            self.edb = bus.read_data(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 2;
             return;
         }
@@ -1484,8 +1425,7 @@ impl M68000 {
             self.alu_roxl(self.aluo);
             self.sr_xnzvc();
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 4;
             return;
         }
@@ -1504,8 +1444,7 @@ impl M68000 {
             self.dbout = self.aluo;
             self.au = self.pc.wrapping_add(2);
             self.base_ssw = SSW_DATA;
-            bus.write_data(self.aob & !1u32, self.dbout);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 6;
             return;
         }
@@ -1540,8 +1479,7 @@ impl M68000 {
             self.au = self.pc.wrapping_add(2);
             self.alu_andx(self.alub, 0xffffu16);
             self.base_ssw = SSW_DATA | SSW_R;
-            self.edb = bus.read_data(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 2;
             return;
         }
@@ -1563,8 +1501,7 @@ impl M68000 {
             self.alu_roxl(self.aluo);
             self.sr_xnzvc();
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 4;
             return;
         }
@@ -1583,8 +1520,7 @@ impl M68000 {
             self.dbout = self.aluo;
             self.au = self.pc.wrapping_add(2);
             self.base_ssw = SSW_DATA;
-            bus.write_data(self.aob & !1u32, self.dbout);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 6;
             return;
         }
@@ -1621,8 +1557,7 @@ impl M68000 {
             self.au = self.pc;
             self.alu_andx(self.alub, 0xffffu16);
             self.base_ssw = SSW_DATA | SSW_R;
-            self.edb = bus.read_data(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 2;
             return;
         }
@@ -1644,8 +1579,7 @@ impl M68000 {
             self.alu_roxl(self.aluo);
             self.sr_xnzvc();
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 4;
             return;
         }
@@ -1664,8 +1598,7 @@ impl M68000 {
             self.dbout = self.aluo;
             self.au = self.pc.wrapping_add(2);
             self.base_ssw = SSW_DATA;
-            bus.write_data(self.aob & !1u32, self.dbout);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 6;
             return;
         }
@@ -1694,8 +1627,7 @@ impl M68000 {
             self.aob = self.au;
             self.au = M68000::ext32(self.dbin).wrapping_add(self.da[ry]);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 2;
             return;
         }
@@ -1714,8 +1646,7 @@ impl M68000 {
             self.alu_andx(self.dbin, 0xffffu16);
             self.dcr = ((self.da[rx]) as u8);
             self.base_ssw = SSW_DATA | SSW_R;
-            self.edb = bus.read_data(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 4;
             return;
         }
@@ -1737,8 +1668,7 @@ impl M68000 {
             self.alu_roxl(self.aluo);
             self.sr_xnzvc();
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 6;
             return;
         }
@@ -1757,8 +1687,7 @@ impl M68000 {
             self.dbout = self.aluo;
             self.au = self.pc.wrapping_add(2);
             self.base_ssw = SSW_DATA;
-            bus.write_data(self.aob & !1u32, self.dbout);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 8;
             return;
         }
@@ -1797,8 +1726,7 @@ impl M68000 {
             1 => {
                 self.au = M68000::ext32(((self.da[self.map_sp((self.irc >> 12) as usize)]) as u16)).wrapping_add(self.au);
                 self.base_ssw = SSW_PROGRAM | SSW_R;
-                self.edb = bus.read_program(self.aob & !1u32);
-                self.icount -= 4;
+                self.pin_state.pending_byte = false;
                 self.inst_substate = 2;
                 return;
             }
@@ -1824,8 +1752,7 @@ impl M68000 {
             1 => {
                 self.au = self.da[self.map_sp((self.irc >> 12) as usize)].wrapping_add(self.au);
                 self.base_ssw = SSW_PROGRAM | SSW_R;
-                self.edb = bus.read_program(self.aob & !1u32);
-                self.icount -= 4;
+                self.pin_state.pending_byte = false;
                 self.inst_substate = 10;
                 return;
             }
@@ -1855,8 +1782,7 @@ impl M68000 {
                 self.alu_andx(self.dbin, 0xffffu16);
                 self.dcr = ((self.da[rx]) as u8);
                 self.base_ssw = SSW_DATA | SSW_R;
-                self.edb = bus.read_data(self.aob & !1u32);
-                self.icount -= 4;
+                self.pin_state.pending_byte = false;
                 self.inst_substate = 4;
                 return;
             }
@@ -1882,8 +1808,7 @@ impl M68000 {
             self.alu_roxl(self.aluo);
             self.sr_xnzvc();
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 6;
             return;
         }
@@ -1902,8 +1827,7 @@ impl M68000 {
             self.dbout = self.aluo;
             self.au = self.pc.wrapping_add(2);
             self.base_ssw = SSW_DATA;
-            bus.write_data(self.aob & !1u32, self.dbout);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 8;
             return;
         }
@@ -1932,8 +1856,7 @@ impl M68000 {
             1 => {
                 self.au = self.da[self.map_sp((self.irc >> 12) as usize)].wrapping_add(self.au);
                 self.base_ssw = SSW_PROGRAM | SSW_R;
-                self.edb = bus.read_program(self.aob & !1u32);
-                self.icount -= 4;
+                self.pin_state.pending_byte = false;
                 self.inst_substate = 10;
                 return;
             }
@@ -1957,8 +1880,7 @@ impl M68000 {
                 self.alu_andx(self.dbin, 0xffffu16);
                 self.dcr = ((self.da[rx]) as u8);
                 self.base_ssw = SSW_DATA | SSW_R;
-                self.edb = bus.read_data(self.aob & !1u32);
-                self.icount -= 4;
+                self.pin_state.pending_byte = false;
                 self.inst_substate = 4;
                 return;
             }
@@ -1980,8 +1902,7 @@ impl M68000 {
             self.at = M68000::ext32(self.dbin);
             self.au = M68000::ext32(self.dbin);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 2;
             return;
         }
@@ -1998,8 +1919,7 @@ impl M68000 {
             self.au = self.pc.wrapping_add(2);
             self.alu_andx(self.dbin, 0xffffu16);
             self.base_ssw = SSW_DATA | SSW_R;
-            self.edb = bus.read_data(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 4;
             return;
         }
@@ -2021,8 +1941,7 @@ impl M68000 {
             self.alu_roxl(self.aluo);
             self.sr_xnzvc();
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 6;
             return;
         }
@@ -2041,8 +1960,7 @@ impl M68000 {
             self.dbout = self.aluo;
             self.au = self.pc.wrapping_add(2);
             self.base_ssw = SSW_DATA;
-            bus.write_data(self.aob & !1u32, self.dbout);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 8;
             return;
         }
@@ -2071,8 +1989,7 @@ impl M68000 {
             { let v = self.dbin; M68000::set_16h(&mut self.at, v); }
             self.au = self.au.wrapping_add(2);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 2;
             return;
         }
@@ -2090,8 +2007,7 @@ impl M68000 {
             { let v = self.dbin; M68000::set_16l_32(&mut self.at, v); }
             self.au = M68000::merge_16_32(M68000::high16(self.at), self.dbin);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 4;
             return;
         }
@@ -2108,8 +2024,7 @@ impl M68000 {
             self.au = self.pc.wrapping_add(2);
             self.alu_andx(self.dbin, 0xffffu16);
             self.base_ssw = SSW_DATA | SSW_R;
-            self.edb = bus.read_data(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 6;
             return;
         }
@@ -2131,8 +2046,7 @@ impl M68000 {
             self.alu_roxl(self.aluo);
             self.sr_xnzvc();
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 8;
             return;
         }
@@ -2151,8 +2065,7 @@ impl M68000 {
             self.dbout = self.aluo;
             self.au = self.pc.wrapping_add(2);
             self.base_ssw = SSW_DATA;
-            bus.write_data(self.aob & !1u32, self.dbout);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 10;
             return;
         }
@@ -2183,8 +2096,7 @@ impl M68000 {
             self.alu_and(self.dbin, 0xffffu16);
             self.dcr = ((self.da[rx]) as u8);
             self.base_ssw = SSW_DATA | SSW_R;
-            self.edb = bus.read_data(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 2;
             return;
         }
@@ -2206,8 +2118,7 @@ impl M68000 {
             self.alu_ror(self.aluo);
             self.sr_nzvc();
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 4;
             return;
         }
@@ -2226,8 +2137,7 @@ impl M68000 {
             self.dbout = self.aluo;
             self.au = self.pc.wrapping_add(2);
             self.base_ssw = SSW_DATA;
-            bus.write_data(self.aob & !1u32, self.dbout);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 6;
             return;
         }
@@ -2262,8 +2172,7 @@ impl M68000 {
             self.au = self.pc.wrapping_add(2);
             self.alu_and(self.alub, 0xffffu16);
             self.base_ssw = SSW_DATA | SSW_R;
-            self.edb = bus.read_data(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 2;
             return;
         }
@@ -2285,8 +2194,7 @@ impl M68000 {
             self.alu_ror(self.aluo);
             self.sr_nzvc();
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 4;
             return;
         }
@@ -2305,8 +2213,7 @@ impl M68000 {
             self.dbout = self.aluo;
             self.au = self.pc.wrapping_add(2);
             self.base_ssw = SSW_DATA;
-            bus.write_data(self.aob & !1u32, self.dbout);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 6;
             return;
         }
@@ -2343,8 +2250,7 @@ impl M68000 {
             self.au = self.pc;
             self.alu_and(self.alub, 0xffffu16);
             self.base_ssw = SSW_DATA | SSW_R;
-            self.edb = bus.read_data(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 2;
             return;
         }
@@ -2366,8 +2272,7 @@ impl M68000 {
             self.alu_ror(self.aluo);
             self.sr_nzvc();
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 4;
             return;
         }
@@ -2386,8 +2291,7 @@ impl M68000 {
             self.dbout = self.aluo;
             self.au = self.pc.wrapping_add(2);
             self.base_ssw = SSW_DATA;
-            bus.write_data(self.aob & !1u32, self.dbout);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 6;
             return;
         }
@@ -2416,8 +2320,7 @@ impl M68000 {
             self.aob = self.au;
             self.au = M68000::ext32(self.dbin).wrapping_add(self.da[ry]);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 2;
             return;
         }
@@ -2436,8 +2339,7 @@ impl M68000 {
             self.alu_and(self.dbin, 0xffffu16);
             self.dcr = ((self.da[rx]) as u8);
             self.base_ssw = SSW_DATA | SSW_R;
-            self.edb = bus.read_data(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 4;
             return;
         }
@@ -2459,8 +2361,7 @@ impl M68000 {
             self.alu_ror(self.aluo);
             self.sr_nzvc();
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 6;
             return;
         }
@@ -2479,8 +2380,7 @@ impl M68000 {
             self.dbout = self.aluo;
             self.au = self.pc.wrapping_add(2);
             self.base_ssw = SSW_DATA;
-            bus.write_data(self.aob & !1u32, self.dbout);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 8;
             return;
         }
@@ -2519,8 +2419,7 @@ impl M68000 {
             1 => {
                 self.au = M68000::ext32(((self.da[self.map_sp((self.irc >> 12) as usize)]) as u16)).wrapping_add(self.au);
                 self.base_ssw = SSW_PROGRAM | SSW_R;
-                self.edb = bus.read_program(self.aob & !1u32);
-                self.icount -= 4;
+                self.pin_state.pending_byte = false;
                 self.inst_substate = 2;
                 return;
             }
@@ -2546,8 +2445,7 @@ impl M68000 {
             1 => {
                 self.au = self.da[self.map_sp((self.irc >> 12) as usize)].wrapping_add(self.au);
                 self.base_ssw = SSW_PROGRAM | SSW_R;
-                self.edb = bus.read_program(self.aob & !1u32);
-                self.icount -= 4;
+                self.pin_state.pending_byte = false;
                 self.inst_substate = 10;
                 return;
             }
@@ -2577,8 +2475,7 @@ impl M68000 {
                 self.alu_and(self.dbin, 0xffffu16);
                 self.dcr = ((self.da[rx]) as u8);
                 self.base_ssw = SSW_DATA | SSW_R;
-                self.edb = bus.read_data(self.aob & !1u32);
-                self.icount -= 4;
+                self.pin_state.pending_byte = false;
                 self.inst_substate = 4;
                 return;
             }
@@ -2604,8 +2501,7 @@ impl M68000 {
             self.alu_ror(self.aluo);
             self.sr_nzvc();
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 6;
             return;
         }
@@ -2624,8 +2520,7 @@ impl M68000 {
             self.dbout = self.aluo;
             self.au = self.pc.wrapping_add(2);
             self.base_ssw = SSW_DATA;
-            bus.write_data(self.aob & !1u32, self.dbout);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 8;
             return;
         }
@@ -2654,8 +2549,7 @@ impl M68000 {
             1 => {
                 self.au = self.da[self.map_sp((self.irc >> 12) as usize)].wrapping_add(self.au);
                 self.base_ssw = SSW_PROGRAM | SSW_R;
-                self.edb = bus.read_program(self.aob & !1u32);
-                self.icount -= 4;
+                self.pin_state.pending_byte = false;
                 self.inst_substate = 10;
                 return;
             }
@@ -2679,8 +2573,7 @@ impl M68000 {
                 self.alu_and(self.dbin, 0xffffu16);
                 self.dcr = ((self.da[rx]) as u8);
                 self.base_ssw = SSW_DATA | SSW_R;
-                self.edb = bus.read_data(self.aob & !1u32);
-                self.icount -= 4;
+                self.pin_state.pending_byte = false;
                 self.inst_substate = 4;
                 return;
             }
@@ -2702,8 +2595,7 @@ impl M68000 {
             self.at = M68000::ext32(self.dbin);
             self.au = M68000::ext32(self.dbin);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 2;
             return;
         }
@@ -2720,8 +2612,7 @@ impl M68000 {
             self.au = self.pc.wrapping_add(2);
             self.alu_and(self.dbin, 0xffffu16);
             self.base_ssw = SSW_DATA | SSW_R;
-            self.edb = bus.read_data(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 4;
             return;
         }
@@ -2743,8 +2634,7 @@ impl M68000 {
             self.alu_ror(self.aluo);
             self.sr_nzvc();
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 6;
             return;
         }
@@ -2763,8 +2653,7 @@ impl M68000 {
             self.dbout = self.aluo;
             self.au = self.pc.wrapping_add(2);
             self.base_ssw = SSW_DATA;
-            bus.write_data(self.aob & !1u32, self.dbout);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 8;
             return;
         }
@@ -2793,8 +2682,7 @@ impl M68000 {
             { let v = self.dbin; M68000::set_16h(&mut self.at, v); }
             self.au = self.au.wrapping_add(2);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 2;
             return;
         }
@@ -2812,8 +2700,7 @@ impl M68000 {
             { let v = self.dbin; M68000::set_16l_32(&mut self.at, v); }
             self.au = M68000::merge_16_32(M68000::high16(self.at), self.dbin);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 4;
             return;
         }
@@ -2830,8 +2717,7 @@ impl M68000 {
             self.au = self.pc.wrapping_add(2);
             self.alu_and(self.dbin, 0xffffu16);
             self.base_ssw = SSW_DATA | SSW_R;
-            self.edb = bus.read_data(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 6;
             return;
         }
@@ -2853,8 +2739,7 @@ impl M68000 {
             self.alu_ror(self.aluo);
             self.sr_nzvc();
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 8;
             return;
         }
@@ -2873,8 +2758,7 @@ impl M68000 {
             self.dbout = self.aluo;
             self.au = self.pc.wrapping_add(2);
             self.base_ssw = SSW_DATA;
-            bus.write_data(self.aob & !1u32, self.dbout);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 10;
             return;
         }
@@ -2905,8 +2789,7 @@ impl M68000 {
             self.alu_and(self.dbin, 0xffffu16);
             self.dcr = ((self.da[rx]) as u8);
             self.base_ssw = SSW_DATA | SSW_R;
-            self.edb = bus.read_data(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 2;
             return;
         }
@@ -2928,8 +2811,7 @@ impl M68000 {
             self.alu_rol(self.aluo);
             self.sr_nzvc();
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 4;
             return;
         }
@@ -2948,8 +2830,7 @@ impl M68000 {
             self.dbout = self.aluo;
             self.au = self.pc.wrapping_add(2);
             self.base_ssw = SSW_DATA;
-            bus.write_data(self.aob & !1u32, self.dbout);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 6;
             return;
         }
@@ -2984,8 +2865,7 @@ impl M68000 {
             self.au = self.pc.wrapping_add(2);
             self.alu_and(self.alub, 0xffffu16);
             self.base_ssw = SSW_DATA | SSW_R;
-            self.edb = bus.read_data(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 2;
             return;
         }
@@ -3007,8 +2887,7 @@ impl M68000 {
             self.alu_rol(self.aluo);
             self.sr_nzvc();
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 4;
             return;
         }
@@ -3027,8 +2906,7 @@ impl M68000 {
             self.dbout = self.aluo;
             self.au = self.pc.wrapping_add(2);
             self.base_ssw = SSW_DATA;
-            bus.write_data(self.aob & !1u32, self.dbout);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 6;
             return;
         }
@@ -3065,8 +2943,7 @@ impl M68000 {
             self.au = self.pc;
             self.alu_and(self.alub, 0xffffu16);
             self.base_ssw = SSW_DATA | SSW_R;
-            self.edb = bus.read_data(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 2;
             return;
         }
@@ -3088,8 +2965,7 @@ impl M68000 {
             self.alu_rol(self.aluo);
             self.sr_nzvc();
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 4;
             return;
         }
@@ -3108,8 +2984,7 @@ impl M68000 {
             self.dbout = self.aluo;
             self.au = self.pc.wrapping_add(2);
             self.base_ssw = SSW_DATA;
-            bus.write_data(self.aob & !1u32, self.dbout);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 6;
             return;
         }
@@ -3138,8 +3013,7 @@ impl M68000 {
             self.aob = self.au;
             self.au = M68000::ext32(self.dbin).wrapping_add(self.da[ry]);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 2;
             return;
         }
@@ -3158,8 +3032,7 @@ impl M68000 {
             self.alu_and(self.dbin, 0xffffu16);
             self.dcr = ((self.da[rx]) as u8);
             self.base_ssw = SSW_DATA | SSW_R;
-            self.edb = bus.read_data(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 4;
             return;
         }
@@ -3181,8 +3054,7 @@ impl M68000 {
             self.alu_rol(self.aluo);
             self.sr_nzvc();
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 6;
             return;
         }
@@ -3201,8 +3073,7 @@ impl M68000 {
             self.dbout = self.aluo;
             self.au = self.pc.wrapping_add(2);
             self.base_ssw = SSW_DATA;
-            bus.write_data(self.aob & !1u32, self.dbout);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 8;
             return;
         }
@@ -3241,8 +3112,7 @@ impl M68000 {
             1 => {
                 self.au = M68000::ext32(((self.da[self.map_sp((self.irc >> 12) as usize)]) as u16)).wrapping_add(self.au);
                 self.base_ssw = SSW_PROGRAM | SSW_R;
-                self.edb = bus.read_program(self.aob & !1u32);
-                self.icount -= 4;
+                self.pin_state.pending_byte = false;
                 self.inst_substate = 2;
                 return;
             }
@@ -3268,8 +3138,7 @@ impl M68000 {
             1 => {
                 self.au = self.da[self.map_sp((self.irc >> 12) as usize)].wrapping_add(self.au);
                 self.base_ssw = SSW_PROGRAM | SSW_R;
-                self.edb = bus.read_program(self.aob & !1u32);
-                self.icount -= 4;
+                self.pin_state.pending_byte = false;
                 self.inst_substate = 10;
                 return;
             }
@@ -3299,8 +3168,7 @@ impl M68000 {
                 self.alu_and(self.dbin, 0xffffu16);
                 self.dcr = ((self.da[rx]) as u8);
                 self.base_ssw = SSW_DATA | SSW_R;
-                self.edb = bus.read_data(self.aob & !1u32);
-                self.icount -= 4;
+                self.pin_state.pending_byte = false;
                 self.inst_substate = 4;
                 return;
             }
@@ -3326,8 +3194,7 @@ impl M68000 {
             self.alu_rol(self.aluo);
             self.sr_nzvc();
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 6;
             return;
         }
@@ -3346,8 +3213,7 @@ impl M68000 {
             self.dbout = self.aluo;
             self.au = self.pc.wrapping_add(2);
             self.base_ssw = SSW_DATA;
-            bus.write_data(self.aob & !1u32, self.dbout);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 8;
             return;
         }
@@ -3376,8 +3242,7 @@ impl M68000 {
             1 => {
                 self.au = self.da[self.map_sp((self.irc >> 12) as usize)].wrapping_add(self.au);
                 self.base_ssw = SSW_PROGRAM | SSW_R;
-                self.edb = bus.read_program(self.aob & !1u32);
-                self.icount -= 4;
+                self.pin_state.pending_byte = false;
                 self.inst_substate = 10;
                 return;
             }
@@ -3401,8 +3266,7 @@ impl M68000 {
                 self.alu_and(self.dbin, 0xffffu16);
                 self.dcr = ((self.da[rx]) as u8);
                 self.base_ssw = SSW_DATA | SSW_R;
-                self.edb = bus.read_data(self.aob & !1u32);
-                self.icount -= 4;
+                self.pin_state.pending_byte = false;
                 self.inst_substate = 4;
                 return;
             }
@@ -3424,8 +3288,7 @@ impl M68000 {
             self.at = M68000::ext32(self.dbin);
             self.au = M68000::ext32(self.dbin);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 2;
             return;
         }
@@ -3442,8 +3305,7 @@ impl M68000 {
             self.au = self.pc.wrapping_add(2);
             self.alu_and(self.dbin, 0xffffu16);
             self.base_ssw = SSW_DATA | SSW_R;
-            self.edb = bus.read_data(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 4;
             return;
         }
@@ -3465,8 +3327,7 @@ impl M68000 {
             self.alu_rol(self.aluo);
             self.sr_nzvc();
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 6;
             return;
         }
@@ -3485,8 +3346,7 @@ impl M68000 {
             self.dbout = self.aluo;
             self.au = self.pc.wrapping_add(2);
             self.base_ssw = SSW_DATA;
-            bus.write_data(self.aob & !1u32, self.dbout);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 8;
             return;
         }
@@ -3515,8 +3375,7 @@ impl M68000 {
             { let v = self.dbin; M68000::set_16h(&mut self.at, v); }
             self.au = self.au.wrapping_add(2);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 2;
             return;
         }
@@ -3534,8 +3393,7 @@ impl M68000 {
             { let v = self.dbin; M68000::set_16l_32(&mut self.at, v); }
             self.au = M68000::merge_16_32(M68000::high16(self.at), self.dbin);
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 4;
             return;
         }
@@ -3552,8 +3410,7 @@ impl M68000 {
             self.au = self.pc.wrapping_add(2);
             self.alu_and(self.dbin, 0xffffu16);
             self.base_ssw = SSW_DATA | SSW_R;
-            self.edb = bus.read_data(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 6;
             return;
         }
@@ -3575,8 +3432,7 @@ impl M68000 {
             self.alu_rol(self.aluo);
             self.sr_nzvc();
             self.base_ssw = SSW_PROGRAM | SSW_R;
-            self.edb = bus.read_program(self.aob & !1u32);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 8;
             return;
         }
@@ -3595,8 +3451,7 @@ impl M68000 {
             self.dbout = self.aluo;
             self.au = self.pc.wrapping_add(2);
             self.base_ssw = SSW_DATA;
-            bus.write_data(self.aob & !1u32, self.dbout);
-            self.icount -= 4;
+            self.pin_state.pending_byte = false;
             self.inst_substate = 10;
             return;
         }

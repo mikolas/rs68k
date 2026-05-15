@@ -77,38 +77,100 @@ fn clone_cpu(cpu: &M68000) -> M68000 {
     c
 }
 
-/// Run a partial handler to completion (keep calling until inst_substate == 0 and
-/// the handler has returned after setting inst_state).
+/// Run a partial handler to completion via pin-level adapter.
+/// Simulates instant DTACK: when handler suspends with a bus request,
+/// perform the access externally, fill edb, charge icount, then resume.
 fn execute_one_partial(cpu: &mut M68000, bus: &mut impl Bus) -> u32 {
     let before = cpu.icount;
     cpu.ipc = cpu.pc.wrapping_sub(2);
     cpu.irdi = cpu.ird;
-    // Run partial handler segments until instruction completes
     let initial_state = cpu.inst_state;
+
     loop {
+        let icount_before = cpu.icount;
         cpu.dispatch_partial(bus);
-        // Instruction is done when inst_substate returns to 0 AND inst_state changed
-        // (or we're in an exception state)
-        if cpu.inst_substate == 0 {
+
+        // If inst_substate != 0, handler suspended for a bus access
+        if cpu.inst_substate != 0 {
+            // Perform the bus access externally based on aob, base_ssw, dbout
+            let is_read = cpu.base_ssw & SSW_R != 0;
+            let is_byte = cpu.pin_state.pending_byte;
+            let space = cpu.base_ssw & 3; // 1=program, 2=data, 3=cpu
+
+            if is_read {
+                if space == 3 {
+                    // CPU space (interrupt ack)
+                    cpu.edb = bus.read_cpu(cpu.aob);
+                } else if is_byte {
+                    // Byte read: read word, pin state machine would put full word on bus
+                    let space_read = if space == 2 {
+                        bus.read_program(cpu.aob & !1u32)
+                    } else {
+                        bus.read_data(cpu.aob & !1u32)
+                    };
+                    cpu.edb = space_read;
+                    // Note: byte shift happens in resume segment, not here
+                } else {
+                    // Word read
+                    cpu.edb = if space == 2 {
+                        bus.read_program(cpu.aob & !1u32)
+                    } else {
+                        bus.read_data(cpu.aob & !1u32)
+                    };
+                }
+            } else {
+                // Write
+                if is_byte {
+                    if cpu.aob & 1 != 0 {
+                        bus.write_data_byte(cpu.aob, cpu.dbout as u8);
+                    } else {
+                        bus.write_data_byte(cpu.aob, (cpu.dbout >> 8) as u8);
+                    }
+                } else {
+                    bus.write_data(cpu.aob & !1u32, cpu.dbout);
+                }
+            }
+            // Charge bus cycle cost
+            cpu.icount -= 4;
+        } else {
+            // inst_substate == 0: instruction (or exception handler) completed
             break;
         }
     }
-    // Handle exception states (same as execute_one)
+
+    // Handle exception states
     let trace_is_next = initial_state >= 10;
     loop {
         match cpu.inst_state {
             S_DOUBLE_FAULT => break,
             S_TRACE if trace_is_next => break,
-            S_TRACE => {
+            S_TRACE | S_RESET | S_BUS_ERROR | S_ADDRESS_ERROR | S_INTERRUPT | S_PRIVILEGE => {
                 loop {
                     cpu.dispatch_partial(bus);
-                    if cpu.inst_substate == 0 { break; }
-                }
-            }
-            S_RESET | S_BUS_ERROR | S_ADDRESS_ERROR | S_INTERRUPT | S_PRIVILEGE => {
-                loop {
-                    cpu.dispatch_partial(bus);
-                    if cpu.inst_substate == 0 { break; }
+                    if cpu.inst_substate != 0 {
+                        let is_read = cpu.base_ssw & SSW_R != 0;
+                        let is_byte = cpu.pin_state.pending_byte;
+                        let space = cpu.base_ssw & 3;
+                        if is_read {
+                            if space == 3 {
+                                cpu.edb = bus.read_cpu(cpu.aob);
+                            } else if is_byte {
+                                cpu.edb = if space == 2 { bus.read_program(cpu.aob & !1u32) } else { bus.read_data(cpu.aob & !1u32) };
+                            } else {
+                                cpu.edb = if space == 2 { bus.read_program(cpu.aob & !1u32) } else { bus.read_data(cpu.aob & !1u32) };
+                            }
+                        } else {
+                            if is_byte {
+                                if cpu.aob & 1 != 0 { bus.write_data_byte(cpu.aob, cpu.dbout as u8); }
+                                else { bus.write_data_byte(cpu.aob, (cpu.dbout >> 8) as u8); }
+                            } else {
+                                bus.write_data(cpu.aob & !1u32, cpu.dbout);
+                            }
+                        }
+                        cpu.icount -= 4;
+                    } else {
+                        break;
+                    }
                 }
             }
             _ => break,
@@ -222,3 +284,156 @@ fn partial_bra() {
     // BRA.b +2: 6002
     run_test(0x6002, 0x4e71, &[(0x1004, 0x4e71), (0x1006, 0x4e71)], "BRA.b +2");
 }
+
+// ─── SST-based partial vs full comparison ─────────────────────────────────────
+
+fn run_sst_partial_vs_full(filename: &str) {
+    use std::collections::HashMap;
+
+    let path = format!("external/SingleStepTests/v1/{}.json.bin", filename);
+    let data = match std::fs::read(&path) {
+        Ok(d) => d,
+        Err(_) => { eprintln!("Skipping {}: file not found", filename); return; }
+    };
+
+    let mut ptr = 0;
+    let magic = u32::from_le_bytes(data[ptr..ptr+4].try_into().unwrap()); ptr += 4;
+    assert_eq!(magic, 0x1A3F5D71);
+    let num_tests = u32::from_le_bytes(data[ptr..ptr+4].try_into().unwrap()) as usize; ptr += 4;
+
+    let limit = std::env::var("SST_LIMIT").ok().and_then(|v| v.parse().ok()).unwrap_or(500usize);
+    let total = num_tests.min(limit);
+    let mut pass = 0usize;
+    let mut fail = 0usize;
+    let mut fail_msgs: Vec<String> = Vec::new();
+
+    for _ in 0..total {
+        // Parse test case (minimal parser)
+        let (cpu_state, mem_data, tc_end) = parse_sst_test(&data, ptr);
+        ptr = tc_end;
+
+        // Setup memory
+        let mut mem = TestMemory::new();
+        for &(addr, val) in &mem_data {
+            mem.data.insert(addr, val);
+        }
+
+        // Run full handler
+        let mut full_cpu = clone_cpu(&cpu_state);
+        let mut full_mem = mem.clone_mem();
+        let full_cycles = full_cpu.execute_one(&mut full_mem);
+
+        // Run partial handler (pin-level adapter)
+        let mut part_cpu = clone_cpu(&cpu_state);
+        let mut part_mem = mem.clone_mem();
+        let part_cycles = execute_one_partial(&mut part_cpu, &mut part_mem);
+
+        // Compare
+        let mut ok = true;
+        if full_cycles != part_cycles {
+            ok = false;
+            if fail_msgs.len() < 10 {
+                fail_msgs.push(format!("cycles: full={} partial={}", full_cycles, part_cycles));
+            }
+        }
+        // Compare key registers
+        for i in 0..17 {
+            if full_cpu.da[i] != part_cpu.da[i] {
+                ok = false;
+                if fail_msgs.len() < 10 {
+                    fail_msgs.push(format!("da[{}]: full={:08x} partial={:08x}", i, full_cpu.da[i], part_cpu.da[i]));
+                }
+            }
+        }
+        if full_cpu.sr != part_cpu.sr { ok = false; if fail_msgs.len() < 10 { fail_msgs.push(format!("sr: full={:04x} partial={:04x}", full_cpu.sr, part_cpu.sr)); } }
+        if full_cpu.au != part_cpu.au { ok = false; if fail_msgs.len() < 10 { fail_msgs.push(format!("au: full={:08x} partial={:08x}", full_cpu.au, part_cpu.au)); } }
+        if full_cpu.inst_state != part_cpu.inst_state { ok = false; if fail_msgs.len() < 10 { fail_msgs.push(format!("inst_state: full={} partial={}", full_cpu.inst_state, part_cpu.inst_state)); } }
+        if full_cpu.irc != part_cpu.irc { ok = false; if fail_msgs.len() < 10 { fail_msgs.push(format!("irc: full={:04x} partial={:04x}", full_cpu.irc, part_cpu.irc)); } }
+
+        if ok { pass += 1; } else { fail += 1; }
+    }
+
+    if fail > 0 {
+        eprintln!("\n=== {} PARTIAL FAILED: {}/{} passed ===", filename, pass, total);
+        for msg in &fail_msgs { eprintln!("  {}", msg); }
+        panic!("{}: {}/{} tests failed", filename, fail, total);
+    } else {
+        eprintln!("{}: partial {}/{} passed", filename, pass, total);
+    }
+}
+
+fn parse_sst_test(data: &[u8], mut ptr: usize) -> (M68000, Vec<(u32, u8)>, usize) {
+    // Skip test envelope
+    let _numbytes = u32::from_le_bytes(data[ptr..ptr+4].try_into().unwrap()); ptr += 4;
+    let magic = u32::from_le_bytes(data[ptr..ptr+4].try_into().unwrap()); ptr += 4;
+    assert_eq!(magic, 0xABC12367);
+
+    // Skip name
+    let _nb = u32::from_le_bytes(data[ptr..ptr+4].try_into().unwrap()); ptr += 4;
+    let _mg = u32::from_le_bytes(data[ptr..ptr+4].try_into().unwrap()); ptr += 4;
+    let strlen = u32::from_le_bytes(data[ptr..ptr+4].try_into().unwrap()) as usize; ptr += 4;
+    ptr += strlen;
+
+    // Read initial state
+    let _nb = u32::from_le_bytes(data[ptr..ptr+4].try_into().unwrap()); ptr += 4;
+    let _mg = u32::from_le_bytes(data[ptr..ptr+4].try_into().unwrap()); ptr += 4;
+
+    let mut d = [0u32; 8];
+    for i in 0..8 { d[i] = u32::from_le_bytes(data[ptr..ptr+4].try_into().unwrap()); ptr += 4; }
+    let mut a = [0u32; 7];
+    for i in 0..7 { a[i] = u32::from_le_bytes(data[ptr..ptr+4].try_into().unwrap()); ptr += 4; }
+    let usp = u32::from_le_bytes(data[ptr..ptr+4].try_into().unwrap()); ptr += 4;
+    let ssp = u32::from_le_bytes(data[ptr..ptr+4].try_into().unwrap()); ptr += 4;
+    let sr = u32::from_le_bytes(data[ptr..ptr+4].try_into().unwrap()) as u16; ptr += 4;
+    let pc = u32::from_le_bytes(data[ptr..ptr+4].try_into().unwrap()); ptr += 4;
+    let pf0 = u32::from_le_bytes(data[ptr..ptr+4].try_into().unwrap()) as u16; ptr += 4;
+    let pf1 = u32::from_le_bytes(data[ptr..ptr+4].try_into().unwrap()) as u16; ptr += 4;
+
+    let num_rams = u32::from_le_bytes(data[ptr..ptr+4].try_into().unwrap()) as usize; ptr += 4;
+    let mut ram = Vec::with_capacity(num_rams * 2);
+    for _ in 0..num_rams {
+        let addr = u32::from_le_bytes(data[ptr..ptr+4].try_into().unwrap()); ptr += 4;
+        let word = u16::from_le_bytes(data[ptr..ptr+2].try_into().unwrap()); ptr += 2;
+        ram.push((addr, (word >> 8) as u8));
+        ram.push((addr | 1, (word & 0xFF) as u8));
+    }
+
+    // Setup CPU
+    let mut cpu = M68000::new();
+    for i in 0..8 { cpu.da[i] = d[i]; }
+    for i in 0..7 { cpu.da[8 + i] = a[i]; }
+    cpu.da[15] = usp;
+    cpu.da[16] = ssp;
+    cpu.sr = sr;
+    cpu.isr = sr & 0x1f;
+    cpu.sp = if sr & SR_S != 0 { 16 } else { 15 };
+    cpu.ir = pf0;
+    cpu.ird = pf0;
+    cpu.irc = pf1;
+    cpu.dbin = pf1;
+    cpu.au = pc;
+    cpu.pc = pc.wrapping_sub(2);
+    cpu.set_ftu_const();
+    cpu.inst_state = cpu.decode_table[pf0 as usize];
+    cpu.icount = 10000;
+
+    // Skip final state
+    let nb = u32::from_le_bytes(data[ptr..ptr+4].try_into().unwrap()) as usize; ptr += 4;
+    ptr += nb - 4; // skip the rest of final state block
+
+    // Skip transactions
+    let nb = u32::from_le_bytes(data[ptr..ptr+4].try_into().unwrap()) as usize; ptr += 4;
+    ptr += nb - 4;
+
+    (cpu, ram, ptr)
+}
+
+#[test] fn partial_sst_nop() { run_sst_partial_vs_full("NOP"); }
+#[test] fn partial_sst_move_q() { run_sst_partial_vs_full("MOVE.q"); }
+#[test] fn partial_sst_add_b() { run_sst_partial_vs_full("ADD.b"); }
+#[test] fn partial_sst_move_b() { run_sst_partial_vs_full("MOVE.b"); }
+#[test] fn partial_sst_move_w() { run_sst_partial_vs_full("MOVE.w"); }
+#[test] fn partial_sst_move_l() { run_sst_partial_vs_full("MOVE.l"); }
+#[test] fn partial_sst_lea() { run_sst_partial_vs_full("LEA"); }
+#[test] fn partial_sst_exg() { run_sst_partial_vs_full("EXG"); }
+#[test] fn partial_sst_swap() { run_sst_partial_vs_full("SWAP"); }

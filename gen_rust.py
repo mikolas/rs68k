@@ -2632,12 +2632,13 @@ def generate_rust_partial_source_from_code(code):
 
 
 def emit_bus_end_partial(ci):
-    """Emit Rust for a bus_end in partial mode: perform access, set substate, return."""
+    """Emit Rust for a bus_end in pin-level partial mode: set up bus request, suspend.
+    No bus access call — the pin state machine performs the actual access."""
     # ci = ["bus_end", bid, space, is_byte, is_write, no_hi, no_lo, group01, is_rmc, critical, sr_update]
     lines = []
     bid = ci[1]
 
-    # SSW setup
+    # SSW setup (tells pin state machine: space, direction, flags)
     ssw = "self.base_ssw = "
     ssw += ["SSW_PROGRAM", "SSW_DATA", "SSW_CPU"][ci[2]]
     if not ci[4]:
@@ -2653,57 +2654,42 @@ def emit_bus_end_partial(ci):
     if is_interrupt_vector_lookup:
         lines.append("self.start_interrupt_vector_lookup();")
 
-    # Bus access
-    if ci[4]:
-        if ci[3]:
-            lines.append("if self.aob & 1 != 0 { bus.write_data_byte(self.aob, self.dbout as u8); }")
-            lines.append("else { bus.write_data_byte(self.aob, (self.dbout >> 8) as u8); }")
-        else:
-            lines.append("bus.write_data(self.aob & !1u32, self.dbout);")
+    # Signal byte access to pin state machine
+    if ci[3]:
+        lines.append("self.pin_state.pending_byte = true;")
     else:
-        if ci[2] == 2:
-            lines.append("self.edb = bus.read_cpu(self.aob);")
-        elif ci[3]:
-            space_fn = "bus.read_program" if ci[2] == 0 else "bus.read_data"
-            lines.append("self.edb = %s(self.aob & !1u32);" % space_fn)
-            lines.append("if self.aob & 1 == 0 { self.edb >>= 8; }")
-        else:
-            space_fn = "bus.read_program" if ci[2] == 0 else "bus.read_data"
-            lines.append("self.edb = %s(self.aob & !1u32);" % space_fn)
+        lines.append("self.pin_state.pending_byte = false;")
 
-    lines.append("self.icount -= 4;")
-
-    # SR update (RTE)
-    if ci[10]:
-        lines.append("self.sr = self.new_sr;")
-        lines.append("self.update_user_super();")
-        lines.append("self.update_interrupt();")
-
-    if is_interrupt_vector_lookup:
-        lines.append("self.end_interrupt_vector_lookup();")
-
-    # Suspend: set substate to resume point and return
+    # Suspend: pin state machine will read aob, base_ssw, dbout and drive the bus
     lines.append("self.inst_substate = %d;" % (bid + 1))
     lines.append("return;")
-
-    # The address error check will be the FIRST thing in the next segment (bid+1)
-    # We need to emit it there. But wait — we handle it in the next segment's start.
-    # Actually no — we need to add the address error check to the START of the next segment.
-    # This is handled by the caller: the next segment starts with the post-bus code.
-    # But the address error check is part of the bus_end logic...
-    # Let me reconsider: in the full handler, emit_bus_end emits the address error check
-    # AFTER the bus access. In partial mode, the address error check must be at the
-    # START of the resume segment (bid+1).
 
     return lines
 
 
 def emit_bus_end_resume(ci):
-    """Emit the post-bus-access code that starts a resume segment."""
-    # This is the address error check + any sr_update that wasn't already done
+    """Emit the post-bus-access code that starts a resume segment.
+    Called after the pin state machine has completed the bus cycle and filled edb."""
+    # ci = ["bus_end", bid, space, is_byte, is_write, no_hi, no_lo, group01, is_rmc, critical, sr_update]
     lines = []
 
-    # Address error check AFTER bus access (at resume point)
+    # Byte read: shift edb to extract the correct byte
+    # (pin state machine latched the full word; we need the addressed byte)
+    if not ci[4] and ci[3] and ci[2] != 2:
+        lines.append("if self.aob & 1 == 0 { self.edb >>= 8; }")
+
+    # SR update (RTE) — must happen after bus cycle completes
+    if ci[10]:
+        lines.append("self.sr = self.new_sr;")
+        lines.append("self.update_user_super();")
+        lines.append("self.update_interrupt();")
+
+    # End interrupt vector lookup — after data latched from CPU space
+    is_interrupt_vector_lookup = not ci[4] and ci[2] == 2
+    if is_interrupt_vector_lookup:
+        lines.append("self.end_interrupt_vector_lookup();")
+
+    # Address error check AFTER bus access
     if not ci[3] and ci[2] != 2:
         fault = "S_DOUBLE_FAULT" if ci[8] else "S_ADDRESS_ERROR"
         lines.append("if self.aob & 1 != 0 {")
