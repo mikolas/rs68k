@@ -1,314 +1,176 @@
-# Bus Interface Specification
+# Bus Interface Specification (Final)
 
-## Design Principles
+## Design
 
-1. The execution core (`dispatch`, handlers, ALU) remains untouched
-2. All bus interaction happens through a single trait
-3. The trait models the real 68000 bus signals, not abstract memory operations
-4. The caller (emulator) controls timing — the CPU never blocks
+We provide a complete 68000 with all pins modeled. One method advances the CPU by one
+CLK period. The emulator wires it up however it wants.
 
-## Real 68000 Bus Signals
-
-### Outputs (CPU → System)
-| Signal | Width | Description |
-|--------|-------|-------------|
-| A1-A23 | 23 bits | Address bus (A0 encoded in UDS/LDS) |
-| D0-D15 | 16 bits | Data bus (bidirectional) |
-| FC0-FC2 | 3 bits | Function code (space + supervisor) |
-| AS | 1 | Address strobe (bus cycle active) |
-| UDS | 1 | Upper data strobe (even byte) |
-| LDS | 1 | Lower data strobe (odd byte) |
-| R/W | 1 | Read (1) / Write (0) |
-
-### Inputs (System → CPU)
-| Signal | Width | Description |
-|--------|-------|-------------|
-| D0-D15 | 16 bits | Data bus (read data) |
-| DTACK | 1 | Data transfer acknowledge (cycle complete) |
-| BERR | 1 | Bus error |
-| IPL0-IPL2 | 3 bits | Interrupt priority level |
-| BR | 1 | Bus request (DMA wants bus) |
-| BGACK | 1 | Bus grant acknowledge (DMA has bus) |
-| VPA | 1 | Valid peripheral address (autovector) |
-| HALT | 1 | Halt |
-| RESET | 1 | Reset input |
-
-## Proposed Rust Interface
+## Interface
 
 ```rust
-/// Bus cycle request from CPU
-pub struct BusCycle {
-    pub addr: u32,       // A1-A23 (bit 0 = 0 for word, encodes byte lane)
-    pub fc: u8,          // FC0-FC2 (1=user data, 2=user program, 5=super data, 6=super program, 7=cpu/interrupt ack)
-    pub rw: bool,        // true = read, false = write
-    pub uds: bool,       // upper data strobe
-    pub lds: bool,       // lower data strobe
-    pub data: u16,       // write data (only valid when rw=false)
+/// CPU output pins — updated after each clock()
+pub struct Pins68k {
+    // Address/data bus
+    pub addr: u32,      // A1-A23 (active when as_n=false)
+    pub data_out: u16,  // D0-D15 output (active during write, when as_n=false and rw=false)
+    pub fc: u8,         // FC0-FC2 (function code)
+
+    // Bus control (active low)
+    pub as_n: bool,     // Address strobe
+    pub uds_n: bool,    // Upper data strobe (even byte, active low)
+    pub lds_n: bool,    // Lower data strobe (odd byte, active low)
+    pub rw: bool,       // Read=true, Write=false
+
+    // Bus arbitration
+    pub bg_n: bool,     // Bus grant (active low)
+
+    // Peripheral control
+    pub e: bool,        // E clock output (CLK÷10, 6-high/4-low)
+    pub vma_n: bool,    // Valid memory address (response to VPA, active low)
 }
 
-/// Bus cycle response from system
-pub struct BusResponse {
-    pub data: u16,       // read data (only valid when rw=true)
-    pub dtack: bool,     // cycle acknowledged (false = insert wait state)
-    pub berr: bool,      // bus error
-}
+/// CPU input pins — provided by the system each clock()
+pub struct Inputs68k {
+    // Data bus
+    pub data_in: u16,   // D0-D15 input (active during read)
 
-/// System state inputs (active between bus cycles)
-pub struct BusInputs {
-    pub ipl: u8,         // interrupt priority level (0-7, active low inverted)
-    pub br: bool,        // bus request
-    pub halt: bool,      // halt
-    pub reset: bool,     // reset
-}
+    // Bus control (active low)
+    pub dtack_n: bool,  // Data transfer acknowledge
+    pub berr_n: bool,   // Bus error
+    pub vpa_n: bool,    // Valid peripheral address (triggers E-clock sync)
 
-/// The bus trait — one method per bus cycle, one for between-cycle state
-pub trait Bus68k {
-    /// Execute a bus cycle. Called once per 4-clock bus cycle.
-    /// Returns response. If dtack=false, CPU calls again next cycle (wait state).
-    fn cycle(&mut self, cycle: &BusCycle) -> BusResponse;
+    // Interrupts (active low, accent: active low encoding means 7=no irq, 1=highest)
+    pub ipl0_n: bool,   // Interrupt priority level bit 0
+    pub ipl1_n: bool,   // Interrupt priority level bit 1
+    pub ipl2_n: bool,   // Interrupt priority level bit 2
 
-    /// Query system inputs (called between bus cycles / during internal cycles).
-    /// Used for interrupt level, bus request, halt.
-    fn inputs(&self) -> BusInputs;
-}
-```
+    // Bus arbitration (active low)
+    pub br_n: bool,     // Bus request
+    pub bgack_n: bool,  // Bus grant acknowledge
 
-## Execution Model
-
-```rust
-impl M68000 {
-    /// Run one bus cycle (4 clocks). Returns number of clocks consumed (always 4).
-    /// The emulator calls this at the 68000 clock rate.
-    /// Between calls, the emulator advances other hardware (DMA, video, etc).
-    pub fn tick(&mut self, bus: &mut impl Bus68k) -> u32;
-
-    /// Run until N clocks consumed. For batch execution when no events pending.
-    pub fn run(&mut self, bus: &mut impl Bus68k, clocks: u32) -> u32;
-}
-```
-
-## How It Maps to Current Code
-
-The current `execute_one` does multiple bus accesses internally (each handler calls
-`bus.read_program()` etc. multiple times). To support the cycle-level interface:
-
-**Option A: Wrapper adapter** (non-intrusive)
-```rust
-/// Adapts Bus68k to the current Bus trait for the execution core
-struct BusAdapter<'a, B: Bus68k> {
-    bus: &'a mut B,
-    fc: u8,
-}
-
-impl<B: Bus68k> Bus for BusAdapter<'_, B> {
-    fn read_program(&mut self, addr: u32) -> u16 {
-        let cycle = BusCycle { addr, fc: self.fc, rw: true, uds: true, lds: true, data: 0 };
-        self.bus.cycle(&cycle).data
-    }
-    // ... etc
-}
-```
-
-The CPU sets `self.fc` before each bus access (already does via `base_ssw`).
-The adapter translates between the abstract Bus trait and the signal-level Bus68k.
-
-**Option B: DMA integration**
-
-For DMA cycle stealing, the emulator doesn't call `execute_one` during DMA slots.
-The CPU is effectively frozen. This matches real hardware where BR/BG handshake
-pauses the CPU between bus cycles.
-
-For the Amiga specifically:
-- Each 68000 clock = 1 CCK (color clock) / 2
-- DMA slots are allocated per scan line
-- CPU gets remaining slots
-- The emulator schedules: `if cpu_slot { cpu.tick(bus); } else { dma_access(); }`
-
-## Wait States
-
-If `BusResponse.dtack = false`, the CPU inserts a wait state (2 extra clocks).
-In the adapter, this means calling `bus.cycle()` again until dtack is asserted.
-The Amiga has no wait states for normal memory, but CIA access uses VPA
-(which adds ~6 cycles for synchronization).
-
-## Interrupt Handling
-
-The emulator updates `bus.inputs().ipl` whenever interrupt lines change.
-The CPU checks IPL at instruction boundaries (already implemented via
-`update_interrupt` / `int_next_state`). The adapter calls `bus.inputs()`
-and feeds IPL to `cpu.set_irq()` at appropriate times.
-
-## Summary
-
-The current `Bus` trait stays as the internal interface for the execution core.
-A new `Bus68k` trait provides the signal-level interface for emulator integration.
-An adapter bridges them. The execution core is never modified.
-
-```
-Emulator ←→ Bus68k trait ←→ BusAdapter ←→ Bus trait ←→ M68000 execution core
-```
-
-## Clock Architecture
-
-### 68000 Clock Structure
-
-The 68000 uses a single clock input (CLK) that is internally divided:
-
-```
-CLK:  ‾‾‾‾\____/‾‾‾‾\____/‾‾‾‾\____/‾‾‾‾\____/
-       S0    S1    S2    S3    S4    S5    S6    S7
-      |<-------- one bus cycle (4 clocks) -------->|
-      |<- internal ->|<- bus access ->|<- latch ->|
-```
-
-- **1 clock** = 1 period of CLK input (140.8 ns at 7.09 MHz for NTSC Amiga)
-- **1 bus cycle** = 4 clocks minimum (S0-S7, 8 states, 2 per clock)
-- **1 internal cycle** = 2 clocks (used for ALU operations without bus access)
-
-### Amiga Clock Relationships
-
-```
-28.37516 MHz   Master oscillator (NTSC) / 28.37516 MHz (PAL: 28.375156)
-    ÷ 4
- 7.09379 MHz   68000 CLK (CPU clock)
-    ÷ 2
- 3.54689 MHz   CCK (Color Clock) = 1 low-res pixel clock
-    × 2
- 7.09379 MHz   CDAC (Chip RAM DMA clock) = same as CPU clock
-```
-
-Key relationship: **1 CPU clock = 1 CDAC cycle = 2 CCK half-cycles**
-
-The Amiga interleaves CPU and DMA on alternating CDAC cycles:
-- Even CDAC: DMA access (if scheduled) or CPU access
-- Odd CDAC: CPU access (always available)
-
-### What the Emulator Must Provide
-
-The emulator drives the CPU at the **bus cycle** level (4 clocks per call):
-
-```rust
-/// The emulator's main loop (simplified)
-fn run_scanline(cpu: &mut M68000, bus: &mut AmigaBus) {
-    // 227.5 CCK per NTSC scanline = 455 CDAC cycles = 455 CPU clocks
-    // = ~113.75 bus cycles per scanline (mix of 4-clock and 2-clock steps)
-    
-    let mut clocks_remaining = 455; // clocks per scanline
-    
-    while clocks_remaining > 0 {
-        // Check if this slot is stolen by DMA
-        if bus.dma_active_this_slot() {
-            bus.do_dma_access();
-            clocks_remaining -= 2; // DMA takes 1 CDAC = 2 clocks
-        } else {
-            // CPU gets this slot
-            let used = cpu.tick(bus); // returns 2 or 4 clocks
-            clocks_remaining -= used;
-        }
-        
-        // Advance other hardware (copper, blitter state machines, audio, etc.)
-        bus.advance_hardware(2); // advance by 1 CDAC
-    }
-}
-```
-
-### CPU Timing Granularity
-
-The CPU consumes time in two units:
-- **4 clocks**: bus access (read or write)
-- **2 clocks**: internal operation (ALU, register transfer)
-
-The `icount` field tracks this: each `icount -= 4` = bus access, each `icount -= 2` = internal.
-
-For cycle-exact Amiga emulation, the emulator needs to know WHEN each bus access happens
-(not just how many total clocks an instruction takes). This is why the `Bus68k::cycle()` 
-interface is called once per bus access — the emulator can interleave DMA between CPU bus cycles.
-
-### Required Emulator Clock Signals
-
-| Signal | Source | Rate | Purpose |
-|--------|--------|------|---------|
-| Master clock | Emulator | 28.375 MHz | Derives all other clocks |
-| CPU clock (CLK) | ÷4 from master | 7.09 MHz | Drives CPU `tick()` calls |
-| E clock | CPU output, ÷10 from CLK | 709 kHz | Peripheral sync (CIA) |
-| CCK | ÷8 from master | 3.55 MHz | Color clock, DMA scheduling |
-| CDAC | ÷4 from master | 7.09 MHz | Chip RAM access timing |
-| Horizontal sync | Every 227.5 CCK | 15.6 kHz | Scanline boundary |
-| Vertical sync | Every 262/312 lines | 59.94/50 Hz | Frame boundary |
-
-### E Clock (Enable)
-
-The 68000 generates the E clock internally by dividing CLK by 10. It's a free-running
-output with a 6-high/4-low duty cycle:
-
-```
-CLK: _/‾\_/‾\_/‾\_/‾\_/‾\_/‾\_/‾\_/‾\_/‾\_/‾\_/‾\_/‾\_/‾\_/‾\_/‾\_/‾\_/‾\_/‾\_/‾\_/‾\
-E:   ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾\________________________________________/‾‾‾‾‾‾‾‾‾‾‾‾
-     |<------------ 6 clocks high ----------->|<---- 4 clocks low ---->|
-     |<----------------------- 10 clocks = 1 E cycle ----------------->|
-```
-
-**Purpose:** Synchronizes 6800-family peripherals (CIAs on the Amiga). When VPA is
-asserted during an interrupt acknowledge, the CPU synchronizes the bus cycle to E clock
-edges, adding wait states until aligned. This is why CIA access takes ~12-16 cycles
-instead of the normal 4.
-
-**Implementation:** The CPU must track E clock phase internally (a counter mod 10).
-When VPA is asserted (CIA access or autovectored interrupt), the bus cycle is stretched
-to align with E clock edges.
-
-```rust
-pub struct M68000 {
-    // ... existing fields ...
-    
-    /// E clock counter (0-9), increments each CPU clock
-    pub e_clock: u8,
+    // System control (active low)
+    pub halt_n: bool,   // Halt
+    pub reset_n: bool,  // Reset
 }
 
 impl M68000 {
-    /// Returns true if E clock output is high (first 6 of 10 clocks)
-    pub fn e_high(&self) -> bool {
-        self.e_clock < 6
-    }
-    
-    /// Advance E clock by N CPU clocks
-    pub fn advance_e_clock(&mut self, clocks: u32) {
-        self.e_clock = ((self.e_clock as u32 + clocks) % 10) as u8;
-    }
+    /// Advance CPU by one CLK period. Call at 7.09 MHz (or system clock rate).
+    /// Reads inputs, updates internal state, updates output pins.
+    pub fn clock(&mut self, inputs: &Inputs68k);
+
+    /// Read current output pin state (no state change).
+    pub fn pins(&self) -> &Pins68k;
+
+    /// Convenience: run N clocks. For batch execution without per-clock interaction.
+    /// Calls clock() internally N times with the provided inputs.
+    pub fn run_clocks(&mut self, inputs: &Inputs68k, n: u32);
+
+    /// High-level: execute one instruction (existing API, for testing/fast path).
+    /// Uses the simple Bus trait internally.
+    pub fn execute_one(&mut self, bus: &mut impl Bus) -> u32;
 }
 ```
 
-The `Bus68k` response includes VPA. When VPA is asserted, the adapter inserts wait
-states until E clock alignment is achieved (the CPU waits for the falling edge of E,
-then completes the cycle on the next rising edge). This adds 0-9 extra clocks depending
-on current E phase.
+## Clock Timing
 
-In MAME, this is handled by `vpa_sync()` and `vpa_after()` which calculate the
-synchronization delay. Our implementation matches this behavior.
+Single CLK input. One `clock()` call = one CLK period = ~141 ns at 7.09 MHz.
 
-The emulator does NOT pass clock signals to the CPU. Instead, it calls `cpu.tick()` at the
-appropriate rate. The CPU is purely passive — it executes when called and returns how many
-clocks it consumed.
+Internally the CPU tracks bus cycle states (S0-S7, two per CLK period) but this is
+not exposed. External behavior is fully defined at CLK boundaries.
 
-### Execution Modes
+### Bus Cycle (minimum 4 CLK)
 
-**Mode 1: Cycle-exact (Amiga)**
-```rust
-// Call tick() for each available CPU slot (2 or 4 clocks)
-let clocks = cpu.tick(bus);
+```
+CLK:    ‾\_/‾\_/‾\_/‾\_/
+State:  S0 S1 S2 S3 S4 S5 S6 S7
+        |     |     |     |     |
+        addr  AS    data  DTACK latch
+        out   assert setup sample result
 ```
 
-**Mode 2: Batch (fast-forward, no DMA contention)**
-```rust
-// Run N clocks worth of instructions
-let actual = cpu.run(bus, 1000);
+- S0-S1: Address and FC driven
+- S2-S3: AS, UDS/LDS asserted; R/W valid
+- S4-S5: Data driven (write) or sampled (read); wait for DTACK
+- S6-S7: Data latched; AS/strobes negated
+
+If DTACK not asserted by S4: wait states inserted (S4-S5 repeated).
+
+### E Clock (generated internally)
+
+```
+CLK count:  0  1  2  3  4  5  6  7  8  9  0  1  2 ...
+E output:   H  H  H  H  H  H  L  L  L  L  H  H  H ...
 ```
 
-**Mode 3: Instruction-at-a-time (debugging)**
-```rust
-// Run exactly one instruction
-let clocks = cpu.execute_one(bus);
+Free-running, ÷10 from CLK. 6 clocks high, 4 clocks low.
+The CPU tracks this with an internal counter (0-9).
+
+When VPA is asserted during a bus cycle, the CPU synchronizes to E:
+- Waits until E falls (end of high phase)
+- Asserts VMA
+- Completes cycle when E rises again
+- Total: 4 + 0..9 extra clocks depending on E phase at VPA assertion
+
+### Internal Cycles (2 CLK)
+
+ALU operations, register transfers, and other internal processing take 2 CLK
+with no bus activity (AS stays negated).
+
+## What We Generate
+
+| Output | Description |
+|--------|-------------|
+| addr | 24-bit address (active during bus cycle) |
+| data_out | 16-bit write data |
+| fc | Function code: 1=user data, 2=user program, 5=super data, 6=super program, 7=interrupt ack |
+| as_n | Bus cycle active |
+| uds_n/lds_n | Byte lane selection |
+| rw | Direction |
+| bg_n | Bus granted to DMA |
+| e | E clock (free-running) |
+| vma_n | Peripheral cycle acknowledged |
+
+## What We Consume
+
+| Input | Description |
+|-------|-------------|
+| data_in | 16-bit read data (active when as_n=false and rw=true) |
+| dtack_n | Cycle complete (false=acknowledged) |
+| berr_n | Bus error (triggers exception) |
+| vpa_n | Peripheral address (triggers E-sync) |
+| ipl0-2_n | Interrupt level (active low, sampled at instruction boundaries) |
+| br_n | DMA requests bus |
+| bgack_n | DMA has taken bus |
+| halt_n | Freeze CPU |
+| reset_n | Reset CPU |
+
+## Implementation Layers
+
+```
+┌─────────────────────────────────────────────┐
+│  Emulator (Amiga, etc.)                     │
+│  - Calls clock() at 7.09 MHz               │
+│  - Provides inputs based on address decode  │
+│  - Reads outputs for bus monitoring         │
+└──────────────────┬──────────────────────────┘
+                   │ Pins68k / Inputs68k
+┌──────────────────▼──────────────────────────┐
+│  Pin-level interface (clock method)          │
+│  - Tracks S0-S7 bus states                  │
+│  - Generates E clock                        │
+│  - Handles VPA synchronization              │
+│  - Handles BR/BG/BGACK arbitration          │
+│  - Handles HALT/RESET                       │
+└──────────────────┬──────────────────────────┘
+                   │ Internal Bus trait
+┌──────────────────▼──────────────────────────┐
+│  Execution core (existing, unchanged)        │
+│  - dispatch() / handlers                    │
+│  - ALU, decode table                        │
+│  - icount-based cycle tracking              │
+└─────────────────────────────────────────────┘
 ```
 
-All three modes use the same execution core. The difference is how the emulator
-schedules calls and interleaves other hardware.
+The pin-level interface is a wrapper around the execution core. It translates between
+the clock-by-clock pin interface and the instruction-at-a-time execution model.
+The execution core is never modified.
