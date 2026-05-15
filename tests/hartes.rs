@@ -4,8 +4,8 @@ use std::io::Read;
 use flate2::read::GzDecoder;
 use serde::Deserialize;
 
-use rs68k_mame::cpu::M68000;
-use rs68k_mame::types::*;
+use rs68k::cpu::M68000;
+use rs68k::types::*;
 
 #[derive(Deserialize)]
 struct TestCase {

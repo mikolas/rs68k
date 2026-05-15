@@ -2,8 +2,8 @@
 //! Runs both variants on the same initial state and compares all registers/memory.
 
 use std::collections::HashMap;
-use rs68k_mame::cpu::M68000;
-use rs68k_mame::types::*;
+use rs68k::cpu::M68000;
+use rs68k::types::*;
 
 struct TestMemory {
     data: HashMap<u32, u8>,

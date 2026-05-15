@@ -1,5 +1,5 @@
 [package]
-name = "rs68k_mame"
+name = "rs68k"
 version = "0.1.0"
 edition = "2021"
 

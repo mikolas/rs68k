@@ -1,5 +1,5 @@
-use rs68k_mame::cpu::M68000;
-use rs68k_mame::types::*;
+use rs68k::cpu::M68000;
+use rs68k::types::*;
 
 #[test]
 fn test_alu_add_overflow() {
