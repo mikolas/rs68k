@@ -76,28 +76,24 @@ The "full" execution variant (`execute_one`): runs an entire instruction in one 
 Functionally correct, cycle-count accurate, but NOT clock-level steppable. This is
 equivalent to MAME's `sdf` (direct full) handlers only.
 
-### What We're Missing
+### What We Have
 
-The "partial" execution variant: can suspend and resume at each bus access point.
-This is MAME's `sdp` (direct partial) handlers. Required for:
-- Pin-level `clock()` interface (one CLK period per call)
-- Mid-instruction bus error (BERR on any access)
-- DMA cycle stealing between bus accesses within an instruction
-- True cycle-exact behavior matching real silicon
+Two execution variants, both verified:
 
-Without partial handlers, the pin-level interface (`src/pins.rs`) is structural only —
-the state machine and signal generation are implemented but cannot actually drive the
-execution core clock-by-clock.
+1. **Full handlers** (`execute_one`): runs an entire instruction in one call.
+   Functionally correct, cycle-count accurate. Equivalent to MAME's `sdf` (direct full).
+   127/127 instructions, 317,500 tests pass.
 
-### What's Needed
+2. **Pin-level partial handlers** (`dispatch_partial`): suspends at each bus access.
+   Handler sets up address/data/direction and returns. External system performs the bus
+   cycle and fills `edb`. Equivalent to MAME's `sdp` but without inline bus calls —
+   designed for true parallel clocking. 127/127 instructions verified against full handlers.
 
-Generate partial handlers from `gen_rust.py` by removing `GEN.full` flag. The generator
-already supports this (the C++ `sdp` variant uses the same IR with substate resume points
-at each bus access). In Rust, each substate becomes a `match self.inst_substate` arm.
-Same microcode, same logic, different execution model.
+### What Remains
 
-The port is complete and verified for instruction-at-a-time execution.
-It is NOT yet complete for clock-level execution.
+- Wire `clock()` / `run_core_step()` in `pins.rs` to call `dispatch_partial()` and
+  drive the S0-S7 bus state machine. This is integration work — the partial handlers
+  themselves are complete and verified.
 
 **42 instructions pass 100% (8065/8065 each):**
 NOP, MOVE.q, EXG, SWAP, EXT.w, EXT.l, ADD.b, SUB.b, AND.b, OR.b, EOR.b, CMP.b,
@@ -270,4 +266,3 @@ on every clock edge, with bus arbitration handled externally.
 
 - Wire `clock()` / `run_core_step()` in `pins.rs` to call `dispatch_partial()` and drive the S0-S7 bus state machine
 - This is integration work — the partial handlers are complete and verified
-```
