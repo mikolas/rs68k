@@ -64,39 +64,46 @@ instruction via `execute_one()`, compares all registers/flags/PC/prefetch/RAM/cy
 
 ### Current Test Results (830,695 total tests)
 
-**41 instructions pass 100% (8065/8065 each):**
+**42 instructions pass 100% (8065/8065 each):**
 NOP, MOVE.q, EXG, SWAP, EXT.w, EXT.l, ADD.b, SUB.b, AND.b, OR.b, EOR.b, CMP.b,
-NEG.b, NOT.b, CLR.b, TST.b, MOVE.b, LEA, PEA, Scc, TAS, NBCD, TRAP, UNLINK,
+NEG.b, NOT.b, CLR.b, TST.b, MOVE.b, LEA, PEA, Scc, TAS, NBCD, TRAP, TRAPV, UNLINK,
 ASL.b, ASL.l, LSL.b, LSL.l, LSR.b, LSR.l, ROL.b, ROL.l, ROR.b, ROR.l,
 ROXL.b, ROXL.l, ROXR.b, ROXR.l, ABCD, SBCD, ADDX.b, SUBX.b
 
-**Remaining failures: 262 total (0.03% of all tests)**
+**Remaining failures: 129,187 total**
 
-Breakdown by root cause:
+Non-address-error failures breakdown (189 total):
 
-| Category | Count | Status |
-|----------|-------|--------|
-| Address error frame state (PC, registers) | 90 | Known MAME-inherited, deferred |
-| ASR X/C flags (shift count > size) | 49 | MAME-inherited microcode issue |
-| DIVS/DIVU SR flags (N, Z) | 13 | Needs investigation |
-| ADDQ/SUBQ.l An timing (+2 cycles) | 8 | Needs fix |
-| CHK timing (-2 cycles) | 8 | Needs fix |
-| TRAPV exception handling | 15 | Needs fix |
-| DIVS early exit (cycle overcount) | 3 | Needs fix |
-| DBcc loop counter | 7 | Needs fix |
-| ASL.b overflow edge case | 3 | Needs fix |
-| MOVE.l V/N flags | 4 | Needs fix |
+| Category | Count | Root Cause | Status |
+|----------|-------|-----------|--------|
+| Address reg state (addr error) | 90 | Register not updated before exception | Known, deferred |
+| ASR/shift X\|C flags | 49 | Undocumented HW: inhibits X/C after `size` shifts | Deferred (complex) |
+| DIVS/DIVU N/Z flags | 20 | Flag set from wrong intermediate | Needs investigation |
+| ADDQ/SUBQ.l An timing | 8 | MAME microcode: 8 cycles vs real HW 6 | MAME-inherited |
+| CHK exception timing | 8 | Missing 2 cycles in exception path | Needs investigation |
+| Data reg wrong (DBcc, ASL.b) | 7 | DBcc: addr error state; ASL.b: overflow edge case | Mixed |
+| DIVS early exit cycles | 3 | Division loop doesn't exit early on overflow | Needs investigation |
+| MOVE.l V/N flags | 3 | Flag computation edge case | Needs investigation |
 
-### Known Limitations (MAME-inherited)
+Address-error stack frame failures (~129,000): PC and register values in the
+exception frame are wrong because the microcode advances state before the bus
+access that triggers the error. Known MAME-inherited limitation.
 
-1. **Address error stack frame PC**: 2 bytes too high. The microcode advances PC before
-   the bus access that triggers the error. The correct value depends on which microstep
-   the error occurs in (varies by addressing mode). C++ MAME has the same behavior.
-   Impact: ~1% of tests, only affects exception handler stack frame inspection.
+### Known Limitations
 
-2. **ASR X/C with count > operand size**: The microcode shift loop continues calling
-   alu_asr after all bits are shifted out. Real 68000 apparently stops propagating X/C
-   after `size` shifts. The C++ MAME code has the same behavior.
+1. **Address error stack frame** (MAME-inherited): PC in frame is 2 bytes too high.
+   Affects ~16% of all tests but only the exception frame content, not execution.
+
+2. **ASR X/C with count > operand size** (undocumented HW behavior): Real 68000
+   inhibits X/C updates after `size-1` shifts when count > size, but updates all
+   shifts when count <= size. Neither MAME nor fx68k models this. The exact rule
+   depends on a runtime comparison (count vs size) that the microcode loop doesn't
+   track. 49 test failures.
+
+3. **ADDQ/SUBQ.l An timing** (MAME-inherited): MAME's microcode produces 8 cycles
+   for these instructions, real hardware takes 6. The extra 2-cycle internal step
+   is in the microcode ROM and cannot be fixed without modifying the generator's
+   microcode interpretation. 8 test failures.
 
 ## Architecture Notes
 
