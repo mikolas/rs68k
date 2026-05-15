@@ -241,6 +241,14 @@ impl M68000 {
             self.irdi = self.ird;
         }
         self.dispatch(bus);
+        // If we transitioned to a special state (exception), keep executing
+        // until we reach a normal instruction state (>= S_ILLEGAL) or halt
+        while self.inst_state < S_ILLEGAL {
+            if self.inst_state == S_DOUBLE_FAULT {
+                break; // CPU halted
+            }
+            self.dispatch(bus);
+        }
         (before - self.icount) as u32
     }
 }
