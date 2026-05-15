@@ -70,7 +70,34 @@ This proves the port is a faithful, verified translation of MAME's m68000 microc
 
 **TomHarte/ProcessorTests (real hardware): 42/103 at 100%, remainder are known MAME inaccuracies.**
 
-The port is complete and ready for integration into an Amiga emulator.
+### What We Have
+
+The "full" execution variant (`execute_one`): runs an entire instruction in one call.
+Functionally correct, cycle-count accurate, but NOT clock-level steppable. This is
+equivalent to MAME's `sdf` (direct full) handlers only.
+
+### What We're Missing
+
+The "partial" execution variant: can suspend and resume at each bus access point.
+This is MAME's `sdp` (direct partial) handlers. Required for:
+- Pin-level `clock()` interface (one CLK period per call)
+- Mid-instruction bus error (BERR on any access)
+- DMA cycle stealing between bus accesses within an instruction
+- True cycle-exact behavior matching real silicon
+
+Without partial handlers, the pin-level interface (`src/pins.rs`) is structural only —
+the state machine and signal generation are implemented but cannot actually drive the
+execution core clock-by-clock.
+
+### What's Needed
+
+Generate partial handlers from `gen_rust.py` by removing `GEN.full` flag. The generator
+already supports this (the C++ `sdp` variant uses the same IR with substate resume points
+at each bus access). In Rust, each substate becomes a `match self.inst_substate` arm.
+Same microcode, same logic, different execution model.
+
+The port is complete and verified for instruction-at-a-time execution.
+It is NOT yet complete for clock-level execution.
 
 **42 instructions pass 100% (8065/8065 each):**
 NOP, MOVE.q, EXG, SWAP, EXT.w, EXT.l, ADD.b, SUB.b, AND.b, OR.b, EOR.b, CMP.b,
