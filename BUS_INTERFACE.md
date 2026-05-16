@@ -110,17 +110,34 @@ You respond with data and acknowledge signals. All internal complexity is hidden
 
 ### Bus Cycle Timing
 
-A minimum bus cycle takes 4 CLK periods:
+A minimum bus cycle takes 4 CLK periods. Read and write cycles differ in when
+the data strobes (UDS/LDS) are asserted — this matches real 68000 silicon.
 
+**Read cycle (4 clocks):**
 ```
 Clock:  1     2     3     4
 Phase:  S0    S2    S4    S6
         │     │     │     │
-        │     │     │     └─ Data latched, strobes negated
+        │     │     │     └─ Data latched from bus, AS/UDS/LDS negated
         │     │     └─────── DTACK sampled (wait if not asserted)
-        │     └───────────── AS/UDS/LDS asserted, write data driven
-        └─────────────────── Address and FC driven
+        │     └───────────── AS asserted, UDS/LDS asserted (simultaneous)
+        └─────────────────── Address and FC driven, R/W = high
 ```
+
+**Write cycle (4 clocks):**
+```
+Clock:  1     2     3     4
+Phase:  S0    S2    S4    S6
+        │     │     │     │
+        │     │     │     └─ AS/UDS/LDS negated (memory latches on rising edge)
+        │     │     └─────── UDS/LDS asserted (DELAYED), DTACK sampled
+        │     └───────────── AS asserted, write data driven on bus
+        └─────────────────── Address and FC driven, R/W = low
+```
+
+The write strobe delay is critical: UDS/LDS are asserted one clock after AS,
+giving the CPU time to stabilize write data before signaling memory to latch it.
+External logic must use UDS/LDS (not just AS) to qualify write-enable signals.
 
 If DTACK is not asserted at S4, the CPU inserts wait states (stays in S4) until
 DTACK arrives. This is how slow memory and peripherals work.

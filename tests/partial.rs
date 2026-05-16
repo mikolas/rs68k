@@ -449,7 +449,7 @@ fn partial_sst_all() {
         "CMP.b", "CMP.w", "CMP.l", "CMPA.w", "CMPA.l",
         "DBcc", "DIVS", "DIVU", "EOR.b", "EOR.w", "EOR.l",
         "EORItoCCR", "EORItoSR", "EXG", "EXT.l", "EXT.w",
-        "ILLEGAL_LineA", "ILLEGAL_LineF",
+        "ILLEGAL_LINEA", "ILLEGAL_LINEF",
         "JMP", "JSR", "LEA", "LINK", "LSL.b", "LSL.l", "LSL.w",
         "LSR.b", "LSR.l", "LSR.w", "MOVE.b", "MOVE.w", "MOVE.l",
         "MOVE.q", "MOVEA.w", "MOVEA.l", "MOVEfromSR",
@@ -517,7 +517,11 @@ fn execute_one_clocked(cpu: &mut M68000, mem: &mut TestMemory) -> u32 {
             last_write_addr = cpu.pins().addr;
             last_write_data = cpu.pins().data_out;
             last_was_write = true;
-            last_was_byte = cpu.pins().uds_n != cpu.pins().lds_n; // one strobe = byte
+            // Byte detection: strobes are delayed on writes (asserted at S4),
+            // so update byte flag whenever strobes become visible
+            if !cpu.pins().uds_n || !cpu.pins().lds_n {
+                last_was_byte = cpu.pins().uds_n != cpu.pins().lds_n;
+            }
         }
 
         // If AS just went high after a write, commit the write to memory
@@ -619,4 +623,343 @@ fn clock_vs_full() {
         assert_eq!(full_cpu.sr, clk_cpu.sr,
             "opcode {:04x}: SR differs", opcode);
     }
+}
+
+#[test]
+fn clock_cmp_l_readback() {
+    // Reproduces Kickstart 1.2 memory test: cmp.l (A0),D0
+    // D0=$F2D4B698, (A0)=$F2D4B698 → should set Z=1
+    let mut mem = TestMemory::new();
+    
+    // Memory: $001000 = $F2D4, $001002 = $B698
+    mem.write_word(0x001000, 0xF2D4);
+    mem.write_word(0x001002, 0xB698);
+    
+    // Code
+    let pc = 0x00FC05ACu32;
+    mem.write_word(pc, 0xB090);     // cmp.l (A0),D0
+    mem.write_word(pc + 2, 0x67EE); // beq.s (next opcode for prefetch)
+    mem.write_word(pc + 4, 0x4E71); // NOP
+    
+    // Setup CPU
+    let mut cpu = M68000::new();
+    cpu.sr = 0x2700;
+    cpu.sp = 16;
+    cpu.da[16] = 0x00100000; // SSP
+    cpu.da[0] = 0xF2D4B698; // D0
+    cpu.da[8] = 0x00001000; // A0
+    cpu.ir = 0xB090;
+    cpu.ird = 0xB090;
+    cpu.irc = 0x67EE;
+    cpu.dbin = 0x67EE;
+    cpu.pc = pc.wrapping_add(2);
+    cpu.au = pc.wrapping_add(4);
+    cpu.set_ftu_const();
+    cpu.inst_state = cpu.decode_table[0xB090 as usize];
+    cpu.icount = 10000;
+    cpu.isr = cpu.sr & 0x1f;
+    
+    // Run via full handler
+    let mut full_cpu = clone_cpu(&cpu);
+    let mut full_mem = mem.clone_mem();
+    let full_cycles = full_cpu.execute_one(&mut full_mem);
+    let full_z = full_cpu.sr & 0x0004 != 0;
+    
+    // Run via clock() interface
+    let mut clk_cpu = clone_cpu(&cpu);
+    let mut clk_mem = mem.clone_mem();
+    let clk_cycles = execute_one_clocked(&mut clk_cpu, &mut clk_mem);
+    let clk_z = clk_cpu.sr & 0x0004 != 0;
+    
+    // Run via partial handler (no clock)
+    let mut part_cpu = clone_cpu(&cpu);
+    let mut part_mem = mem.clone_mem();
+    let part_cycles = execute_one_partial(&mut part_cpu, &mut part_mem);
+    let part_z = part_cpu.sr & 0x0004 != 0;
+    
+    eprintln!("CMP.L (A0),D0 where D0=(A0)=$F2D4B698:");
+    eprintln!("  full:    cycles={} Z={} SR={:04x}", full_cycles, full_z, full_cpu.sr);
+    eprintln!("  partial: cycles={} Z={} SR={:04x}", part_cycles, part_z, part_cpu.sr);
+    eprintln!("  clock:   cycles={} Z={} SR={:04x}", clk_cycles, clk_z, clk_cpu.sr);
+    
+    assert!(full_z, "full handler: Z should be 1 (operands equal)");
+    assert!(part_z, "partial handler: Z should be 1");
+    assert!(clk_z, "clock() interface: Z should be 1");
+    assert_eq!(full_cycles, clk_cycles, "cycle count mismatch");
+}
+
+/// Test the exact Kickstart sequence: tst.l (A2) → bne.s → cmp.l (A0),D0
+/// This exercises the instruction boundary transition via clock().
+#[test]
+fn clock_kickstart_cmp_l_sequence() {
+    let mut mem = TestMemory::new();
+
+    // Chip RAM: $001000 = $F2D4B698 (written by move.l D0,(A0) earlier)
+    mem.write_word(0x001000, 0xF2D4);
+    mem.write_word(0x001002, 0xB698);
+    // Location 0: $00000000 (tst.l target)
+    mem.write_word(0x000000, 0x0000);
+    mem.write_word(0x000002, 0x0000);
+
+    // Code sequence:
+    // FC05A8: 4A92     tst.l (A2)         ; A2=$000000
+    // FC05AA: 6604     bne.s FC05B0       ; not taken (Z=1)
+    // FC05AC: B090     cmp.l (A0),D0      ; A0=$001000, D0=$F2D4B698
+    // FC05AE: 67EE     beq.s FC059E       ; should be taken (Z=1)
+    // FC05B0: ...      (error path)
+    let pc = 0x00FC05A8u32;
+    mem.write_word(pc,     0x4A92); // tst.l (A2)
+    mem.write_word(pc + 2, 0x6604); // bne.s +4
+    mem.write_word(pc + 4, 0xB090); // cmp.l (A0),D0
+    mem.write_word(pc + 6, 0x67EE); // beq.s -18
+    mem.write_word(pc + 8, 0x4E71); // NOP (error path)
+    mem.write_word(pc + 10, 0x4E71);
+
+    // CPU state: about to execute tst.l (A2)
+    // IRC already has the next opcode (bne.s = $6604)
+    let mut cpu = M68000::new();
+    cpu.sr = 0x2700; // supervisor, all ints masked
+    cpu.sp = 16;
+    cpu.da[16] = 0x00100000; // SSP
+    cpu.da[0] = 0xF2D4B698; // D0
+    cpu.da[8] = 0x00001000; // A0
+    cpu.da[10] = 0x00000000; // A2
+    cpu.ir = 0x4A92;  // tst.l (A2)
+    cpu.ird = 0x4A92;
+    cpu.irc = 0x6604; // bne.s already prefetched
+    cpu.dbin = 0x6604;
+    cpu.pc = pc.wrapping_add(2); // past opcode
+    cpu.au = pc.wrapping_add(4);
+    cpu.set_ftu_const();
+    cpu.inst_state = cpu.decode_table[0x4A92 as usize];
+    cpu.icount = 10000;
+    cpu.isr = cpu.sr & 0x1f;
+
+    // Run 3 instructions via clock() and check where we end up
+    let mut clocks = 0u32;
+    let mut instructions_done = 0u32;
+    let mut prev_substate = cpu.inst_substate;
+    let mut prev_inst_state = cpu.inst_state;
+
+    loop {
+        let mut inputs = Inputs68k::default();
+        inputs.dtack_n = false;
+
+        if !cpu.pins().as_n && cpu.pins().rw {
+            let addr = cpu.pins().addr & 0x00FF_FFFE;
+            inputs.data_in = mem.read_word_raw(addr);
+        }
+
+        // Detect write and commit
+        if cpu.pins().as_n && !cpu.pins().rw {
+            // Write already committed by previous logic... actually we need
+            // the same write handling as execute_one_clocked
+        }
+
+        cpu.clock(&inputs);
+        clocks += 1;
+
+        // Detect instruction boundaries
+        if cpu.inst_substate == 0 && prev_substate != 0 && cpu.inst_state != prev_inst_state {
+            instructions_done += 1;
+            if instructions_done >= 3 {
+                break;
+            }
+            prev_inst_state = cpu.inst_state;
+        }
+        prev_substate = cpu.inst_substate;
+
+        if clocks >= 500 { panic!("timeout after {} clocks", clocks); }
+    }
+
+    // After tst.l + bne.s + cmp.l, check Z flag
+    let z = cpu.sr & 0x0004 != 0;
+    eprintln!("After tst.l → bne.s → cmp.l: SR={:04x} Z={} (clocks={})", cpu.sr, z, clocks);
+    eprintln!("  edb={:04x} dbin={:04x} alub={:04x}", cpu.edb, cpu.dbin, cpu.alub);
+
+    // Also run the same via full handler for comparison
+    let mut full_cpu = M68000::new();
+    full_cpu.sr = 0x2700;
+    full_cpu.sp = 16;
+    full_cpu.da[16] = 0x00100000;
+    full_cpu.da[0] = 0xF2D4B698;
+    full_cpu.da[8] = 0x00001000;
+    full_cpu.da[10] = 0x00000000;
+    full_cpu.ir = 0x4A92;
+    full_cpu.ird = 0x4A92;
+    full_cpu.irc = 0x6604;
+    full_cpu.dbin = 0x6604;
+    full_cpu.pc = pc.wrapping_add(2);
+    full_cpu.au = pc.wrapping_add(4);
+    full_cpu.set_ftu_const();
+    full_cpu.inst_state = full_cpu.decode_table[0x4A92 as usize];
+    full_cpu.icount = 10000;
+    full_cpu.isr = full_cpu.sr & 0x1f;
+    let mut full_mem = mem.clone_mem();
+
+    full_cpu.execute_one(&mut full_mem); // tst.l
+    full_cpu.execute_one(&mut full_mem); // bne.s
+    full_cpu.execute_one(&mut full_mem); // cmp.l
+
+    let full_z = full_cpu.sr & 0x0004 != 0;
+    eprintln!("Full handler after 3 instructions: SR={:04x} Z={}", full_cpu.sr, full_z);
+
+    assert!(full_z, "full handler: Z should be 1");
+    assert!(z, "clock() interface: Z should be 1 — BUG if this fails!");
+}
+
+/// Same as above but with delayed DTACK (simulating Agnus DMA contention).
+/// DTACK is only asserted 2 clocks after AS goes low.
+#[test]
+fn clock_kickstart_cmp_l_delayed_dtack() {
+    let mut mem = TestMemory::new();
+    mem.write_word(0x001000, 0xF2D4);
+    mem.write_word(0x001002, 0xB698);
+    mem.write_word(0x000000, 0x0000);
+    mem.write_word(0x000002, 0x0000);
+
+    let pc = 0x00FC05A8u32;
+    mem.write_word(pc,     0x4A92);
+    mem.write_word(pc + 2, 0x6604);
+    mem.write_word(pc + 4, 0xB090);
+    mem.write_word(pc + 6, 0x67EE);
+    mem.write_word(pc + 8, 0x4E71);
+    mem.write_word(pc + 10, 0x4E71);
+
+    let mut cpu = M68000::new();
+    cpu.sr = 0x2700;
+    cpu.sp = 16;
+    cpu.da[16] = 0x00100000;
+    cpu.da[0] = 0xF2D4B698;
+    cpu.da[8] = 0x00001000;
+    cpu.da[10] = 0x00000000;
+    cpu.ir = 0x4A92;
+    cpu.ird = 0x4A92;
+    cpu.irc = 0x6604;
+    cpu.dbin = 0x6604;
+    cpu.pc = pc.wrapping_add(2);
+    cpu.au = pc.wrapping_add(4);
+    cpu.set_ftu_const();
+    cpu.inst_state = cpu.decode_table[0x4A92 as usize];
+    cpu.icount = 10000;
+    cpu.isr = cpu.sr & 0x1f;
+
+    let mut clocks = 0u32;
+    let mut instructions_done = 0u32;
+    let mut prev_substate = cpu.inst_substate;
+    let mut prev_inst_state = cpu.inst_state;
+    let mut as_low_count = 0u32; // count clocks since AS went low
+
+    loop {
+        let mut inputs = Inputs68k::default();
+
+        // Simulate delayed DTACK: only assert after AS has been low for 2 clocks
+        if !cpu.pins().as_n {
+            as_low_count += 1;
+            if as_low_count >= 2 {
+                inputs.dtack_n = false;
+            }
+            // Always provide data when reading (data bus is always driven)
+            if cpu.pins().rw {
+                let addr = cpu.pins().addr & 0x00FF_FFFE;
+                inputs.data_in = mem.read_word_raw(addr);
+            }
+        } else {
+            as_low_count = 0;
+        }
+
+        cpu.clock(&inputs);
+        clocks += 1;
+
+        if cpu.inst_substate == 0 && prev_substate != 0 && cpu.inst_state != prev_inst_state {
+            instructions_done += 1;
+            if instructions_done >= 3 { break; }
+            prev_inst_state = cpu.inst_state;
+        }
+        prev_substate = cpu.inst_substate;
+
+        if clocks >= 500 { panic!("timeout after {} clocks", clocks); }
+    }
+
+    let z = cpu.sr & 0x0004 != 0;
+    eprintln!("Delayed DTACK: SR={:04x} Z={} (clocks={})", cpu.sr, z, clocks);
+    eprintln!("  edb={:04x} dbin={:04x} alub={:04x}", cpu.edb, cpu.dbin, cpu.alub);
+    assert!(z, "clock() with delayed DTACK: Z should be 1");
+}
+
+/// Extreme DTACK delay — forces multiple wait states per bus cycle.
+#[test]
+fn clock_kickstart_cmp_l_extreme_wait() {
+    let mut mem = TestMemory::new();
+    mem.write_word(0x001000, 0xF2D4);
+    mem.write_word(0x001002, 0xB698);
+    mem.write_word(0x000000, 0x0000);
+    mem.write_word(0x000002, 0x0000);
+
+    let pc = 0x00FC05A8u32;
+    mem.write_word(pc,     0x4A92);
+    mem.write_word(pc + 2, 0x6604);
+    mem.write_word(pc + 4, 0xB090);
+    mem.write_word(pc + 6, 0x67EE);
+    mem.write_word(pc + 8, 0x4E71);
+    mem.write_word(pc + 10, 0x4E71);
+
+    let mut cpu = M68000::new();
+    cpu.sr = 0x2700;
+    cpu.sp = 16;
+    cpu.da[16] = 0x00100000;
+    cpu.da[0] = 0xF2D4B698;
+    cpu.da[8] = 0x00001000;
+    cpu.da[10] = 0x00000000;
+    cpu.ir = 0x4A92;
+    cpu.ird = 0x4A92;
+    cpu.irc = 0x6604;
+    cpu.dbin = 0x6604;
+    cpu.pc = pc.wrapping_add(2);
+    cpu.au = pc.wrapping_add(4);
+    cpu.set_ftu_const();
+    cpu.inst_state = cpu.decode_table[0x4A92 as usize];
+    cpu.icount = 10000;
+    cpu.isr = cpu.sr & 0x1f;
+
+    let mut clocks = 0u32;
+    let mut instructions_done = 0u32;
+    let mut prev_substate = cpu.inst_substate;
+    let mut prev_inst_state = cpu.inst_state;
+    let mut as_low_count = 0u32;
+
+    loop {
+        let mut inputs = Inputs68k::default();
+
+        if !cpu.pins().as_n {
+            as_low_count += 1;
+            // Only assert DTACK after 5 clocks of AS low (forces 2+ wait states)
+            if as_low_count >= 5 {
+                inputs.dtack_n = false;
+            }
+            if cpu.pins().rw {
+                let addr = cpu.pins().addr & 0x00FF_FFFE;
+                inputs.data_in = mem.read_word_raw(addr);
+            }
+        } else {
+            as_low_count = 0;
+        }
+
+        cpu.clock(&inputs);
+        clocks += 1;
+
+        if cpu.inst_substate == 0 && prev_substate != 0 && cpu.inst_state != prev_inst_state {
+            instructions_done += 1;
+            if instructions_done >= 3 { break; }
+            prev_inst_state = cpu.inst_state;
+        }
+        prev_substate = cpu.inst_substate;
+
+        if clocks >= 2000 { panic!("timeout after {} clocks", clocks); }
+    }
+
+    let z = cpu.sr & 0x0004 != 0;
+    eprintln!("Extreme wait: SR={:04x} Z={} (clocks={})", cpu.sr, z, clocks);
+    eprintln!("  edb={:04x} dbin={:04x} alub={:04x}", cpu.edb, cpu.dbin, cpu.alub);
+    assert!(z, "clock() with extreme wait states: Z should be 1");
 }

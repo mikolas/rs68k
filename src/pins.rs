@@ -181,27 +181,43 @@ impl M68000 {
             BusPhase::S0 => {
                 self.pin_state.bus_phase = BusPhase::S2;
                 self.pin_state.pins.as_n = false;
-                // Strobes
-                if self.pin_state.pending_byte {
-                    if self.aob & 1 == 0 {
-                        self.pin_state.pins.uds_n = false;
-                        self.pin_state.pins.lds_n = true;
+                // Read cycle: assert data strobes now (AS and UDS/LDS fall together)
+                if self.pin_state.pins.rw {
+                    if self.pin_state.pending_byte {
+                        if self.aob & 1 == 0 {
+                            self.pin_state.pins.uds_n = false;
+                            self.pin_state.pins.lds_n = true;
+                        } else {
+                            self.pin_state.pins.uds_n = true;
+                            self.pin_state.pins.lds_n = false;
+                        }
                     } else {
-                        self.pin_state.pins.uds_n = true;
+                        self.pin_state.pins.uds_n = false;
                         self.pin_state.pins.lds_n = false;
                     }
                 } else {
-                    self.pin_state.pins.uds_n = false;
-                    self.pin_state.pins.lds_n = false;
-                }
-                // Write data
-                if !self.pin_state.pins.rw {
+                    // Write cycle: drive data, but UDS/LDS stay HIGH until S4
                     self.pin_state.pins.data_out = self.dbout;
                 }
             }
 
             BusPhase::S2 => {
                 self.pin_state.bus_phase = BusPhase::S4;
+                // Write cycle: assert data strobes now (delayed to S4)
+                if !self.pin_state.pins.rw {
+                    if self.pin_state.pending_byte {
+                        if self.aob & 1 == 0 {
+                            self.pin_state.pins.uds_n = false;
+                            self.pin_state.pins.lds_n = true;
+                        } else {
+                            self.pin_state.pins.uds_n = true;
+                            self.pin_state.pins.lds_n = false;
+                        }
+                    } else {
+                        self.pin_state.pins.uds_n = false;
+                        self.pin_state.pins.lds_n = false;
+                    }
+                }
             }
 
             BusPhase::S4 => {

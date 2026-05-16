@@ -1,3 +1,4 @@
+#![allow(unused_parens, unused_imports, private_interfaces)]
 pub mod types;
 pub mod cpu;
 pub mod alu;
