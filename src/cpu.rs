@@ -233,7 +233,13 @@ impl M68000 {
 
     /// End interrupt vector lookup — called after reading vector from bus
     pub fn end_interrupt_vector_lookup(&mut self) {
-        self.int_vector = ((self.edb & 0xff) as u32) << 2;
+        if self.pin_state.vpa_completed {
+            let level = (self.aob >> 1) & 7;
+            self.int_vector = (24 + level) * 4;
+            self.pin_state.vpa_completed = false;
+        } else {
+            self.int_vector = ((self.edb & 0xff) as u32) << 2;
+        }
         self.int_next_state = 0;
     }
 

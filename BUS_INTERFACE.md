@@ -108,6 +108,18 @@ You respond with data and acknowledge signals. All internal complexity is hidden
 | `halt_n` | bool | Halt — false = freeze CPU |
 | `reset_n` | bool | Reset — false = reset CPU |
 
+### Tracing Exceptions (Bus Sniffing)
+
+The `rs68k` core is designed for maximum performance and does not expose internal software hooks for exceptions or traps. To detect when the CPU takes an exception (e.g., Bus Error, Address Error, or a TRAP instruction), the host system must passively "sniff" the bus.
+
+When the 68000 processes an exception, it always fetches the target PC from the exception vector table located at the bottom of memory (`0x000000` to `0x0003FC`).
+
+To detect an exception in your host:
+1. Observe a bus read cycle (`as_n` is false, `rw` is true).
+2. Check if the address is within the vector table (`addr < 0x400`).
+3. Confirm the CPU is in Supervisor mode accessing Data or Program space (`fc == 5` or `fc == 6`).
+4. The vector number is simply `addr / 4`.
+
 ### Bus Cycle Timing
 
 A minimum bus cycle takes 4 CLK periods. Read and write cycles differ in when

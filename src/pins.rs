@@ -76,6 +76,7 @@ pub struct PinState {
     pub vma_active: bool,
     pub pending_byte: bool,
     pub internal_clocks: u32,
+    pub vpa_completed: bool,
     bus_request: bool,  // handler requested a bus cycle
 }
 
@@ -94,6 +95,7 @@ impl Default for PinState {
             vma_active: false,
             pending_byte: false,
             internal_clocks: 0,
+            vpa_completed: false,
             bus_request: false,
         }
     }
@@ -235,6 +237,7 @@ impl M68000 {
                         self.pin_state.vpa_pending = false;
                         self.pin_state.vma_active = false;
                         self.pin_state.pins.vma_n = true;
+                        self.pin_state.vpa_completed = true;
                         self.pin_state.bus_phase = BusPhase::S6;
                     }
                 } else if !inputs.dtack_n {
